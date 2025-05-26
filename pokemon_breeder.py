@@ -290,6 +290,8 @@ def propagate_cost_update_to_children_in_plan(
         owned_pokemon_list: List[Pokemon],
         final_goal_node_for_heuristic: BreedingNode
 ):
+    # Point 7
+    d_print(f"    [Propagate START] parent_P: {resolved_parent_P.get_state_tuple()} (g={resolved_parent_P.g_cost:.2f}, used:{resolved_parent_P.used_owned_pokemon_ids}) has {len(resolved_parent_P.children_in_plan_this_node_is_parent_for)} children entries.")
     d_print(
         f"    [Propagate] Genitore Risolto P: {resolved_parent_P.get_state_tuple()} (key: {resolved_parent_P.get_full_state_tuple_for_closed_list()}) con g={resolved_parent_P.g_cost}. Used: {resolved_parent_P.used_owned_pokemon_ids}")
 
@@ -336,10 +338,14 @@ def propagate_cost_update_to_children_in_plan(
                 f"        [Propagate] Altro genitore P_other ({other_parent_target_state_tuple}) non ancora risolto/compatibile in closed_list. Salto aggiornamento per C.")
             continue
 
+        # Point 8
+        d_print(f"        [Propagate] Found other_parent_resolved_node: {other_parent_resolved_node.get_state_tuple()} (g={other_parent_resolved_node.g_cost:.2f}, used:{other_parent_resolved_node.used_owned_pokemon_ids}) for child_C {child_C_node_original_ref.get_state_tuple()}")
         d_print(
             f"        [Propagate] Trovato altro genitore P_other risolto: {other_parent_resolved_node.get_state_tuple()} (key: {other_parent_resolved_node.get_full_state_tuple_for_closed_list()}) con g={other_parent_resolved_node.g_cost}. Used: {other_parent_resolved_node.used_owned_pokemon_ids}")
 
         new_g_cost_for_child_C = resolved_parent_P.g_cost + other_parent_resolved_node.g_cost
+        # Point 9
+        d_print(f"        [Propagate] Child C {child_C_node_original_ref.get_state_tuple()}: P1_g(resolved_parent_P)={resolved_parent_P.g_cost:.2f}, P2_g(other_parent)={other_parent_resolved_node.g_cost:.2f} -> new_child_g={new_g_cost_for_child_C:.2f}")
         combined_used_ids = resolved_parent_P.used_owned_pokemon_ids.union(
             other_parent_resolved_node.used_owned_pokemon_ids)
         child_C_target_full_key = (child_C_node_original_ref.species, child_C_node_original_ref.ivs,
@@ -362,11 +368,14 @@ def propagate_cost_update_to_children_in_plan(
             node_to_update_C.parent_options_for_this_node = list(child_C_node_original_ref.parent_options_for_this_node)
             node_to_update_C.children_in_plan_this_node_is_parent_for = list(
                 child_C_node_original_ref.children_in_plan_this_node_is_parent_for)
-
+        
+        # Point 10
+        d_print(f"        [Propagate] Comparing new_g_cost {new_g_cost_for_child_C:.2f} with existing g_cost {node_to_update_C.g_cost:.2f} for child key {child_C_target_full_key}")
         if new_g_cost_for_child_C < node_to_update_C.g_cost:
             d_print(
                 f"        [Propagate] Trovato percorso MIGLIORE per figlio C {node_to_update_C.get_state_tuple()} (key: {child_C_target_full_key}): nuovo g={new_g_cost_for_child_C} (vecchio g={node_to_update_C.g_cost}). Used IDs: {combined_used_ids}")
 
+            old_f_cost_for_logging = node_to_update_C.f_cost # Capture old f_cost before g_cost is updated
             node_to_update_C.g_cost = new_g_cost_for_child_C
             node_to_update_C.used_owned_pokemon_ids = combined_used_ids
             node_to_update_C.action_taken_to_create_this_node = {
@@ -382,28 +391,40 @@ def propagate_cost_update_to_children_in_plan(
             }
             node_to_update_C.h_cost = calculate_heuristic(node_to_update_C, owned_pokemon_list)
             d_print(f"          [Propagate] Aggiornato figlio C: {node_to_update_C}")
+            # Point 11
+            d_print(f"          [Propagate] Better path FOUND for {child_C_target_full_key}. Updating node. Old f={old_f_cost_for_logging:.2f}, New f calculated from new_g ({new_g_cost_for_child_C:.2f}) and existing_h ({node_to_update_C.h_cost:.2f}) will be {new_g_cost_for_child_C + node_to_update_C.h_cost:.2f}")
+
 
             if child_C_target_full_key in closed_list and closed_list[child_C_target_full_key] == node_to_update_C:
                 del closed_list[child_C_target_full_key]
+                # Point 12
+                d_print(f"          [Propagate] Child {child_C_target_full_key} was in closed_list with higher cost. Removing to re-evaluate and add to open_list.")
                 d_print(f"          [Propagate] Rimosso {child_C_target_full_key} da closed_list per riapertura.")
 
             if child_C_target_full_key in open_list_map:
                 if open_list_map[child_C_target_full_key] != node_to_update_C or \
-                        open_list_map[child_C_target_full_key].g_cost > new_g_cost_for_child_C:
+                        open_list_map[child_C_target_full_key].g_cost > new_g_cost_for_child_C: # Check if g_cost is actually better
                     try:
-                        if open_list_map[child_C_target_full_key] != node_to_update_C:
-                            open_list.remove(open_list_map[child_C_target_full_key])
-                            heapq.heapify(open_list)
-                    except ValueError:
-                        pass
-                    if open_list_map.get(child_C_target_full_key) != node_to_update_C:
-                        heapq.heappush(open_list, node_to_update_C)
-                    open_list_map[child_C_target_full_key] = node_to_update_C
+                        # If the node instance itself is different or g_cost is higher, remove old one before adding/updating.
+                        # This handles cases where node_to_update_C is a new instance for an existing key.
+                        if open_list_map[child_C_target_full_key] != node_to_update_C :
+                             open_list.remove(open_list_map[child_C_target_full_key])
+                             heapq.heapify(open_list) # re-heapify
+                    except ValueError: # pragma: no cover
+                        pass # Element might have been already removed or not present by other means (less likely here)
+                    
+                    # Add the new or updated node to heap and map
+                    heapq.heappush(open_list, node_to_update_C)
+                    open_list_map[child_C_target_full_key] = node_to_update_C # Update map to the new or updated node
                     d_print(f"          [Propagate] Nodo {child_C_target_full_key} aggiornato/riaggiunto a open_list.")
-            else:
+                    # Point 13
+                    d_print(f"          [Propagate] Pushing/Updating child {node_to_update_C} to open_list. New f={node_to_update_C.f_cost:.2f}")
+            else: # Not in open_list_map, so add it
                 heapq.heappush(open_list, node_to_update_C)
                 open_list_map[child_C_target_full_key] = node_to_update_C
                 d_print(f"          [Propagate] Nodo {child_C_target_full_key} aggiunto a open_list.")
+                # Point 13
+                d_print(f"          [Propagate] Pushing/Updating child {node_to_update_C} to open_list. New f={node_to_update_C.f_cost:.2f}")
         else:
             d_print(
                 f"        [Propagate] Percorso NON migliore per figlio C {node_to_update_C.get_state_tuple()} (key: {child_C_target_full_key}): nuovo g={new_g_cost_for_child_C}, vecchio g={node_to_update_C.g_cost}.")
@@ -765,6 +786,8 @@ def find_optimal_breeding_plan(
     while open_list and nodes_processed_count < max_nodes_to_explore:
         nodes_processed_count += 1
         current_C_node = heapq.heappop(open_list)
+        # Point 1
+        d_print(f"  [A*] Popped from Open: {current_C_node} with f={current_C_node.f_cost:.2f}, g={current_C_node.g_cost:.2f}, h={current_C_node.h_cost:.2f}")
         current_C_full_key = current_C_node.get_full_state_tuple_for_closed_list()
 
         if current_C_full_key in open_list_map:
@@ -772,7 +795,9 @@ def find_optimal_breeding_plan(
 
         d_print(
             f"\n[A* ({nodes_processed_count})] Nodo C estratto da Open List ({len(open_list)} rimasti): {current_C_node}")
-
+        
+        # Point 2
+        d_print(f"    [A*] Checking closed_list for {current_C_full_key}. Found existing node: {closed_list.get(current_C_full_key)}. Current g={current_C_node.g_cost:.2f}. Existing g={closed_list[current_C_full_key].g_cost:.2f if closed_list.get(current_C_full_key) else 'N/A'}. Skipping: {closed_list.get(current_C_full_key) is not None and closed_list[current_C_full_key].g_cost <= current_C_node.g_cost}")
         if current_C_full_key in closed_list:
             closed_g = closed_list[current_C_full_key].g_cost
             current_g = current_C_node.g_cost
@@ -801,6 +826,8 @@ def find_optimal_breeding_plan(
                                                                    'pokemon_object': owned_match}
                 d_print(
                     f"  [A*] Nodo C {current_C_node.get_state_tuple()} (key: {current_C_node.get_full_state_tuple_for_closed_list()}) RISOLTO come 'owned', g_cost=0")
+                # Point 3
+                d_print(f"    [A*] Resolved as OWNED: {current_C_node.get_state_tuple()} (key: {current_C_full_key}) using PkID {owned_match.id}. New g={current_C_node.g_cost:.2f}, UsedIDs={current_C_node.used_owned_pokemon_ids}")
 
             # MODIFIED BLOCK: If not an owned_match, check if it's a buyable base Pokemon
             else:  # No owned match found, try to buy if it's a base Pokemon
@@ -816,6 +843,8 @@ def find_optimal_breeding_plan(
                                                                        'nature': current_C_node.nature}
                     d_print(
                         f"  [A*] Nodo C {current_C_node.get_state_tuple()} (key: {current_C_full_key}) RISOLTO come 'bought_base', g_cost=1")
+                    # Point 4
+                    d_print(f"    [A*] Resolved as BOUGHT_BASE: {current_C_node.get_state_tuple()} (key: {current_C_full_key}). New g={current_C_node.g_cost:.2f}")
             # END OF MODIFIED BLOCK
 
         final_key_for_closed_list = current_C_node.get_full_state_tuple_for_closed_list()
@@ -848,7 +877,8 @@ def find_optimal_breeding_plan(
                     f"[A*] Target finale {start_node.get_state_tuple()} (come {current_C_node.get_state_tuple()} con used_ids {current_C_node.used_owned_pokemon_ids}) FINALIZZATO con g_cost finito ({current_C_node.g_cost}). Piano trovato!")
                 return reconstruct_plan(current_C_node, target_gender, {p.id: p for p in owned_pokemon_list},
                                         closed_list)
-
+            # Point 5
+            d_print(f"  [A*] Propagation PRE-CALL for resolved {current_C_node.get_state_tuple()} (key {final_key_for_closed_list}) with g={current_C_node.g_cost:.2f}")
             d_print(
                 f"  [A*] Propagazione aggiornamento costo da NODO ORA IN CLOSED {current_C_node.get_state_tuple()} (g={current_C_node.g_cost})")
             propagate_cost_update_to_children_in_plan(current_C_node, open_list, open_list_map, closed_list,
@@ -916,8 +946,11 @@ def find_optimal_breeding_plan(
                         used_owned_ids=parent_used_ids  # Initialize with child's used IDs
                     )
                     actual_parent_P_node.h_cost = calculate_heuristic(actual_parent_P_node, owned_pokemon_list)
-                    d_print(
-                        f"      [A*] Creato NUOVO genitore P istanza {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}).")
+                    # Point 6
+                    d_print(f"      [A*] NEW Parent Node created: {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}), h_cost specifically: {actual_parent_P_node.h_cost:.2f}")
+                    # d_print( # This was the old line, replaced by point 6
+                    #     f"      [A*] Creato NUOVO genitore P istanza {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}).")
+
 
                 is_already_child = any(
                     child_node_in_list.get_full_state_tuple_for_closed_list() == current_C_full_key and opt_in_list == option
@@ -1083,8 +1116,28 @@ def test_intermediate_figlia1():
         # However, if the plan involves using P4 and buying one {DEF} Pokemon, the cost is 1.
         # Let's check the source_info of the final child, which often has the cost of the node producing it.
         # Example: "Generato per target (Costo Nodo Orig:1.0)"
-        assert "Costo Nodo Orig:1.0)" in final_child_pokemon.source_info, f"Costo finale del nodo non è 1.0, source_info: {final_child_pokemon.source_info}"
-        assert p4_used_in_plan, "P4 (ID 3) non è stato usato nel piano."
+        # assert "(Costo Nodo Orig:1.0)" in final_child_pokemon.source_info, f"Costo finale del nodo non è 1.0, source_info: {final_child_pokemon.source_info}"
+        # assert p4_used_in_plan, "P4 (ID 3) non è stato usato nel piano." # This was already implicitly checked by parent check
+
+        # New direct assertions on plan structure
+        assert len(plan_steps) == 1, f"Plan for Figlia1 should have exactly one step, found {len(plan_steps)}"
+        first_step = plan_steps[0]
+        
+        parent1_is_bought = "Acquistato Base" in first_step.parent1.source_info
+        parent2_is_owned_p4 = first_step.parent2.id == 3 and "Owned P4" in first_step.parent2.source_info
+        
+        parent1_is_owned_p4 = first_step.parent1.id == 3 and "Owned P4" in first_step.parent1.source_info
+        parent2_is_bought = "Acquistato Base" in first_step.parent2.source_info
+        
+        assert (parent1_is_bought and parent2_is_owned_p4) or \
+               (parent1_is_owned_p4 and parent2_is_bought), \
+               "Plan should involve P4 (ID 3) and one bought Pokemon. \n" + \
+               f"P1: {first_step.parent1.name} (ID {first_step.parent1.id}, Source: {first_step.parent1.source_info}), \n" + \
+               f"P2: {first_step.parent2.name} (ID {first_step.parent2.id}, Source: {first_step.parent2.source_info})"
+        
+        # We can also check that the owned pokemon (P4) is used in the used_owned_pokemon_ids of the final node if we had access to it.
+        # For now, checking the parents in the step is a good proxy.
+
 
     else:
         print("\n[FAILURE] Nessun piano di breeding trovato per test_intermediate_figlia1.")
