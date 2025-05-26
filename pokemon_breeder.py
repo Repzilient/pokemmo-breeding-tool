@@ -146,7 +146,8 @@ def calculate_heuristic(node_to_evaluate: BreedingNode, owned_pokemon: List[Poke
     _species, node_ivs_set, node_nature = node_to_evaluate.species, set(node_to_evaluate.ivs), node_to_evaluate.nature
     is_base = (not node_ivs_set and node_nature == "NEUTRAL") or \
               (len(node_ivs_set) == 1 and node_nature == "NEUTRAL") or \
-              (not node_ivs_set and node_nature != "NEUTRAL")
+              (not node_ivs_set and node_nature != "NEUTRAL") or \
+              (len(node_ivs_set) == 1 and node_nature != "NEUTRAL") # Added: 1 IV + Specific Nature
     if is_base:
         for pkm in owned_pokemon:
             if pkm.id not in node_to_evaluate.used_owned_pokemon_ids and \
@@ -179,7 +180,8 @@ def generate_breeding_options_for_child(child_node_state: BreedingNode) -> List[
     child_s, child_i_set, child_n = child_node_state.species, set(child_node_state.ivs), child_node_state.nature
     is_child_buyable_base = (not child_i_set and child_n == "NEUTRAL") or \
                             (len(child_i_set) == 1 and child_n == "NEUTRAL") or \
-                            (not child_i_set and child_n != "NEUTRAL")
+                            (not child_i_set and child_n != "NEUTRAL") or \
+                            (len(child_i_set) == 1 and child_n != "NEUTRAL") # Added: 1 IV + Specific Nature
     if is_child_buyable_base:
         d_print(
             f"  [GenOpts] Nodo figlio {child_node_state.get_state_tuple()} è acquistabile base, nessuna opzione di breeding.")
@@ -780,7 +782,8 @@ def find_optimal_breeding_plan(
             else:  # No owned match found, try to buy if it's a base Pokemon
                 is_buyable_base = (not current_C_node.ivs and current_C_node.nature == "NEUTRAL") or \
                                   (len(current_C_node.ivs) == 1 and current_C_node.nature == "NEUTRAL") or \
-                                  (not current_C_node.ivs and current_C_node.nature != "NEUTRAL")
+                                  (not current_C_node.ivs and current_C_node.nature != "NEUTRAL") or \
+                                  (len(current_C_node.ivs) == 1 and current_C_node.nature != "NEUTRAL") # Added: 1 IV + Specific Nature
                 if is_buyable_base:
                     current_C_node.g_cost = 1  # Cost is 1 for buying a base Pokemon
                     current_C_node.action_taken_to_create_this_node = {'type': 'bought_base',
@@ -954,3 +957,91 @@ def find_optimal_breeding_plan(
 
     d_print("[A*] Target finale non trovato con costo finito.")
     return None
+
+
+def test_4iv_plus_nature_plan():
+    """
+    Tests the breeding plan generation for a 4IV Charizard with a specific nature,
+    leveraging the 'buy 1 IV + Nature' logic.
+    """
+    print("\n--- Esecuzione test_4iv_plus_nature_plan ---")
+    # global DEBUG_ASTAR
+    # original_debug_astar = DEBUG_ASTAR
+    # DEBUG_ASTAR = False  # Disable verbose A* logging for this test
+
+    # Reset Pokemon ID counter for consistent IDs if tests are run multiple times in same session (if needed)
+    Pokemon._id_counter = 0
+
+    target_species = "Charizard"
+    target_ivs = {"PS", "ATK", "DEF", "SPE"}
+    target_nature = "Adamant"
+    target_gender = "Maschio" # Gender for the final Pokemon
+
+    owned_pokemon = [
+        Pokemon("Charizard", {"PS"}, "Adamant", "Maschio", name="OwnedAdaPS", is_owned=True, source_info="OwnedInitial1"),
+        Pokemon("Charizard", {"ATK", "PS"}, "NEUTRAL", "Maschio", name="OwnedNeutAtkPS", is_owned=True, source_info="OwnedInitial2")
+    ]
+    # Manually assign IDs for very precise test control if required, though automatic assignment is usually fine.
+    # owned_pokemon[0].id = 0
+    # owned_pokemon[1].id = 1
+    # Pokemon._id_counter = 2 # Ensure next auto-IDs don't collide if more Pokemon are created manually
+
+    print(f"Target: {target_species} ({target_gender}), Nature: {target_nature}, IVs: {target_ivs}")
+    print("Owned Pokémon:")
+    for p in owned_pokemon:
+        print(f"  - {p}")
+
+    plan = find_optimal_breeding_plan(
+        target_species=target_species,
+        target_ivs=target_ivs,
+        target_nature=target_nature,
+        target_gender=target_gender,
+        owned_pokemon_list=owned_pokemon,
+        max_depth=10, # Default max_depth
+        max_nodes_to_explore=100000 # Default max_nodes
+    )
+
+    if plan:
+        print("\n[SUCCESS] Piano di breeding trovato!")
+        print(f"Numero totale di passi: {len(plan)}")
+        final_pokemon_in_plan = plan[-1].child
+        print(f"Costo totale stimato (g_cost del nodo finale): {final_pokemon_in_plan.source_info}") # g_cost is in source_info for target
+
+        # Basic check: The final Pokemon in the plan should match the target specs
+        assert final_pokemon_in_plan.species == target_species
+        assert final_pokemon_in_plan.nature == target_nature
+        assert final_pokemon_in_plan.ivs == target_ivs
+        # Gender check might be more complex if the plan involves Dittos and gender assignment rules
+        # For this specific test, we expect the target gender.
+        if target_species.lower() != "ditto": # Dittos are genderless
+             assert final_pokemon_in_plan.gender == target_gender
+
+
+        print("\Dettagli del Piano:")
+        for step in plan:
+            print(step)
+    else:
+        print("\n[FAILURE] Nessun piano di breeding trovato.")
+
+    assert plan is not None, "Il piano di breeding non dovrebbe essere None"
+
+    # DEBUG_ASTAR = original_debug_astar # Restore original A* debug state
+    print("--- Fine test_4iv_plus_nature_plan ---\n")
+
+
+if __name__ == "__main__":
+    # Example of how to run the test
+    # You might want to load POKEMON_EGG_GROUPS_RAW here if it's not loaded globally
+    # or ensure it's loaded before find_optimal_breeding_plan is called.
+    # Global loading at the top of the script is typical.
+    if not POKEMON_EGG_GROUPS_RAW:
+        print("Dati Pokémon non caricati. Caricamento in corso...")
+        POKEMON_EGG_GROUPS_RAW = load_pokemon_data()
+        if not POKEMON_EGG_GROUPS_RAW:
+            print("ERRORE: Impossibile caricare i dati dei Pokémon. Test annullato.")
+            exit(1)
+        # Re-initialize ALL_POKEMON_NAMES if necessary, though it's not directly used by the algorithm itself
+        ALL_POKEMON_NAMES = sorted([name.capitalize() for name in POKEMON_EGG_GROUPS_RAW.keys()])
+
+
+    test_4iv_plus_nature_plan()
