@@ -959,6 +959,83 @@ def find_optimal_breeding_plan(
     return None
 
 
+def test_regole2_example_4iv_plan():
+    """
+    Tests the breeding plan generation based on the 4IV Charizard example
+    from regole2.txt.
+    Target: Charizard, Adamant, {SPA, DEF, SPD, SPE}
+    Owned:
+    P1: Charizard, Adamant, M, {SPA, SPE}
+    P2: Charizard, Quiet, M, {SPA, SPE}
+    P3: Charizard, Quiet, F, {SPD, DEF}
+    P4: Charizard, Quiet, F, {SPE}
+    """
+    print("\n--- Esecuzione test_regole2_example_4iv_plan ---")
+    Pokemon._id_counter = 0 # Reset ID counter
+
+    target_species = "Charizard"
+    target_ivs = {"SPA", "DEF", "SPD", "SPE"}
+    target_nature = "Adamant"
+    target_gender = "Maschio"
+
+    # Define owned Pokemon as per regole2.txt example
+    p1_owned = Pokemon("Charizard", {"SPA", "SPE"}, "Adamant", "Maschio", name="P1_Own_Ada_SPA_SPE", is_owned=True, source_info="Owned P1")
+    p1_owned.id = 0
+    p2_owned = Pokemon("Charizard", {"SPA", "SPE"}, "Quiet", "Maschio", name="P2_Own_Quiet_SPA_SPE", is_owned=True, source_info="Owned P2")
+    p2_owned.id = 1
+    p3_owned = Pokemon("Charizard", {"SPD", "DEF"}, "Quiet", "Femmina", name="P3_Own_Quiet_SPD_DEF", is_owned=True, source_info="Owned P3")
+    p3_owned.id = 2
+    p4_owned = Pokemon("Charizard", {"SPE"}, "Quiet", "Femmina", name="P4_Own_Quiet_SPE", is_owned=True, source_info="Owned P4")
+    p4_owned.id = 3
+    Pokemon._id_counter = 4 # Ensure next auto-IDs start from 4
+
+    owned_pokemon_list = [p1_owned, p2_owned, p3_owned, p4_owned]
+
+    print(f"Target: {target_species} ({target_gender}), Nature: {target_nature}, IVs: {target_ivs}")
+    print("Owned Pokémon:")
+    for p in owned_pokemon_list:
+        print(f"  - {p}")
+
+    plan = find_optimal_breeding_plan(
+        target_species=target_species,
+        target_ivs=target_ivs,
+        target_nature=target_nature,
+        target_gender=target_gender,
+        owned_pokemon_list=owned_pokemon_list,
+        max_depth=15, # Example plan has 10 steps, so 15 should be sufficient
+        max_nodes_to_explore=200000
+    )
+
+    if plan:
+        print("\n[SUCCESS] Piano di breeding trovato per test_regole2_example_4iv_plan!")
+        final_node_in_plan = plan[-1] # This is a BreedingStepDetailed object
+        final_pokemon_in_plan = final_node_in_plan.child
+
+        # To get the g_cost of the final node, we need to find it in the closed_list from the algorithm
+        # However, the plan reconstruction already stores source_info that might contain cost,
+        # or we can infer it from the sum of costs of base pokemon if the plan is simple.
+        # For this test, we'll just print the source_info which often has the original node cost.
+        print(f"Source info of final Pokemon (may contain cost context): {final_pokemon_in_plan.source_info}")
+        print(f"Numero totale di passi: {len(plan)}")
+        print("Dettagli del Pokémon Finale dal Piano:")
+        print(f"  - {final_pokemon_in_plan.get_display_string()}")
+
+        assert final_pokemon_in_plan.species == target_species
+        assert final_pokemon_in_plan.nature == target_nature
+        assert final_pokemon_in_plan.ivs == target_ivs
+        if target_species.lower() != "ditto":
+            assert final_pokemon_in_plan.gender == target_gender
+
+        print("--- Dettagli del Piano Completo (test_regole2_example_4iv_plan): ---")
+        for step in plan:
+            print(step)
+    else:
+        print("\n[FAILURE] Nessun piano di breeding trovato per test_regole2_example_4iv_plan.")
+
+    assert plan is not None, "Il piano di breeding (test_regole2_example_4iv_plan) non dovrebbe essere None"
+    print("--- Fine test_regole2_example_4iv_plan ---\n")
+
+
 def test_4iv_plus_nature_plan():
     """
     Tests the breeding plan generation for a 4IV Charizard with a specific nature,
@@ -1043,5 +1120,5 @@ if __name__ == "__main__":
         # Re-initialize ALL_POKEMON_NAMES if necessary, though it's not directly used by the algorithm itself
         ALL_POKEMON_NAMES = sorted([name.capitalize() for name in POKEMON_EGG_GROUPS_RAW.keys()])
 
-
-    test_4iv_plus_nature_plan()
+    # test_4iv_plus_nature_plan()
+    test_regole2_example_4iv_plan()
