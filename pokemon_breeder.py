@@ -144,34 +144,58 @@ class BreedingNode:
 
 def calculate_heuristic(node_to_evaluate: BreedingNode, owned_pokemon: List[Pokemon]) -> int:
     _species, node_ivs_set, node_nature = node_to_evaluate.species, set(node_to_evaluate.ivs), node_to_evaluate.nature
-    is_base = (not node_ivs_set and node_nature == "NEUTRAL") or \
-              (len(node_ivs_set) == 1 and node_nature == "NEUTRAL") or \
-              (not node_ivs_set and node_nature != "NEUTRAL") or \
-              (len(node_ivs_set) == 1 and node_nature != "NEUTRAL") # Added: 1 IV + Specific Nature
-    if is_base:
-        for pkm in owned_pokemon:
-            if pkm.id not in node_to_evaluate.used_owned_pokemon_ids and \
-                    pkm.species == _species and node_ivs_set.issubset(pkm.ivs) and \
-                    (node_nature == "NEUTRAL" or node_nature == pkm.nature):
-                return 0
+
+    # Check for direct fulfillment by a single owned Pokemon first
+    for pkm in owned_pokemon:
+        if pkm.id not in node_to_evaluate.used_owned_pokemon_ids and \
+                pkm.species == _species and \
+                node_ivs_set.issubset(pkm.ivs) and \
+                (node_nature == "NEUTRAL" or node_nature == pkm.nature):
+            # This node can be entirely fulfilled by one owned Pokemon
+            # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} directly matched by owned {pkm.id}. h=0")
+            return 0
+
+    # Not directly owned, check if it's a single-purchase type
+    # These are profiles that can be bought for a cost of 1 if not directly owned.
+    is_single_purchase_profile = \
+        (not node_ivs_set and node_nature != "NEUTRAL") or \
+        (len(node_ivs_set) == 1 and node_nature == "NEUTRAL") or \
+        (len(node_ivs_set) == 1 and node_nature != "NEUTRAL") or \
+        (not node_ivs_set and node_nature == "NEUTRAL")  # 0IV Neutral (standard base)
+
+    if is_single_purchase_profile:
+        # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} is single_purchase_profile. h=1")
         return 1
+
+    # Requires breeding or assembly from multiple sources
     h = 0
+    # Check for Nature availability in the general pool if specific nature is required
     if node_nature != "NEUTRAL":
         if not any(p.id not in node_to_evaluate.used_owned_pokemon_ids and
                    p.nature == node_nature and
                    (p.species == _species or p.species.lower() == 'ditto')
                    for p in owned_pokemon):
             h += 1
+            # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} missing Nature {node_nature}. h incremented to {h}")
+
+    # Check for IV availability in the general pool
     for iv in node_ivs_set:
         if not any(p.id not in node_to_evaluate.used_owned_pokemon_ids and
                    iv in p.ivs and
                    (p.species == _species or p.species.lower() == 'ditto')
                    for p in owned_pokemon):
             h += 1
-    if not node_ivs_set and node_nature == "NEUTRAL" and h == 0:
-        if not any(p.id not in node_to_evaluate.used_owned_pokemon_ids and p.species == _species and
-                   not p.ivs and p.nature == "NEUTRAL" for p in owned_pokemon):
-            return 1
+            # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} missing IV {iv}. h incremented to {h}")
+
+    # Ensure h is at least 1 if breeding is required (i.e., it wasn't directly owned or single purchase)
+    # This covers cases where all components (IVs/Nature) are available across *multiple* owned Pokémon,
+    # but no single Pokémon fulfills the requirement, and it's not a single-purchase profile.
+    # Such a node requires at least one breeding step.
+    if h == 0: # All components are available, but spread out, and it's not a single-purchase profile.
+        h = 1  # Minimum cost for a breeding operation itself.
+        # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} has all components spread (h=0 initially), setting h=1 for breeding.")
+    
+    # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} requires breeding/assembly. Final calculated h={h}")
     return h
 
 
