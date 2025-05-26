@@ -1,24 +1,50 @@
 # pokemon_breeder.py
 import json
 from typing import List, Dict, Optional, Set, Tuple, Any
-import functools
-import heapq
+import functools  # Non utilizzato direttamente, ma potrebbe servire per future ottimizzazioni con cache
+import heapq  # Non utilizzato direttamente, ma utile per algoritmi di ricerca come A*
 from itertools import combinations
+import os
+import time  # Per timestamp nel log di debug
 
-DEBUG_ASTAR = True
+DEBUG_RECURSIVE_PLANNER = True
+DEBUG_FILE_NAME = "debug.txt"
+
+
+def clear_debug_log_once_for_suite():
+    """
+    Pulisce il file di debug una volta all'inizio di una suite di test.
+    Questa funzione dovrebbe essere chiamata solo una volta prima di eseguire run_complex_test.
+    """
+    try:
+        with open(DEBUG_FILE_NAME, 'w', encoding='utf-8') as f:
+            f.write(f"--- Inizio Nuovo Log di Debug Suite ({time.strftime('%Y-%m-%d %H:%M:%S')}) ---\n")
+    except IOError:
+        print(f"Attenzione: Impossibile pulire il file di debug {DEBUG_FILE_NAME}")
 
 
 def d_print(*args, **kwargs):
-    if DEBUG_ASTAR:
+    """Scrive i messaggi di debug in modalità append su un file chiamato debug.txt."""
+    if not DEBUG_RECURSIVE_PLANNER:
+        return
+    try:
+        with open(DEBUG_FILE_NAME, 'a', encoding='utf-8') as f:
+            print(*args, **kwargs, file=f)
+    except IOError:
+        # Fallback alla console se la scrittura su file fallisce
+        print("Errore: Impossibile scrivere sul file di debug. Messaggio originale:")
         print(*args, **kwargs)
 
 
 def load_pokemon_data(filename="pokemon_data.json") -> Dict[str, List[str]]:
+    """Carica i dati dei Pokémon (gruppi uova) da un file JSON."""
     try:
         with open(filename, 'r', encoding='utf-8') as f:
             data = json.load(f)
+            # Converte i nomi delle specie in minuscolo per una ricerca case-insensitive
             return {k.lower(): v for k, v in data.items()}
     except (FileNotFoundError, json.JSONDecodeError):
+        d_print(f"Errore: File {filename} non trovato o formato JSON non valido.")
         return {}
 
 
@@ -41,34 +67,44 @@ ALL_NATURES = sorted([
 
 
 class Pokemon:
-    _id_counter = 0
+    """Rappresenta un singolo Pokémon con le sue caratteristiche rilevanti per il breeding."""
+    _id_counter = 0  # Contatore statico per assegnare ID univoci ai Pokémon generati
 
     def __init__(self, species: str, ivs: Set[str], nature: str, gender: str,
                  name: Optional[str] = None, is_owned: bool = False,
-                 source_info: str = "N/A"):
-        self.species = species.capitalize()
+                 source_info: str = "N/A", internal_id: Optional[int] = None):
+        self.species = species.capitalize()  # Standardizza la prima lettera maiuscola
         self.name = name if name else self.species
-        self.ivs = set(ivs)
+        self.ivs = set(ivs)  # Assicura che sia un set
         self.nature = nature
         self.gender = gender
-        self.is_owned = is_owned
+        self.is_owned = is_owned  # True se il Pokémon è posseduto dall'utente inizialmente
         self.egg_groups = POKEMON_EGG_GROUPS_RAW.get(self.species.lower(), [])
-        self.id = Pokemon._id_counter
-        Pokemon._id_counter += 1
-        self.source_info = source_info
+
+        if internal_id is not None:  # Permette di specificare un ID (es. per Pokémon posseduti)
+            self.id = internal_id
+        else:  # Altrimenti, assegna un nuovo ID
+            self.id = Pokemon._id_counter
+            Pokemon._id_counter += 1
+
+        self.source_info = source_info  # Stringa per tracciare l'origine del Pokémon nel piano
+        self.cost_to_produce = 0.0  # Costo (in acquisti) per produrre questo Pokémon
 
     def __repr__(self):
         iv_str = ", ".join(sorted(list(self.ivs))) if self.ivs else "Nessuno"
+        cost_str = f"CostoProd:{self.cost_to_produce:.1f}" if not self.is_owned else "Posseduto"
         return (f"{self.name} ({self.species}, {self.gender}) | N: {self.nature}, "
-                f"IVs: [{iv_str}] | ID: {self.id} | Fonte: {self.source_info}")
+                f"IVs: [{iv_str}] | ID: {self.id} ({cost_str}) | Fonte: {self.source_info}")
 
-    def get_display_string(self):
+    def get_display_string(self):  # Usato dalla GUI
         iv_str = f"IVs: {', '.join(sorted(list(self.ivs)))}" if self.ivs else "Nessun IV 31"
         nature_str = f"Natura: {self.nature}" if self.nature != "NEUTRAL" else "Natura non specificata"
         return f"{self.name} ({self.species}, {self.gender}) - {nature_str}, {iv_str}"
 
 
 class BreedingStepDetailed:
+    """Rappresenta un singolo passo di accoppiamento nel piano di breeding."""
+
     def __init__(self, child_pokemon: Pokemon,
                  parent1_pokemon: Pokemon, parent1_item: Optional[str],
                  parent2_pokemon: Pokemon, parent2_item: Optional[str],
@@ -78,7 +114,7 @@ class BreedingStepDetailed:
         self.parent1_item = parent1_item
         self.parent2 = parent2_pokemon
         self.parent2_item = parent2_item
-        self.step_number = step_number
+        self.step_number = step_number  # Numero progressivo del passo nel piano
 
     def __str__(self):
         child_ivs_str = str(set(self.child.ivs)) if self.child.ivs else "{}"
@@ -87,1226 +123,618 @@ class BreedingStepDetailed:
         return (f"--- PASSO {self.step_number} ---\n"
                 f"  Figlio Generato: {self.child.name} ({self.child.species}, {self.child.gender}) N:{self.child.nature}, IVs:{child_ivs_str} (Fonte: {self.child.source_info})\n"
                 f"  Genitore 1: {self.parent1.name} ({self.parent1.species}, {self.parent1.gender}) [{self.parent1_item if self.parent1_item else 'Nessun Oggetto'}]\n"
-                f"    (N:{self.parent1.nature}, IVs:{p1_ivs_str}, Fonte:{self.parent1.source_info})\n"
+                f"    (N:{self.parent1.nature}, IVs:{p1_ivs_str}, ID:{self.parent1.id}, Fonte:{self.parent1.source_info})\n"
                 f"  Genitore 2: {self.parent2.name} ({self.parent2.species}, {self.parent2.gender}) [{self.parent2_item if self.parent2_item else 'Nessun Oggetto'}]\n"
-                f"    (N:{self.parent2.nature}, IVs:{p2_ivs_str}, Fonte:{self.parent2.source_info})\n")
+                f"    (N:{self.parent2.nature}, IVs:{p2_ivs_str}, ID:{self.parent2.id}, Fonte:{self.parent2.source_info})\n")
 
 
-@functools.total_ordering
 class BreedingNode:
-    def __init__(self, species: str, ivs: Set[str], nature: str,
-                 g_cost: float = float('inf'), depth: int = 0,
-                 used_owned_ids: Optional[Set[int]] = None):
-        self.species = species.capitalize()
-        self.ivs = frozenset(ivs)
-        self.nature = nature
-        self.g_cost = g_cost
-        self.h_cost = 0
-        self.depth = depth
-        self.used_owned_pokemon_ids = used_owned_ids if used_owned_ids is not None else set()
-        self.action_taken_to_create_this_node: Optional[Dict[str, Any]] = None
-        self.parent_options_for_this_node: List[Dict[str, Any]] = []
-        self.children_in_plan_this_node_is_parent_for: List[Tuple[BreedingNode, Dict[str, Any]]] = []
+    """Rappresenta un Pokémon target da ottenere (uno stato nella ricerca)."""
 
-    @property
-    def f_cost(self) -> float:
-        return self.g_cost + self.h_cost
+    def __init__(self, species: str, ivs: Set[str], nature: str, **kwargs):
+        self.species = species.capitalize()
+        self.ivs = frozenset(ivs)  # Immutabile, per uso come chiave in dizionari/set
+        self.nature = nature
 
     def get_state_tuple(self) -> Tuple[str, frozenset, str]:
+        """Restituisce una tupla che rappresenta univocamente lo stato del Pokémon."""
         return (self.species, self.ivs, self.nature)
-
-    def get_full_state_tuple_for_closed_list(self) -> Tuple[str, frozenset, str, frozenset]:
-        return (self.species, self.ivs, self.nature, frozenset(self.used_owned_pokemon_ids))
-
-    def __eq__(self, other):
-        if not isinstance(other, BreedingNode): return NotImplemented
-        return self.get_full_state_tuple_for_closed_list() == other.get_full_state_tuple_for_closed_list()
-
-    def __lt__(self, other):
-        if not isinstance(other, BreedingNode): return NotImplemented
-        if self.f_cost != other.f_cost:
-            return self.f_cost < other.f_cost
-        if self.h_cost != other.h_cost:
-            return self.h_cost < other.h_cost
-        return self.g_cost < other.g_cost
-
-    def __hash__(self):
-        return hash(self.get_full_state_tuple_for_closed_list())
-
-    def __repr__(self):
-        iv_s = set(self.ivs)
-        action_type = self.action_taken_to_create_this_node.get('type',
-                                                                'N/D') if self.action_taken_to_create_this_node else 'N/D'
-        return (f"Nodo(S:{self.species}, IVs:{iv_s if iv_s else '{}'}, N:{self.nature}, "
-                f"g:{self.g_cost:.1f}, h:{self.h_cost:.1f}, f:{self.f_cost:.1f}, d:{self.depth}, "
-                f"UsedIDs:{sorted(list(self.used_owned_pokemon_ids)) if self.used_owned_pokemon_ids else '{}'}, Action:{action_type})")
-
-
-def calculate_heuristic(node_to_evaluate: BreedingNode, owned_pokemon: List[Pokemon]) -> int:
-    _species, node_ivs_set, node_nature = node_to_evaluate.species, set(node_to_evaluate.ivs), node_to_evaluate.nature
-
-    # Check for direct fulfillment by a single owned Pokemon first
-    for pkm in owned_pokemon:
-        if pkm.id not in node_to_evaluate.used_owned_pokemon_ids and \
-                pkm.species == _species and \
-                node_ivs_set.issubset(pkm.ivs) and \
-                (node_nature == "NEUTRAL" or node_nature == pkm.nature):
-            # This node can be entirely fulfilled by one owned Pokemon
-            # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} directly matched by owned {pkm.id}. h=0")
-            return 0
-
-    # Not directly owned, check if it's a single-purchase type
-    # These are profiles that can be bought for a cost of 1 if not directly owned.
-    is_single_purchase_profile = \
-        (not node_ivs_set and node_nature != "NEUTRAL") or \
-        (len(node_ivs_set) == 1 and node_nature == "NEUTRAL") or \
-        (len(node_ivs_set) == 1 and node_nature != "NEUTRAL") or \
-        (not node_ivs_set and node_nature == "NEUTRAL")  # 0IV Neutral (standard base)
-
-    if is_single_purchase_profile:
-        # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} is single_purchase_profile. h=1")
-        return 1
-
-    # Requires breeding or assembly from multiple sources
-    h = 0
-    # Check for Nature availability in the general pool if specific nature is required
-    if node_nature != "NEUTRAL":
-        if not any(p.id not in node_to_evaluate.used_owned_pokemon_ids and
-                   p.nature == node_nature and
-                   (p.species == _species or p.species.lower() == 'ditto')
-                   for p in owned_pokemon):
-            h += 1
-            # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} missing Nature {node_nature}. h incremented to {h}")
-
-    # Check for IV availability in the general pool
-    for iv in node_ivs_set:
-        if not any(p.id not in node_to_evaluate.used_owned_pokemon_ids and
-                   iv in p.ivs and
-                   (p.species == _species or p.species.lower() == 'ditto')
-                   for p in owned_pokemon):
-            h += 1
-            # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} missing IV {iv}. h incremented to {h}")
-
-    # Ensure h is at least 1 if breeding is required (i.e., it wasn't directly owned or single purchase)
-    # This covers cases where all components (IVs/Nature) are available across *multiple* owned Pokémon,
-    # but no single Pokémon fulfills the requirement, and it's not a single-purchase profile.
-    # Such a node requires at least one breeding step.
-    if h == 0: # All components are available, but spread out, and it's not a single-purchase profile.
-        h = 1  # Minimum cost for a breeding operation itself.
-        # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} has all components spread (h=0 initially), setting h=1 for breeding.")
-    
-    # d_print(f"  [Heuristic] Node {node_to_evaluate.get_state_tuple()} requires breeding/assembly. Final calculated h={h}")
-    return h
 
 
 def generate_breeding_options_for_child(child_node_state: BreedingNode) -> List[Dict[str, Any]]:
+    """
+    Genera le possibili combinazioni di genitori (specifiche) e oggetti per produrre il child_node_state.
+    Questa funzione è cruciale e deve riflettere accuratamente le regole di breeding
+    per garantire la trasmissione degli IV e della natura.
+    """
     options: List[Dict[str, Any]] = []
     child_s, child_i_set, child_n = child_node_state.species, set(child_node_state.ivs), child_node_state.nature
+
     is_child_buyable_base = (not child_i_set and child_n == "NEUTRAL") or \
                             (len(child_i_set) == 1 and child_n == "NEUTRAL") or \
-                            (not child_i_set and child_n != "NEUTRAL") or \
-                            (len(child_i_set) == 1 and child_n != "NEUTRAL") # Added: 1 IV + Specific Nature
+                            (not child_i_set and child_n != "NEUTRAL")
     if is_child_buyable_base:
-        d_print(
-            f"  [GenOpts] Nodo figlio {child_node_state.get_state_tuple()} è acquistabile base, nessuna opzione di breeding.")
         return []
-    d_print(f"  [GenOpts] Generazione opzioni per figlio: {child_node_state.get_state_tuple()}")
+
     if child_n != "NEUTRAL":
-        p1_spec_1a = {'species': child_s, 'ivs': set(child_i_set), 'nature': child_n}
-        p2_spec_1a = {'species': child_s, 'ivs': set(child_i_set), 'nature': "NEUTRAL"}
-        options.append(
-            {'type': 'bred', 'p1_spec': p1_spec_1a, 'p2_spec': p2_spec_1a, 'item1': EVERSTONE, 'item2': None})
-        for iv_x_from_p2_vigor in child_i_set:
-            item2_for_p2 = VIGOR_ITEMS_MAP.get(iv_x_from_p2_vigor)
-            if not item2_for_p2: continue
-            shared_ivs_for_1b = child_i_set - {iv_x_from_p2_vigor}
-            p1_spec_1b = {'species': child_s, 'ivs': set(shared_ivs_for_1b), 'nature': child_n}
-            p2_ivs_for_1b = set(shared_ivs_for_1b);
-            p2_ivs_for_1b.add(iv_x_from_p2_vigor)
-            p2_spec_1b = {'species': child_s, 'ivs': p2_ivs_for_1b, 'nature': "NEUTRAL"}
-            options.append({'type': 'bred', 'p1_spec': p1_spec_1b, 'p2_spec': p2_spec_1b, 'item1': EVERSTONE,
-                            'item2': item2_for_p2})
+        if child_i_set:
+            for iv_vigor_p2 in child_i_set:
+                item_p2 = VIGOR_ITEMS_MAP.get(iv_vigor_p2)
+                if not item_p2: continue
+
+                p1_ivs_spec = child_i_set - {iv_vigor_p2}
+                p1_spec = {'species': child_s, 'ivs': p1_ivs_spec, 'nature': child_n}
+
+                p2_ivs_spec_for_option1 = set(child_i_set)
+
+                p2_spec_non_ditto = {'species': child_s, 'ivs': p2_ivs_spec_for_option1, 'nature': "NEUTRAL"}
+                options.append(
+                    {'type': 'bred', 'p1_spec': p1_spec, 'p2_spec': p2_spec_non_ditto, 'item1': EVERSTONE,
+                     'item2': item_p2})
+
+                if child_s.lower() != 'ditto' and p1_spec['species'].lower() != 'ditto':
+                    p2_spec_ditto = {'species': 'Ditto', 'ivs': p2_ivs_spec_for_option1, 'nature': "NEUTRAL"}
+                    options.append(
+                        {'type': 'bred', 'p1_spec': p1_spec, 'p2_spec': p2_spec_ditto, 'item1': EVERSTONE,
+                         'item2': item_p2})
+
+        if not child_i_set:
+            p1_spec_no_iv = {'species': child_s, 'ivs': set(), 'nature': child_n}
+            p2_spec_non_ditto_no_iv = {'species': child_s, 'ivs': set(), 'nature': "NEUTRAL"}
+            options.append(
+                {'type': 'bred', 'p1_spec': p1_spec_no_iv, 'p2_spec': p2_spec_non_ditto_no_iv, 'item1': EVERSTONE,
+                 'item2': None})
+
+            if child_s.lower() != 'ditto' and p1_spec_no_iv['species'].lower() != 'ditto':
+                p2_spec_ditto_no_iv = {'species': 'Ditto', 'ivs': set(), 'nature': "NEUTRAL"}
+                options.append(
+                    {'type': 'bred', 'p1_spec': p1_spec_no_iv, 'p2_spec': p2_spec_ditto_no_iv, 'item1': EVERSTONE,
+                     'item2': None})
+
     if child_i_set:
-        for iv_x_from_p1_vigor in child_i_set:
-            item1_for_p1 = VIGOR_ITEMS_MAP.get(iv_x_from_p1_vigor)
-            if not item1_for_p1: continue
-            shared_ivs_for_2a = child_i_set - {iv_x_from_p1_vigor}
-            p1_ivs_for_2a = set(shared_ivs_for_2a);
-            p1_ivs_for_2a.add(iv_x_from_p1_vigor)
-            p1_spec_2a = {'species': child_s, 'ivs': p1_ivs_for_2a, 'nature': "NEUTRAL"}
-            p2_nature_req = child_n if child_n != "NEUTRAL" else "NEUTRAL"
-            item2_for_p2 = EVERSTONE if child_n != "NEUTRAL" else None
-            p2_spec_2a = {'species': child_s, 'ivs': set(shared_ivs_for_2a), 'nature': p2_nature_req}
-            options.append({'type': 'bred', 'p1_spec': p1_spec_2a, 'p2_spec': p2_spec_2a, 'item1': item1_for_p1,
-                            'item2': item2_for_p2})
+        for iv_vigor_p1 in child_i_set:
+            item_p1 = VIGOR_ITEMS_MAP.get(iv_vigor_p1)
+            if not item_p1: continue
+
+            p1_ivs_spec_for_option2 = set(child_i_set)
+            p1_spec_op2 = {'species': child_s, 'ivs': p1_ivs_spec_for_option2, 'nature': "NEUTRAL"}
+
+            p2_nature_spec = child_n if child_n != "NEUTRAL" else "NEUTRAL"
+            item_p2_op2 = EVERSTONE if child_n != "NEUTRAL" else None
+            p2_spec_op2_corrected = {'species': child_s, 'ivs': set(child_i_set), 'nature': p2_nature_spec}
+
+            options.append({'type': 'bred', 'p1_spec': p1_spec_op2,
+                            'p2_spec': p2_spec_op2_corrected,
+                            'item1': item_p1, 'item2': item_p2_op2})
+
+            if child_s.lower() != 'ditto':
+                if p2_spec_op2_corrected['species'].lower() != 'ditto':
+                    ditto_p1_spec = {'species': 'Ditto', 'ivs': p1_ivs_spec_for_option2, 'nature': 'NEUTRAL'}
+                    options.append({'type': 'bred', 'p1_spec': ditto_p1_spec, 'p2_spec': p2_spec_op2_corrected,
+                                    'item1': item_p1, 'item2': item_p2_op2})
+
+                if p1_spec_op2['species'].lower() != 'ditto':
+                    ditto_p2_spec = {'species': 'Ditto', 'ivs': set(child_i_set), 'nature': p2_nature_spec}
+                    options.append({'type': 'bred', 'p1_spec': p1_spec_op2, 'p2_spec': ditto_p2_spec,
+                                    'item1': item_p1, 'item2': item_p2_op2})
+
     if child_n == "NEUTRAL" and len(child_i_set) >= 2:
-        for iv_x, iv_y in combinations(child_i_set, 2):
-            item1_for_p1 = VIGOR_ITEMS_MAP.get(iv_x);
-            item2_for_p2 = VIGOR_ITEMS_MAP.get(iv_y)
-            if not item1_for_p1 or not item2_for_p2 or item1_for_p1 == item2_for_p2: continue
-            shared_ivs_for_2b = child_i_set - {iv_x, iv_y}
-            p1_ivs_for_2b = set(shared_ivs_for_2b);
-            p1_ivs_for_2b.add(iv_x)
-            p2_ivs_for_2b = set(shared_ivs_for_2b);
-            p2_ivs_for_2b.add(iv_y)
-            p1_spec_2b = {'species': child_s, 'ivs': p1_ivs_for_2b, 'nature': "NEUTRAL"}
-            p2_spec_2b = {'species': child_s, 'ivs': p2_ivs_for_2b, 'nature': "NEUTRAL"}
-            options.append({'type': 'bred', 'p1_spec': p1_spec_2b, 'p2_spec': p2_spec_2b, 'item1': item1_for_p1,
-                            'item2': item2_for_p2})
-    if child_n == "NEUTRAL" and child_i_set:
-        p1_spec_2c = {'species': child_s, 'ivs': set(child_i_set), 'nature': "NEUTRAL"}
-        p2_spec_2c = {'species': child_s, 'ivs': set(child_i_set), 'nature': "NEUTRAL"}
-        options.append({'type': 'bred', 'p1_spec': p1_spec_2c, 'p2_spec': p2_spec_2c, 'item1': None, 'item2': None})
+        for iv_p1_vigor, iv_p2_vigor in combinations(child_i_set, 2):
+            item_p1_for_3 = VIGOR_ITEMS_MAP.get(iv_p1_vigor)
+            item_p2_for_3 = VIGOR_ITEMS_MAP.get(iv_p2_vigor)
+            if not item_p1_for_3 or not item_p2_for_3: continue
+
+            shared_ivs_op3 = child_i_set - {iv_p1_vigor, iv_p2_vigor}
+
+            p1_ivs_op3 = {iv_p1_vigor}.union(shared_ivs_op3)
+            p1_spec_op3 = {'species': child_s, 'ivs': p1_ivs_op3, 'nature': "NEUTRAL"}
+
+            p2_ivs_op3 = {iv_p2_vigor}.union(shared_ivs_op3)
+            p2_spec_op3 = {'species': child_s, 'ivs': p2_ivs_op3, 'nature': "NEUTRAL"}
+
+            options.append({'type': 'bred', 'p1_spec': p1_spec_op3, 'p2_spec': p2_spec_op3, 'item1': item_p1_for_3,
+                            'item2': item_p2_for_3})
+
+            if child_s.lower() != 'ditto':
+                if p2_spec_op3['species'].lower() != 'ditto':
+                    p1_spec_op3_ditto = {'species': 'Ditto', 'ivs': p1_ivs_op3, 'nature': "NEUTRAL"}
+                    options.append(
+                        {'type': 'bred', 'p1_spec': p1_spec_op3_ditto, 'p2_spec': p2_spec_op3, 'item1': item_p1_for_3,
+                         'item2': item_p2_for_3})
+                if p1_spec_op3['species'].lower() != 'ditto':
+                    p2_spec_op3_ditto = {'species': 'Ditto', 'ivs': p2_ivs_op3, 'nature': "NEUTRAL"}
+                    options.append(
+                        {'type': 'bred', 'p1_spec': p1_spec_op3, 'p2_spec': p2_spec_op3_ditto, 'item1': item_p1_for_3,
+                         'item2': item_p2_for_3})
+
     final_options, seen_options_tuples = [], set()
     for opt_idx, opt in enumerate(options):
         p1_s, p1_i, p1_n = opt['p1_spec']['species'], frozenset(opt['p1_spec']['ivs']), opt['p1_spec']['nature']
         p2_s, p2_i, p2_n = opt['p2_spec']['species'], frozenset(opt['p2_spec']['ivs']), opt['p2_spec']['nature']
         it1, it2 = opt['item1'], opt['item2']
-        if (it1 == EVERSTONE and it2 == EVERSTONE): continue
-        if it1 and it1 in REVERSE_VIGOR_ITEMS_MAP.values() and \
-                it2 and it2 in REVERSE_VIGOR_ITEMS_MAP.values() and it1 == it2:
+
+        if p1_s.lower() == 'ditto' and p2_s.lower() == 'ditto':
             continue
-        parents_tuple_part1 = (p1_s, tuple(sorted(list(p1_i))), p1_n, it1)
-        parents_tuple_part2 = (p2_s, tuple(sorted(list(p2_i))), p2_n, it2)
-        sorted_parents_tuple = tuple(sorted((parents_tuple_part1, parents_tuple_part2)))
+
+        if it1 == EVERSTONE and it2 == EVERSTONE:
+            continue
+        if it1 and it1 in REVERSE_VIGOR_ITEMS_MAP and \
+                it2 and it2 in REVERSE_VIGOR_ITEMS_MAP and it1 == it2:
+            continue
+
+        # CORREZIONE TypeError: Sostituisci None con "" per l'ordinamento degli item
+        item1_sort_val = it1 if it1 is not None else ""
+        item2_sort_val = it2 if it2 is not None else ""
+
+        parents_tuple_part1 = (p1_s, tuple(sorted(list(p1_i))), p1_n, item1_sort_val)
+        parents_tuple_part2 = (p2_s, tuple(sorted(list(p2_i))), p2_n, item2_sort_val)
+
+        try:
+            sorted_parents_tuple = tuple(sorted((parents_tuple_part1, parents_tuple_part2)))
+        except TypeError as e:
+            d_print(f"Errore durante l'ordinamento delle tuple dei genitori: {e}")
+            d_print(f"  Tuple Part 1: {parents_tuple_part1}")
+            d_print(f"  Tuple Part 2: {parents_tuple_part2}")
+            continue  # Salta questa opzione se l'ordinamento fallisce ancora per qualche motivo
+
         if sorted_parents_tuple not in seen_options_tuples:
             final_options.append(opt)
             seen_options_tuples.add(sorted_parents_tuple)
-            d_print(
-                f"    [GenOpts] Opzione valida {len(final_options)}: P1({p1_s}, {set(p1_i)}, {p1_n}, It:{it1}) + P2({p2_s}, {set(p2_i)}, {p2_n}, It:{it2})")
-    d_print(f"  [GenOpts] Trovate {len(final_options)} opzioni uniche per {child_node_state.get_state_tuple()}")
+
     return final_options
 
 
-_RECONSTRUCTION_INSTANCE_COUNTER = 0
-_final_target_node_for_reconstruction: Optional[BreedingNode] = None
+memo_get_pokemon = {}
+MAX_RECURSION_DEPTH = 30
 
 
-def propagate_cost_update_to_children_in_plan(
-        resolved_parent_P: BreedingNode,
-        open_list: list,
-        open_list_map: Dict[Tuple[str, frozenset, str, frozenset], BreedingNode],
-        closed_list: Dict[Tuple[str, frozenset, str, frozenset], BreedingNode],
-        owned_pokemon_list: List[Pokemon],
-        final_goal_node_for_heuristic: BreedingNode
-):
-    # Point 7
-    d_print(f"    [Propagate START] parent_P: {resolved_parent_P.get_state_tuple()} (g={resolved_parent_P.g_cost:.2f}, used:{resolved_parent_P.used_owned_pokemon_ids}) has {len(resolved_parent_P.children_in_plan_this_node_is_parent_for)} children entries.")
+def get_pokemon_with_minimal_cost(
+        target_species: str,
+        target_ivs: Set[str],
+        target_nature: str,
+        owned_pokemon_map: Dict[int, Pokemon],
+        consumed_owned_ids: frozenset[int],
+        depth: int = 0
+) -> Tuple[Optional[Pokemon], List[BreedingStepDetailed], float, frozenset[int]]:
+    global memo_get_pokemon
+
+    target_species_cap = target_species.capitalize()
+    target_ivs_fs = frozenset(target_ivs)
+    current_target_tuple_for_loop_check = (target_species_cap, target_ivs_fs, target_nature)
+
+    memo_key = (target_species_cap, target_ivs_fs, target_nature, consumed_owned_ids)
+
+    if memo_key in memo_get_pokemon:
+        cached_pkm_template, cached_steps, cached_cost, cached_consumed = memo_get_pokemon[memo_key]
+        cloned_pkm = None
+        if cached_pkm_template:
+            cloned_pkm = Pokemon(cached_pkm_template.species, cached_pkm_template.ivs, cached_pkm_template.nature,
+                                 cached_pkm_template.gender,
+                                 name=cached_pkm_template.name,
+                                 is_owned=cached_pkm_template.is_owned,
+                                 source_info=cached_pkm_template.source_info,
+                                 internal_id=cached_pkm_template.id if cached_pkm_template.is_owned else None)
+            if not cloned_pkm.is_owned:
+                cloned_pkm.id = Pokemon._id_counter
+                Pokemon._id_counter += 1
+            cloned_pkm.cost_to_produce = cached_pkm_template.cost_to_produce
+
+        d_print(
+            f"{'  ' * depth}CACHE HIT for: {target_species_cap} {target_ivs_fs} {target_nature} (Consumed: {list(consumed_owned_ids)}) -> Cost: {cached_cost}, PkmID: {cloned_pkm.id if cloned_pkm else 'None'}")
+        return cloned_pkm, list(cached_steps), cached_cost, cached_consumed
+
+    if depth > MAX_RECURSION_DEPTH:
+        d_print(
+            f"{'  ' * depth}MAX DEPTH {MAX_RECURSION_DEPTH} reached for: {target_species_cap} {target_ivs_fs} {target_nature}")
+        memo_get_pokemon[memo_key] = (None, [], float('inf'), consumed_owned_ids)
+        return None, [], float('inf'), consumed_owned_ids
+
     d_print(
-        f"    [Propagate] Genitore Risolto P: {resolved_parent_P.get_state_tuple()} (key: {resolved_parent_P.get_full_state_tuple_for_closed_list()}) con g={resolved_parent_P.g_cost}. Used: {resolved_parent_P.used_owned_pokemon_ids}")
+        f"{'  ' * depth}GETTING: {target_species_cap} IVs:{target_ivs_fs} N:{target_nature} (Consumed: {list(consumed_owned_ids)}) Depth: {depth}")
 
-    if resolved_parent_P.g_cost == float('inf'): return
+    best_owned_candidate: Optional[Pokemon] = None
+    best_candidate_score = -float('inf')
 
-    for child_C_node_original_ref, breeding_option_for_C in resolved_parent_P.children_in_plan_this_node_is_parent_for:
+    for p_id, owned_p in owned_pokemon_map.items():
+        if p_id not in consumed_owned_ids:
+            current_p_score = 0.0
+            species_compatible_for_role = False
+
+            if target_species_cap.lower() == "ditto":
+                if owned_p.species.lower() == "ditto":
+                    species_compatible_for_role = True;
+                    current_p_score += 200
+            elif owned_p.species.lower() == target_species_cap.lower():
+                species_compatible_for_role = True;
+                current_p_score += 100
+
+            if species_compatible_for_role:
+                if not target_ivs_fs.issubset(owned_p.ivs):
+                    d_print(
+                        f"{'  ' * (depth + 1)}[IV-CHECK] SKIPPING Owned Pkm ID {owned_p.id} ({owned_p.name}) for target '{target_species_cap} IVs:{target_ivs_fs} N:{target_nature}' | Needed IVs: {sorted(list(target_ivs_fs))} | Has IVs: {sorted(list(owned_p.ivs))}")
+                    continue
+                d_print(
+                    f"{'  ' * (depth + 1)}[IV-CHECK] PASSED Owned Pkm ID {owned_p.id} ({owned_p.name}) for target '{target_species_cap} IVs:{target_ivs_fs} N:{target_nature}' | Needed IVs: {sorted(list(target_ivs_fs))} | Has IVs: {sorted(list(owned_p.ivs))}")
+
+                matching_iv_count = len(target_ivs_fs.intersection(owned_p.ivs))
+                current_p_score += matching_iv_count * 10
+
+                if target_nature == "NEUTRAL":
+                    current_p_score += 5
+                elif owned_p.nature == target_nature:
+                    current_p_score += 30
+                else:
+                    continue
+
+                current_p_score -= len(owned_p.ivs) * 0.1
+
+                if current_p_score > best_candidate_score:
+                    best_candidate_score = current_p_score
+                    best_owned_candidate = owned_p
+
+    if best_owned_candidate:
         d_print(
-            f"      [Propagate] Considerando figlio C (ref originale): {child_C_node_original_ref.get_state_tuple()} (key: {child_C_node_original_ref.get_full_state_tuple_for_closed_list()}) attuale g={child_C_node_original_ref.g_cost}")
+            f"{'  ' * depth}  FOUND OWNED (Best): {best_owned_candidate} (ID: {best_owned_candidate.id}, Score: {best_candidate_score:.2f}) for {target_species_cap} {target_ivs_fs} {target_nature}")
+        new_consumed_ids = consumed_owned_ids.union({best_owned_candidate.id})
 
-        p1_spec_in_option = breeding_option_for_C['p1_spec']
-        p2_spec_in_option = breeding_option_for_C['p2_spec']
+        final_owned_pkm = Pokemon(best_owned_candidate.species, best_owned_candidate.ivs, best_owned_candidate.nature,
+                                  best_owned_candidate.gender,
+                                  name=best_owned_candidate.name,
+                                  is_owned=True,
+                                  source_info=f"Posseduto (Nome: {best_owned_candidate.name}, ID:{best_owned_candidate.id})",
+                                  internal_id=best_owned_candidate.id)
+        final_owned_pkm.cost_to_produce = 0.0
 
-        current_P_node_state_tuple = resolved_parent_P.get_state_tuple()
-        other_parent_spec_in_option: Optional[Dict[str, Any]] = None
+        memo_get_pokemon[memo_key] = (final_owned_pkm, [], 0.0, new_consumed_ids)
+        return final_owned_pkm, [], 0.0, new_consumed_ids
 
-        if current_P_node_state_tuple == (p1_spec_in_option['species'], frozenset(p1_spec_in_option['ivs']),
-                                          p1_spec_in_option['nature']):
-            other_parent_spec_in_option = p2_spec_in_option
-        elif current_P_node_state_tuple == (p2_spec_in_option['species'], frozenset(p2_spec_in_option['ivs']),
-                                            p2_spec_in_option['nature']):
-            other_parent_spec_in_option = p1_spec_in_option
-        else:
-            d_print(
-                f"        [Propagate] ERRORE MATCH: resolved_parent_P {resolved_parent_P.get_state_tuple()} non matcha spec opzione per C {child_C_node_original_ref.get_state_tuple()}.");
+    is_buyable_base = (not target_ivs_fs and target_nature == "NEUTRAL") or \
+                      (len(target_ivs_fs) == 1 and target_nature == "NEUTRAL") or \
+                      (not target_ivs_fs and target_nature != "NEUTRAL")
+
+    if is_buyable_base:
+        ivs_str_info = ",".join(sorted(list(target_ivs_fs))) if target_ivs_fs else "0IV"
+        nature_str_info = target_nature if target_nature != "NEUTRAL" else "Ntrl"
+
+        bought_pokemon = Pokemon(species=target_species_cap,
+                                 ivs=set(target_ivs_fs),
+                                 nature=target_nature,
+                                 gender="Acquistato",
+                                 name=f"Acq_{target_species_cap[:3]}",
+                                 source_info=f"Acquistato Base ({ivs_str_info},{nature_str_info}, ID:temp)")
+        bought_pokemon.cost_to_produce = 1.0
+        bought_pokemon.source_info = f"Acquistato Base ({ivs_str_info},{nature_str_info}, ID:{bought_pokemon.id})"
+        d_print(f"{'  ' * depth}  BUYING BASE: {bought_pokemon}")
+
+        memo_get_pokemon[memo_key] = (bought_pokemon, [], 1.0, consumed_owned_ids)
+        return bought_pokemon, [], 1.0, consumed_owned_ids
+
+    current_request_node = BreedingNode(species=target_species_cap, ivs=set(target_ivs_fs), nature=target_nature)
+    possible_parent_options = generate_breeding_options_for_child(current_request_node)
+
+    if not possible_parent_options:
+        d_print(
+            f"{'  ' * depth}  NO BREEDING OPTIONS generated for {target_species_cap} {target_ivs_fs} {target_nature}")
+        memo_get_pokemon[memo_key] = (None, [], float('inf'), consumed_owned_ids)
+        return None, [], float('inf'), consumed_owned_ids
+
+    best_overall_child_obj: Optional[Pokemon] = None
+    min_overall_cost = float('inf')
+    best_overall_steps: List[BreedingStepDetailed] = []
+    best_overall_consumed_ids = consumed_owned_ids
+
+    def option_complexity_sort_key(opt):
+        c = len(opt['p1_spec']['ivs']) + len(opt['p2_spec']['ivs'])
+        if opt['p1_spec']['nature'] != "NEUTRAL": c += 1
+        if opt['p2_spec']['nature'] != "NEUTRAL": c += 1
+        if opt['p1_spec']['species'].lower() == 'ditto' or opt['p2_spec']['species'].lower() == 'ditto':
+            c -= 0.5
+
+        p1_tuple_check = (opt['p1_spec']['species'].capitalize(), frozenset(opt['p1_spec']['ivs']),
+                          opt['p1_spec']['nature'])
+        p2_tuple_check = (opt['p2_spec']['species'].capitalize(), frozenset(opt['p2_spec']['ivs']),
+                          opt['p2_spec']['nature'])
+
+        if p1_tuple_check == current_target_tuple_for_loop_check: c += 1000
+        if p2_tuple_check == current_target_tuple_for_loop_check: c += 1000
+        return c
+
+    sorted_parent_options = sorted(possible_parent_options, key=option_complexity_sort_key)
+
+    for option_idx, parent_option in enumerate(sorted_parent_options):
+        p1_spec = parent_option['p1_spec']
+        p2_spec = parent_option['p2_spec']
+
+        p1_obj_result, p1_plan_result, p1_cost_result, p1_consumed_after = get_pokemon_with_minimal_cost(
+            p1_spec['species'], set(p1_spec['ivs']), p1_spec['nature'],
+            owned_pokemon_map, consumed_owned_ids, depth + 1
+        )
+
+        if p1_obj_result is None or p1_cost_result == float('inf'):
             continue
 
-        if not other_parent_spec_in_option: continue
+        p2_obj_result, p2_plan_result, p2_cost_result, p2_consumed_after = get_pokemon_with_minimal_cost(
+            p2_spec['species'], set(p2_spec['ivs']), p2_spec['nature'],
+            owned_pokemon_map, p1_consumed_after, depth + 1
+        )
 
-        other_parent_resolved_node: Optional[BreedingNode] = None
-        other_parent_target_state_tuple = (other_parent_spec_in_option['species'],
-                                           frozenset(other_parent_spec_in_option['ivs']),
-                                           other_parent_spec_in_option['nature'])
-
-        possible_other_parents = [node for key, node in closed_list.items() if
-                                  node.get_state_tuple() == other_parent_target_state_tuple]
-        for p_other_candidate in possible_other_parents:
-            if p_other_candidate.g_cost != float('inf') and \
-                    not resolved_parent_P.used_owned_pokemon_ids.intersection(p_other_candidate.used_owned_pokemon_ids):
-                if other_parent_resolved_node is None or p_other_candidate.g_cost < other_parent_resolved_node.g_cost:
-                    other_parent_resolved_node = p_other_candidate
-
-        if not other_parent_resolved_node:
-            d_print(
-                f"        [Propagate] Altro genitore P_other ({other_parent_target_state_tuple}) non ancora risolto/compatibile in closed_list. Salto aggiornamento per C.")
+        if p2_obj_result is None or p2_cost_result == float('inf'):
             continue
 
-        # Point 8
-        d_print(f"        [Propagate] Found other_parent_resolved_node: {other_parent_resolved_node.get_state_tuple()} (g={other_parent_resolved_node.g_cost:.2f}, used:{other_parent_resolved_node.used_owned_pokemon_ids}) for child_C {child_C_node_original_ref.get_state_tuple()}")
-        d_print(
-            f"        [Propagate] Trovato altro genitore P_other risolto: {other_parent_resolved_node.get_state_tuple()} (key: {other_parent_resolved_node.get_full_state_tuple_for_closed_list()}) con g={other_parent_resolved_node.g_cost}. Used: {other_parent_resolved_node.used_owned_pokemon_ids}")
+        current_option_total_cost = p1_cost_result + p2_cost_result
 
-        new_g_cost_for_child_C = resolved_parent_P.g_cost + other_parent_resolved_node.g_cost
-        # Point 9
-        d_print(f"        [Propagate] Child C {child_C_node_original_ref.get_state_tuple()}: P1_g(resolved_parent_P)={resolved_parent_P.g_cost:.2f}, P2_g(other_parent)={other_parent_resolved_node.g_cost:.2f} -> new_child_g={new_g_cost_for_child_C:.2f}")
-        combined_used_ids = resolved_parent_P.used_owned_pokemon_ids.union(
-            other_parent_resolved_node.used_owned_pokemon_ids)
-        child_C_target_full_key = (child_C_node_original_ref.species, child_C_node_original_ref.ivs,
-                                   child_C_node_original_ref.nature, frozenset(combined_used_ids))
+        if current_option_total_cost < min_overall_cost:
+            min_overall_cost = current_option_total_cost
 
-        node_to_update_C: BreedingNode
-        if child_C_target_full_key in open_list_map:
-            node_to_update_C = open_list_map[child_C_target_full_key]
-        elif child_C_target_full_key in closed_list:
-            node_to_update_C = closed_list[child_C_target_full_key]
-        elif child_C_node_original_ref.get_full_state_tuple_for_closed_list() == child_C_target_full_key:
-            node_to_update_C = child_C_node_original_ref
-        else:
-            node_to_update_C = BreedingNode(
-                species=child_C_node_original_ref.species, ivs=child_C_node_original_ref.ivs,
-                nature=child_C_node_original_ref.nature,
-                g_cost=float('inf'), depth=child_C_node_original_ref.depth,
-                used_owned_ids=combined_used_ids
+            p1_gender_for_step, p2_gender_for_step = "Maschio", "Femmina"
+            effective_p1_species = p1_obj_result.species.lower()
+            effective_p2_species = p2_obj_result.species.lower()
+
+            if effective_p1_species == "ditto":
+                p1_gender_for_step = "Genderless"
+                p2_gender_for_step = "Femmina" if effective_p2_species != "ditto" else "Genderless"
+                if POKEMON_EGG_GROUPS_RAW.get(p2_obj_result.species.lower(), [""])[
+                    0] == "Genderless" and effective_p2_species != "ditto":
+                    p2_gender_for_step = "Genderless"
+            elif effective_p2_species == "ditto":
+                p2_gender_for_step = "Genderless"
+                p1_gender_for_step = "Femmina" if effective_p1_species != "ditto" else "Genderless"
+                if POKEMON_EGG_GROUPS_RAW.get(p1_obj_result.species.lower(), [""])[
+                    0] == "Genderless" and effective_p1_species != "ditto":
+                    p1_gender_for_step = "Genderless"
+            else:
+                if effective_p1_species == target_species_cap.lower():
+                    p1_gender_for_step = "Femmina";
+                    p2_gender_for_step = "Maschio"
+                elif effective_p2_species == target_species_cap.lower():
+                    p2_gender_for_step = "Femmina";
+                    p1_gender_for_step = "Maschio"
+                else:
+                    if p1_spec['species'].lower() == target_species_cap.lower():
+                        p1_gender_for_step = "Femmina";
+                        p2_gender_for_step = "Maschio"
+                    elif p2_spec['species'].lower() == target_species_cap.lower():
+                        p2_gender_for_step = "Femmina";
+                        p1_gender_for_step = "Maschio"
+                    else:
+                        d_print(
+                            f"ATTENZIONE: Logica genere P1/P2 incerta per {p1_obj_result.species} + {p2_obj_result.species} -> {target_species_cap}")
+                        p1_gender_for_step = "Femmina";
+                        p2_gender_for_step = "Maschio"
+
+            child_for_this_step = Pokemon(species=target_species_cap,
+                                          ivs=set(target_ivs_fs),
+                                          nature=target_nature,
+                                          gender="Nascituro",
+                                          name=f"Bred_{target_species_cap[:3]}",
+                                          source_info=f"Intermedio (ID:temp, Costo Prod.: {min_overall_cost:.1f})")
+            child_for_this_step.cost_to_produce = min_overall_cost
+            child_for_this_step.source_info = f"Figlio Intermedio (ID:{child_for_this_step.id}, Costo Prod.: {min_overall_cost:.1f})"
+            best_overall_child_obj = child_for_this_step
+
+            p1_step_parent = p1_obj_result
+            p1_step_parent.gender = p1_gender_for_step
+
+            p2_step_parent = p2_obj_result
+            p2_step_parent.gender = p2_gender_for_step
+
+            current_step = BreedingStepDetailed(
+                child_pokemon=best_overall_child_obj,
+                parent1_pokemon=p1_step_parent, parent1_item=parent_option['item1'],
+                parent2_pokemon=p2_step_parent, parent2_item=parent_option['item2']
             )
-            node_to_update_C.parent_options_for_this_node = list(child_C_node_original_ref.parent_options_for_this_node)
-            node_to_update_C.children_in_plan_this_node_is_parent_for = list(
-                child_C_node_original_ref.children_in_plan_this_node_is_parent_for)
-        
-        # Point 10
-        d_print(f"        [Propagate] Comparing new_g_cost {new_g_cost_for_child_C:.2f} with existing g_cost {node_to_update_C.g_cost:.2f} for child key {child_C_target_full_key}")
-        if new_g_cost_for_child_C < node_to_update_C.g_cost:
+            best_overall_steps = p1_plan_result + p2_plan_result + [current_step]
+            best_overall_consumed_ids = p2_consumed_after
+
             d_print(
-                f"        [Propagate] Trovato percorso MIGLIORE per figlio C {node_to_update_C.get_state_tuple()} (key: {child_C_target_full_key}): nuovo g={new_g_cost_for_child_C} (vecchio g={node_to_update_C.g_cost}). Used IDs: {combined_used_ids}")
+                f"{'  ' * (depth + 1)}  SUCCESSFUL OPTION: Total cost {min_overall_cost}. Consumed: {list(best_overall_consumed_ids)}")
 
-            old_f_cost_for_logging = node_to_update_C.f_cost # Capture old f_cost before g_cost is updated
-            node_to_update_C.g_cost = new_g_cost_for_child_C
-            node_to_update_C.used_owned_pokemon_ids = combined_used_ids
-            node_to_update_C.action_taken_to_create_this_node = {
-                'type': 'bred',
-                'p1_node_full_key': resolved_parent_P.get_full_state_tuple_for_closed_list() if resolved_parent_P.get_state_tuple() == (
-                    p1_spec_in_option['species'], frozenset(p1_spec_in_option['ivs']),
-                    p1_spec_in_option['nature']) else other_parent_resolved_node.get_full_state_tuple_for_closed_list(),
-                'p2_node_full_key': other_parent_resolved_node.get_full_state_tuple_for_closed_list() if resolved_parent_P.get_state_tuple() == (
-                    p1_spec_in_option['species'], frozenset(p1_spec_in_option['ivs']),
-                    p1_spec_in_option['nature']) else resolved_parent_P.get_full_state_tuple_for_closed_list(),
-                'item1': breeding_option_for_C['item1'],
-                'item2': breeding_option_for_C['item2']
-            }
-            node_to_update_C.h_cost = calculate_heuristic(node_to_update_C, owned_pokemon_list)
-            d_print(f"          [Propagate] Aggiornato figlio C: {node_to_update_C}")
-            # Point 11
-            d_print(f"          [Propagate] Better path FOUND for {child_C_target_full_key}. Updating node. Old f={old_f_cost_for_logging:.2f}, New f calculated from new_g ({new_g_cost_for_child_C:.2f}) and existing_h ({node_to_update_C.h_cost:.2f}) will be {new_g_cost_for_child_C + node_to_update_C.h_cost:.2f}")
-
-
-            if child_C_target_full_key in closed_list and closed_list[child_C_target_full_key] == node_to_update_C:
-                del closed_list[child_C_target_full_key]
-                # Point 12
-                d_print(f"          [Propagate] Child {child_C_target_full_key} was in closed_list with higher cost. Removing to re-evaluate and add to open_list.")
-                d_print(f"          [Propagate] Rimosso {child_C_target_full_key} da closed_list per riapertura.")
-
-            if child_C_target_full_key in open_list_map:
-                if open_list_map[child_C_target_full_key] != node_to_update_C or \
-                        open_list_map[child_C_target_full_key].g_cost > new_g_cost_for_child_C: # Check if g_cost is actually better
-                    try:
-                        # If the node instance itself is different or g_cost is higher, remove old one before adding/updating.
-                        # This handles cases where node_to_update_C is a new instance for an existing key.
-                        if open_list_map[child_C_target_full_key] != node_to_update_C :
-                             open_list.remove(open_list_map[child_C_target_full_key])
-                             heapq.heapify(open_list) # re-heapify
-                    except ValueError: # pragma: no cover
-                        pass # Element might have been already removed or not present by other means (less likely here)
-                    
-                    # Add the new or updated node to heap and map
-                    heapq.heappush(open_list, node_to_update_C)
-                    open_list_map[child_C_target_full_key] = node_to_update_C # Update map to the new or updated node
-                    d_print(f"          [Propagate] Nodo {child_C_target_full_key} aggiornato/riaggiunto a open_list.")
-                    # Point 13
-                    d_print(f"          [Propagate] Pushing/Updating child {node_to_update_C} to open_list. New f={node_to_update_C.f_cost:.2f}")
-            else: # Not in open_list_map, so add it
-                heapq.heappush(open_list, node_to_update_C)
-                open_list_map[child_C_target_full_key] = node_to_update_C
-                d_print(f"          [Propagate] Nodo {child_C_target_full_key} aggiunto a open_list.")
-                # Point 13
-                d_print(f"          [Propagate] Pushing/Updating child {node_to_update_C} to open_list. New f={node_to_update_C.f_cost:.2f}")
-        else:
-            d_print(
-                f"        [Propagate] Percorso NON migliore per figlio C {node_to_update_C.get_state_tuple()} (key: {child_C_target_full_key}): nuovo g={new_g_cost_for_child_C}, vecchio g={node_to_update_C.g_cost}.")
-
-
-def _materialize_node_recursively(
-        node_to_materialize_key: Tuple[str, frozenset, str, frozenset],
-        target_gender_for_this_instance: str,
-        closed_list_lookup: Dict[Tuple[str, frozenset, str, frozenset], BreedingNode],
-        owned_pokemon_map_by_id: Dict[int, Pokemon],
-        parent_context_name: str,
-        is_final_target_node: bool
-) -> Tuple[Optional[Pokemon], List[BreedingStepDetailed]]:
-    global _RECONSTRUCTION_INSTANCE_COUNTER
-    _RECONSTRUCTION_INSTANCE_COUNTER += 1
-    current_instance_suffix = f"inst{_RECONSTRUCTION_INSTANCE_COUNTER}"
-
-    node_definition = closed_list_lookup.get(node_to_materialize_key)
-    if not node_definition:
+    if best_overall_child_obj:
         d_print(
-            f"  [RecursiveMat:{current_instance_suffix}] ERRORE: Definizione nodo {node_to_materialize_key} non trovata.")
-        error_pkm = Pokemon("ErroreRic", set(), "NEUTRAL", "N/A",
-                            name=f"Err_{parent_context_name}_{current_instance_suffix}",
-                            source_info="Def Nodo Mancante")
-        return error_pkm, []
-
-    action = node_definition.action_taken_to_create_this_node
-    steps_for_this_node: List[BreedingStepDetailed] = []
-    created_pokemon_instance: Optional[Pokemon] = None
-
-    effective_gender = target_gender_for_this_instance
-    if node_definition.species.lower() == "ditto":
-        effective_gender = "Genderless"
-
-    unique_name_base = f"{node_definition.species[:3]}_{parent_context_name}_{current_instance_suffix}"
-
-    if not action:
-        d_print(
-            f"  [RecursiveMat:{current_instance_suffix}] ERRORE: Azione mancante per nodo {node_to_materialize_key}")
-        created_pokemon_instance = Pokemon(node_definition.species, set(node_definition.ivs), node_definition.nature,
-                                           effective_gender,
-                                           name=f"Err_NoAct_{unique_name_base}",
-                                           source_info=f"Azione Mancante ({unique_name_base})")
-        return created_pokemon_instance, []
-
-    elif action['type'] == 'owned':
-        pkm_id = action['pokemon_id']
-        original_pkm_obj = action.get('pokemon_object') or owned_pokemon_map_by_id.get(pkm_id)
-        if original_pkm_obj:
-            actual_display_gender = original_pkm_obj.gender
-            if original_pkm_obj.species.lower() != "ditto":
-                actual_display_gender = target_gender_for_this_instance if is_final_target_node else original_pkm_obj.gender
-            else:
-                actual_display_gender = "Genderless"
-
-            created_pokemon_instance = Pokemon(original_pkm_obj.species, original_pkm_obj.ivs, original_pkm_obj.nature,
-                                               actual_display_gender,
-                                               name=f"{original_pkm_obj.name}_{current_instance_suffix}", is_owned=True,
-                                               source_info=f"Posseduto (ID:{original_pkm_obj.id}) per {parent_context_name} (Costo Nodo:{node_definition.g_cost})")
-            created_pokemon_instance.id = original_pkm_obj.id
-        else:
-            created_pokemon_instance = Pokemon(node_definition.species, set(node_definition.ivs),
-                                               node_definition.nature, effective_gender,
-                                               name=f"Err_OwnMiss_{unique_name_base}",
-                                               source_info=f"Posseduto Mancante ID:{pkm_id}")
-        return created_pokemon_instance, []
-
-    elif action['type'] == 'bought_base':
-        created_pokemon_instance = Pokemon(node_definition.species, set(node_definition.ivs), node_definition.nature,
-                                           effective_gender,
-                                           name=f"Acq_{unique_name_base}", is_owned=False,
-                                           source_info=f"Acquistato Base per {parent_context_name} (Costo Nodo:{node_definition.g_cost})")
-        return created_pokemon_instance, []
-
-    elif action['type'] == 'bred':
-        p1_key, p2_key = action.get('p1_node_full_key'), action.get('p2_node_full_key')
-        item1, item2 = action.get('item1'), action.get('item2')
-
-        p1_node_def = closed_list_lookup.get(p1_key)
-        p2_node_def = closed_list_lookup.get(p2_key)
-
-        if not p1_node_def or not p2_node_def:
-            d_print(
-                f"  [RecursiveMat:{current_instance_suffix}] ERRORE: Def genitore mancante per {node_to_materialize_key}")
-            error_pkm = Pokemon(node_definition.species, set(node_definition.ivs), node_definition.nature,
-                                effective_gender, name=f"Err_ParentDef_{unique_name_base}",
-                                source_info="Def Genitore Mancante")
-            return error_pkm, []
-
-        p1_req_gender, p2_req_gender = "Maschio", "Femmina"
-
-        if p1_node_def.species.lower() == "ditto":
-            p1_req_gender = "Genderless"
-            # If P1 is Ditto, P2 must be the one providing the species for the child.
-            # P2's gender for breeding with Ditto can be either Male or Female.
-            # We assign a gender opposite to the desired child's gender for P2,
-            # unless child is genderless (then P2 can be anything not Ditto).
-            if effective_gender == "Genderless":
-                p2_req_gender = "Femmina"  # Default if child is genderless and P2 is not Ditto
-            else:
-                p2_req_gender = "Femmina" if effective_gender == "Maschio" else "Maschio"
-
-            if node_definition.species.lower() != p2_node_def.species.lower():
-                d_print(
-                    f"  [RecursiveMat:{current_instance_suffix}] ERRORE SPECIE (P1 Ditto): P2 {p2_node_def.species} dovrebbe essere {node_definition.species}")
-        elif p2_node_def.species.lower() == "ditto":
-            p2_req_gender = "Genderless"
-            # If P2 is Ditto, P1 must be the one providing the species.
-            if effective_gender == "Genderless":
-                p1_req_gender = "Femmina"  # Default if child is genderless and P1 is not Ditto
-            else:
-                p1_req_gender = "Femmina" if effective_gender == "Maschio" else "Maschio"
-            if node_definition.species.lower() != p1_node_def.species.lower():
-                d_print(
-                    f"  [RecursiveMat:{current_instance_suffix}] ERRORE SPECIE (P2 Ditto): P1 {p1_node_def.species} dovrebbe essere {node_definition.species}")
-        else:  # Neither parent is Ditto
-            # Child species must come from the female parent.
-            # If child species matches P1, P1 must be female.
-            if node_definition.species.lower() == p1_node_def.species.lower():
-                p1_req_gender = "Femmina"
-                p2_req_gender = "Maschio"
-            # If child species matches P2, P2 must be female.
-            elif node_definition.species.lower() == p2_node_def.species.lower():
-                p2_req_gender = "Femmina"
-                p1_req_gender = "Maschio"
-            else:
-                # This case implies an egg group match but different species, which is complex.
-                # For now, default to P1 female, P2 male if species don't match child.
-                # This might need refinement based on specific game mechanics for cross-species breeding if it's common.
-                d_print(
-                    f"  [RecursiveMat:{current_instance_suffix}] AVVISO SPECIE/GENERE (Non-Ditto): Figlio={node_definition.species}, P1={p1_node_def.species}, P2={p2_node_def.species}. Assegnazione generi di default P1=F, P2=M.")
-                p1_req_gender = "Femmina"
-                p2_req_gender = "Maschio"
-
-        (p1_instance, p1_steps) = _materialize_node_recursively(p1_key, p1_req_gender, closed_list_lookup,
-                                                                owned_pokemon_map_by_id, parent_context_name + "_p1",
-                                                                False)
-        (p2_instance, p2_steps) = _materialize_node_recursively(p2_key, p2_req_gender, closed_list_lookup,
-                                                                owned_pokemon_map_by_id, parent_context_name + "_p2",
-                                                                False)
-
-        if not p1_instance or not p2_instance:
-            d_print(
-                f"  [RecursiveMat:{current_instance_suffix}] ERRORE: Fallita materializzazione di un genitore per {node_to_materialize_key}")
-            created_pokemon_instance = Pokemon(node_definition.species, set(node_definition.ivs),
-                                               node_definition.nature, effective_gender,
-                                               name=f"Err_ParentMat_{unique_name_base}",
-                                               source_info="Fallita Mat. Genitore")
-            all_partial_steps = []
-            if p1_steps: all_partial_steps.extend(p1_steps)
-            if p2_steps: all_partial_steps.extend(p2_steps)
-            return created_pokemon_instance, all_partial_steps
-
-        # Ensure correct gender assignment for display and logic, especially if one is Ditto
-        p1_final_gender = p1_instance.gender
-        p2_final_gender = p2_instance.gender
-
-        if p1_instance.species.lower() == "ditto":
-            p1_final_gender = "Genderless"
-            # If P1 is Ditto, P2 determines the species. P2's gender should be set according to breeding rules.
-            # If child is genderless, P2 can be M/F. If child has gender, P2 is that gender.
-            if node_definition.species.lower() == p2_instance.species.lower():  # P2 is the species parent
-                if effective_gender != "Genderless":
-                    p2_final_gender = effective_gender  # P2 takes child's gender if child is gendered
-                # If child is genderless, p2_final_gender remains as it was (M or F, not Ditto)
-        elif p2_instance.species.lower() == "ditto":
-            p2_final_gender = "Genderless"
-            if node_definition.species.lower() == p1_instance.species.lower():  # P1 is the species parent
-                if effective_gender != "Genderless":
-                    p1_final_gender = effective_gender
-        else:  # Neither is Ditto
-            # The female parent determines the species.
-            # Ensure the parent providing the species is female.
-            if node_definition.species.lower() == p1_instance.species.lower():
-                p1_final_gender = "Femmina"
-                p2_final_gender = "Maschio"
-            elif node_definition.species.lower() == p2_instance.species.lower():
-                p2_final_gender = "Femmina"
-                p1_final_gender = "Maschio"
-            # If genders were conflicting (e.g. both male), adjust one.
-            if p1_final_gender != "Genderless" and p2_final_gender != "Genderless" and p1_final_gender == p2_final_gender:
-                d_print(
-                    f"  [RecursiveMat:{current_instance_suffix}] Adattamento genere (non-Ditto): P1({p1_final_gender}) & P2({p2_final_gender}) -> P2 diventa l'opposto di P1.")
-                p2_final_gender = "Femmina" if p1_final_gender == "Maschio" else "Maschio"
-
-        p1_instance.gender = p1_final_gender
-        p2_instance.gender = p2_final_gender
-
-        created_pokemon_instance = Pokemon(node_definition.species, set(node_definition.ivs), node_definition.nature,
-                                           effective_gender,
-                                           name=f"Bred_{unique_name_base}",
-                                           source_info=f"Generato per {parent_context_name} (Costo Nodo Orig:{node_definition.g_cost})")
-
-        current_step = BreedingStepDetailed(created_pokemon_instance, p1_instance, item1, p2_instance, item2)
-        steps_for_this_node.extend(p1_steps)
-        steps_for_this_node.extend(p2_steps)
-        steps_for_this_node.append(current_step)
-
-        return created_pokemon_instance, steps_for_this_node
-
+            f"{'  ' * depth}RETURNING BEST for {target_species_cap} {target_ivs_fs} {target_nature}: Cost={min_overall_cost}, Child ID: {best_overall_child_obj.id}")
+        memo_get_pokemon[memo_key] = (best_overall_child_obj, best_overall_steps, min_overall_cost,
+                                      best_overall_consumed_ids)
+        return best_overall_child_obj, best_overall_steps, min_overall_cost, best_overall_consumed_ids
     else:
-        d_print(
-            f"  [RecursiveMat:{current_instance_suffix}] ERRORE: Tipo azione '{action.get('type')}' sconosciuto per {node_to_materialize_key}")
-        created_pokemon_instance = Pokemon(node_definition.species, set(node_definition.ivs), node_definition.nature,
-                                           effective_gender, name=f"Err_BadAct_{unique_name_base}",
-                                           source_info="Azione Sconosciuta")
-        return created_pokemon_instance, []
+        d_print(f"{'  ' * depth}NO VIABLE BREEDING PATH found for {target_species_cap} {target_ivs_fs} {target_nature}")
+        memo_get_pokemon[memo_key] = (None, [], float('inf'), consumed_owned_ids)
+        return None, [], float('inf'), consumed_owned_ids
 
 
-def reconstruct_plan(final_node: BreedingNode, target_final_gender: str,
-                     owned_pokemon_map_by_id: Dict[int, Pokemon],
-                     closed_list_for_lookup: Dict[Tuple[str, frozenset, str, frozenset], BreedingNode]
-                     ) -> List[BreedingStepDetailed]:
-    d_print("\n--- Inizio Ricostruzione Piano (Logica Ricorsiva) ---")
-    global _RECONSTRUCTION_INSTANCE_COUNTER, _final_target_node_for_reconstruction
-    _RECONSTRUCTION_INSTANCE_COUNTER = 0
-    _final_target_node_for_reconstruction = final_node
+def plan_breeding_recursively_phased(
+        target_species: str,
+        target_ivs: Set[str],
+        target_nature: str,
+        target_gender: str,
+        owned_pokemon_list: List[Pokemon]
+) -> Optional[List[BreedingStepDetailed]]:
+    global memo_get_pokemon
+    memo_get_pokemon = {}
 
     max_owned_id = -1
-    if owned_pokemon_map_by_id:
-        max_owned_id = max(owned_pokemon_map_by_id.keys(), default=-1)
-    Pokemon._id_counter = max_owned_id + 1001  # Start new IDs well above owned ones
-
-    if final_node is None or (not final_node.action_taken_to_create_this_node and final_node.g_cost == float('inf')):
-        d_print(f"  [Reconstruct] Nodo finale invalido o non risolto. Impossibile ricostruire.")
-        return [BreedingStepDetailed(
-            Pokemon("Errore", set(), "NEUTRAL", "N/A", source_info=f"Piano Invalido (Nodo Target non risolto)"),
-            Pokemon("N/A", set(), "NEUTRAL", "N/A"), None, Pokemon("N/A", set(), "NEUTRAL", "N/A"), None)]
-
-    final_node_key = final_node.get_full_state_tuple_for_closed_list()
-
-    final_pokemon_instance, all_steps = _materialize_node_recursively(
-        final_node_key,
-        target_final_gender,
-        closed_list_for_lookup,
-        owned_pokemon_map_by_id,
-        "target",
-        True  # This is the final target node
-    )
-
-    # Assign step numbers and refine source info for generated/bought Pokemon in steps
-    generated_pokemon_in_plan_ids = set()
-    step_counter = 0
-    final_plan_ordered: List[BreedingStepDetailed] = []
-
-    # First, identify all Pokemon that are products of a breeding step (children)
-    # These are the ones that will get a step number in their source_info if they are bred
-    # Owned or directly bought base Pokemon for the final target don't get this "Passo X" in source.
-
-    # We need a way to uniquely identify Pokemon instances within the plan as they are created
-    # The Pokemon.id is global, so newly created Pokemon will have unique IDs.
-    # We can use these IDs to track if a Pokemon in a step was already part of a previous step's output.
-
-    # Re-think step numbering:
-    # The goal is to present a chronological plan.
-    # The `all_steps` list is already roughly in order of dependency due to recursion.
-    # We just need to assign sequential step numbers.
-
-    temp_id_map_for_reconstruction: Dict[
-        int, Pokemon] = {}  # Maps original Pokemon ID to reconstructed instance for this plan
-
-    # Populate owned Pokemon into the temp map
-    for p_id, p_obj in owned_pokemon_map_by_id.items():
-        temp_id_map_for_reconstruction[p_id] = p_obj
-
-    processed_child_ids_for_numbering = set()
-
-    for i, step in enumerate(all_steps):
-        step.step_number = i + 1
-
-        # Update source_info for the child of this step
-        child_source_info_prefix = "Generato"
-        if step.child.source_info.startswith("Acq_"):  # Indicates it was a 'bought_base' type node
-            child_source_info_prefix = "Acquistato Base"
-
-        # Ensure child's name reflects its role if it's not an owned Pokemon being directly used
-        # The name like "Bred_Cha_target_p1_inst123" is already good.
-        # Source info should clearly indicate it's from this step.
-        step.child.source_info = f"{child_source_info_prefix} (Passo {step.step_number})"
-
-        # For parents, if they were from a previous step, their source_info should already be set.
-        # If a parent is an owned Pokemon, its source_info will be like "Posseduto (ID:X)"
-        # If a parent was bought base for a previous step, its source_info will reflect that.
-
-        # Add the child to the temp_id_map if it's newly created in this step
-        if not step.child.is_owned:  # Check if it's not an original owned Pokemon
-            temp_id_map_for_reconstruction[step.child.id] = step.child
-
-        # Update parent instances from the temp_id_map if they were products of earlier steps or owned
-        if step.parent1.id in temp_id_map_for_reconstruction and temp_id_map_for_reconstruction[
-            step.parent1.id] != step.parent1:
-            step.parent1 = temp_id_map_for_reconstruction[step.parent1.id]
-        elif not step.parent1.is_owned and step.parent1.id not in temp_id_map_for_reconstruction and step.parent1.name != "N/A":
-            # This case implies a parent was materialized but not from owned or a previous step's child,
-            # which means it was likely a 'bought_base' that didn't become a child of another step.
-            # Its source_info should reflect it was bought.
-            if "Acquistato Base per" in step.parent1.source_info:  # Check the original source_info from node materialization
-                step.parent1.source_info = "Acquistato Base (Necessario per Passo Successivo)"  # Generic, as it's not a step child
-            temp_id_map_for_reconstruction[step.parent1.id] = step.parent1
-
-        if step.parent2.id in temp_id_map_for_reconstruction and temp_id_map_for_reconstruction[
-            step.parent2.id] != step.parent2:
-            step.parent2 = temp_id_map_for_reconstruction[step.parent2.id]
-        elif not step.parent2.is_owned and step.parent2.id not in temp_id_map_for_reconstruction and step.parent2.name != "N/A":
-            if "Acquistato Base per" in step.parent2.source_info:
-                step.parent2.source_info = "Acquistato Base (Necessario per Passo Successivo)"
-            temp_id_map_for_reconstruction[step.parent2.id] = step.parent2
-
-    if not all_steps and final_pokemon_instance:
-        action = final_node.action_taken_to_create_this_node
-        if action and action.get('type') in ('owned', 'bought_base'):
-            d_print(f"  [Reconstruct] Piano finale è un Pokémon base/owned: {final_pokemon_instance}")
-            dummy_p = Pokemon("N/A", set(), "NEUTRAL", "N/A", source_info="Non Applicabile")
-            # Update source_info of the final Pokemon to be more descriptive for this special case
-            final_pokemon_instance.source_info = f"TARGET ({action.get('type').upper()}, Costo Totale: {final_node.g_cost})"
-            if action.get('type') == 'owned':
-                final_pokemon_instance.source_info += f", ID Originale: {action.get('pokemon_id')}"
-            return [BreedingStepDetailed(final_pokemon_instance, dummy_p, None, dummy_p, None,
-                                         step_number=0)]  # Step 0 for base case
-
-    d_print(f"--- Fine Ricostruzione Piano (Logica Ricorsiva). Step totali: {len(all_steps)} ---")
-    if not all_steps:
-        d_print(
-            f"  [Reconstruct] Nessuno step generato. Nodo finale: {final_node}, Azione: {final_node.action_taken_to_create_this_node}")
-        return [BreedingStepDetailed(
-            Pokemon("Errore", set(), "NEUTRAL", "N/A",
-                    source_info=f"Piano Vuoto o Errore Ricostr. (Target: {final_node.get_state_tuple()})"),
-            Pokemon("N/A", set(), "NEUTRAL", "N/A"), None, Pokemon("N/A", set(), "NEUTRAL", "N/A"), None)]
-
-    return all_steps
-
-
-def find_optimal_breeding_plan(
-        target_species: str, target_ivs: Set[str], target_nature: str, target_gender: str,
-        owned_pokemon_list: List[Pokemon], max_depth: int = 10, max_nodes_to_explore: int = 100000
-):
-    initial_max_id = -1
     if owned_pokemon_list:
-        initial_max_id = max((p.id for p in owned_pokemon_list), default=-1)
-    Pokemon._id_counter = initial_max_id + 1
+        valid_ids = [p.id for p in owned_pokemon_list if hasattr(p, 'id') and isinstance(p.id, int)]
+        if valid_ids:
+            max_owned_id = max(valid_ids)
+    Pokemon._id_counter = max_owned_id + 1001
 
-    d_print(f"\n--- Inizio A* per {target_species} {target_ivs} {target_nature} ({target_gender}) ---")
-    d_print(f"Pokémon Posseduti: {[str(p) for p in owned_pokemon_list]}")
+    owned_pokemon_map = {p.id: p for p in owned_pokemon_list}
 
-    start_node = BreedingNode(species=target_species, ivs=target_ivs, nature=target_nature,
-                              g_cost=float('inf'), depth=0, used_owned_ids=set())
-    start_node.h_cost = calculate_heuristic(start_node, owned_pokemon_list)
+    d_print(
+        f"\n\n--- Inizio Pianificazione: {target_species} IVs:{target_ivs} N:{target_nature} G:{target_gender} ({time.strftime('%H:%M:%S')}) ---")
+    d_print(f"Pokémon Posseduti Iniziali: {[(p.name, p.id, p.ivs, p.nature) for p in owned_pokemon_list]}")
+    d_print(f"ID Counter start: {Pokemon._id_counter}")
 
-    open_list: List[BreedingNode] = []
-    open_list_map: Dict[Tuple[str, frozenset, str, frozenset], BreedingNode] = {}
-
-    heapq.heappush(open_list, start_node)
-    open_list_map[start_node.get_full_state_tuple_for_closed_list()] = start_node
-    d_print(f"[A*] Start Node aggiunto a Open List: {start_node}")
-
-    closed_list: Dict[Tuple[str, frozenset, str, frozenset], BreedingNode] = {}
-    nodes_processed_count = 0
-
-    while open_list and nodes_processed_count < max_nodes_to_explore:
-        nodes_processed_count += 1
-        current_C_node = heapq.heappop(open_list)
-        # Point 1
-        d_print(f"  [A*] Popped from Open: {current_C_node} with f={current_C_node.f_cost:.2f}, g={current_C_node.g_cost:.2f}, h={current_C_node.h_cost:.2f}")
-        current_C_full_key = current_C_node.get_full_state_tuple_for_closed_list()
-
-        if current_C_full_key in open_list_map:
-            del open_list_map[current_C_full_key]
-
-        d_print(
-            f"\n[A* ({nodes_processed_count})] Nodo C estratto da Open List ({len(open_list)} rimasti): {current_C_node}")
-        
-        # Point 2
-        d_print(f"    [A*] Checking closed_list for {current_C_full_key}. Found existing node: {closed_list.get(current_C_full_key)}. Current g={current_C_node.g_cost:.2f}. Existing g={closed_list[current_C_full_key].g_cost:.2f if closed_list.get(current_C_full_key) else 'N/A'}. Skipping: {closed_list.get(current_C_full_key) is not None and closed_list[current_C_full_key].g_cost <= current_C_node.g_cost}")
-        if current_C_full_key in closed_list:
-            closed_g = closed_list[current_C_full_key].g_cost
-            current_g = current_C_node.g_cost
-            if closed_g <= current_g:
-                d_print(
-                    f"  [A*] Nodo C {current_C_node.get_state_tuple()} (key: {current_C_full_key}) già in Closed List con costo ({closed_g}) <= costo corrente ({current_g}). Salto.")
-                continue
-
-        # Risoluzione del nodo C se è una foglia e la sua azione non è ancora stata definita
-        if current_C_node.action_taken_to_create_this_node is None:
-            owned_match = None
-            for pkm in owned_pokemon_list:
-                if pkm.id not in current_C_node.used_owned_pokemon_ids and \
-                        pkm.species == current_C_node.species and \
-                        current_C_node.ivs.issubset(pkm.ivs) and \
-                        (current_C_node.nature == "NEUTRAL" or current_C_node.nature == pkm.nature):
-                    owned_match = pkm;
-                    break
-
-            if owned_match:
-                # This node can be fulfilled by an owned Pokemon
-                current_C_node.g_cost = 0  # Cost is 0 for using an owned Pokemon
-                current_C_node.used_owned_pokemon_ids = current_C_node.used_owned_pokemon_ids.union(
-                    {owned_match.id})
-                current_C_node.action_taken_to_create_this_node = {'type': 'owned', 'pokemon_id': owned_match.id,
-                                                                   'pokemon_object': owned_match}
-                d_print(
-                    f"  [A*] Nodo C {current_C_node.get_state_tuple()} (key: {current_C_node.get_full_state_tuple_for_closed_list()}) RISOLTO come 'owned', g_cost=0")
-                # Point 3
-                d_print(f"    [A*] Resolved as OWNED: {current_C_node.get_state_tuple()} (key: {current_C_full_key}) using PkID {owned_match.id}. New g={current_C_node.g_cost:.2f}, UsedIDs={current_C_node.used_owned_pokemon_ids}")
-
-            # MODIFIED BLOCK: If not an owned_match, check if it's a buyable base Pokemon
-            else:  # No owned match found, try to buy if it's a base Pokemon
-                is_buyable_base = (not current_C_node.ivs and current_C_node.nature == "NEUTRAL") or \
-                                  (len(current_C_node.ivs) == 1 and current_C_node.nature == "NEUTRAL") or \
-                                  (not current_C_node.ivs and current_C_node.nature != "NEUTRAL") or \
-                                  (len(current_C_node.ivs) == 1 and current_C_node.nature != "NEUTRAL") # Added: 1 IV + Specific Nature
-                if is_buyable_base:
-                    current_C_node.g_cost = 1  # Cost is 1 for buying a base Pokemon
-                    current_C_node.action_taken_to_create_this_node = {'type': 'bought_base',
-                                                                       'species': current_C_node.species,
-                                                                       'ivs': set(current_C_node.ivs),
-                                                                       'nature': current_C_node.nature}
-                    d_print(
-                        f"  [A*] Nodo C {current_C_node.get_state_tuple()} (key: {current_C_full_key}) RISOLTO come 'bought_base', g_cost=1")
-                    # Point 4
-                    d_print(f"    [A*] Resolved as BOUGHT_BASE: {current_C_node.get_state_tuple()} (key: {current_C_full_key}). New g={current_C_node.g_cost:.2f}")
-            # END OF MODIFIED BLOCK
-
-        final_key_for_closed_list = current_C_node.get_full_state_tuple_for_closed_list()
-        closed_list[final_key_for_closed_list] = current_C_node
-        d_print(
-            f"  [A*] Nodo C {current_C_node.get_state_tuple()} (key: {final_key_for_closed_list}) aggiunto/aggiornato in Closed List. g={current_C_node.g_cost}")
-
-        if current_C_node.g_cost != float('inf'):
-            # Check if the current node being processed is the START_NODE (our ultimate goal)
-            # And if its g_cost is now finite, meaning a complete path to it has been found.
-            # The start_node's full key needs to match the current_C_node's full key
-            # This check needs to compare the *current state of current_C_node* with the *initial state of start_node*
-            # However, the start_node itself might have its used_owned_ids set updated if it was resolved directly.
-            # The most reliable check is if current_C_node represents the target species, IVs, and nature,
-            # AND its g_cost is finite. The used_owned_ids for the start_node when it's *resolved* is what matters.
-
-            # If the current_C_node *is* the start_node (by its state tuple and potentially used_ids if it was resolved directly)
-            # and its cost is finite, we found a plan.
-            # The start_node's *initial* full key (with empty used_ids) might differ from its *final* full key if it's resolved.
-            # We are looking for *any* version of the start_node (potentially with different used_ids combinations)
-            # that has a finite cost.
-
-            # The critical check: is current_C_node (which is now in closed_list) our target Pokemon?
-            if (current_C_node.species == start_node.species and
-                    current_C_node.ivs == start_node.ivs and
-                    current_C_node.nature == start_node.nature):
-                # This means we have found a way to produce the target Pokemon.
-                # The current_C_node IS the (or a version of the) start_node, but resolved.
-                d_print(
-                    f"[A*] Target finale {start_node.get_state_tuple()} (come {current_C_node.get_state_tuple()} con used_ids {current_C_node.used_owned_pokemon_ids}) FINALIZZATO con g_cost finito ({current_C_node.g_cost}). Piano trovato!")
-                return reconstruct_plan(current_C_node, target_gender, {p.id: p for p in owned_pokemon_list},
-                                        closed_list)
-            # Point 5
-            d_print(f"  [A*] Propagation PRE-CALL for resolved {current_C_node.get_state_tuple()} (key {final_key_for_closed_list}) with g={current_C_node.g_cost:.2f}")
-            d_print(
-                f"  [A*] Propagazione aggiornamento costo da NODO ORA IN CLOSED {current_C_node.get_state_tuple()} (g={current_C_node.g_cost})")
-            propagate_cost_update_to_children_in_plan(current_C_node, open_list, open_list_map, closed_list,
-                                                      owned_pokemon_list, start_node)
-
-        is_leaf_node_for_expansion_check = False
-        if current_C_node.action_taken_to_create_this_node:
-            if current_C_node.action_taken_to_create_this_node.get('type') in ('owned', 'bought_base'):
-                is_leaf_node_for_expansion_check = True
-
-        if is_leaf_node_for_expansion_check:
-            d_print(
-                f"  [A*] Nodo {current_C_node.get_state_tuple()} (key: {final_key_for_closed_list}) è una foglia, non espandere ulteriormente.")
-            continue
-
-        if current_C_node.depth >= max_depth:
-            d_print(
-                f"  [A*] Raggiunta profondità massima ({max_depth}) per {current_C_node.get_state_tuple()}. Salto espansione.");
-            continue
-
-        d_print(
-            f"  [A*] Nodo C {current_C_node.get_state_tuple()} (g={current_C_node.g_cost}) deve essere generato (non è foglia). Espansione...")
-        if not current_C_node.parent_options_for_this_node:
-            current_C_node.parent_options_for_this_node = generate_breeding_options_for_child(current_C_node)
-
-        if not current_C_node.parent_options_for_this_node:
-            # If this node is the start_node itself and has no breeding options, it's impossible if not base
-            is_start_node_state = (current_C_node.species == start_node.species and
-                                   current_C_node.ivs == start_node.ivs and
-                                   current_C_node.nature == start_node.nature)
-            if is_start_node_state:
-                d_print(
-                    f"[A*] Target finale ({start_node.get_state_tuple()}) non è base/owned e non ha opzioni di breeding. Impossibile.")
-                return None  # Cannot make the target
-
-        for option in current_C_node.parent_options_for_this_node:
-            p1_spec, p2_spec = option['p1_spec'], option['p2_spec']
-            d_print(
-                f"    [A*] Opzione per C: P1_spec={p1_spec}, P2_spec={p2_spec}, Items=({option['item1']},{option['item2']})")
-
-            for parent_spec, parent_role_for_child in [(p1_spec, 'p1'), (p2_spec, 'p2')]:
-                parent_species = parent_spec['species']
-                parent_ivs = frozenset(parent_spec['ivs'])
-                parent_nature = parent_spec['nature']
-                # Parents inherit the used_owned_ids from the child they are trying to create (current_C_node)
-                # because if current_C_node used certain owned Pokemon, its parents cannot re-use them for *their own* resolution.
-                parent_used_ids = frozenset(current_C_node.used_owned_pokemon_ids)
-                parent_P_full_key = (parent_species, parent_ivs, parent_nature, parent_used_ids)
-
-                actual_parent_P_node: Optional[BreedingNode] = None
-
-                if parent_P_full_key in open_list_map:
-                    actual_parent_P_node = open_list_map[parent_P_full_key]
-                    d_print(
-                        f"      [A*] Genitore P {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}) trovato in open_list_map.")
-                elif parent_P_full_key in closed_list:
-                    actual_parent_P_node = closed_list[parent_P_full_key]
-                    d_print(
-                        f"      [A*] Genitore P {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}) trovato in closed_list.")
-
-                if actual_parent_P_node is None:
-                    actual_parent_P_node = BreedingNode(
-                        species=parent_species, ivs=parent_ivs, nature=parent_nature,
-                        g_cost=float('inf'), depth=current_C_node.depth + 1,
-                        used_owned_ids=parent_used_ids  # Initialize with child's used IDs
-                    )
-                    actual_parent_P_node.h_cost = calculate_heuristic(actual_parent_P_node, owned_pokemon_list)
-                    # Point 6
-                    d_print(f"      [A*] NEW Parent Node created: {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}), h_cost specifically: {actual_parent_P_node.h_cost:.2f}")
-                    # d_print( # This was the old line, replaced by point 6
-                    #     f"      [A*] Creato NUOVO genitore P istanza {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}).")
-
-
-                is_already_child = any(
-                    child_node_in_list.get_full_state_tuple_for_closed_list() == current_C_full_key and opt_in_list == option
-                    for child_node_in_list, opt_in_list in actual_parent_P_node.children_in_plan_this_node_is_parent_for
-                )
-                if not is_already_child:
-                    actual_parent_P_node.children_in_plan_this_node_is_parent_for.append((current_C_node, option))
-                    d_print(
-                        f"        -> Registrato {current_C_node.get_state_tuple()} (key {current_C_full_key}) come figlio di {actual_parent_P_node.get_state_tuple()} (key {parent_P_full_key})")
-
-                add_to_open = True
-                if parent_P_full_key in closed_list:  # Check if this *exact* parent node (with these used_ids) is closed
-                    if closed_list[
-                        parent_P_full_key].g_cost <= actual_parent_P_node.g_cost:  # And has a better or equal cost
-                        add_to_open = False
-
-                if add_to_open and parent_P_full_key not in open_list_map:
-                    # Only add to open list if not already there with this exact key
-                    d_print(
-                        f"      [A*] Aggiungo genitore P {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}) a Open List.")
-                    heapq.heappush(open_list, actual_parent_P_node)
-                    open_list_map[parent_P_full_key] = actual_parent_P_node
-                elif parent_P_full_key in open_list_map:
-                    # If it's already in open_list_map, ensure we have the best g_cost reference
-                    # This scenario should ideally be handled by propagate_cost_update if a better path to this parent is found later.
-                    # For now, if it's already there, we assume it's being handled or will be.
-                    d_print(
-                        f"      [A*] Genitore P {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}) già in open_list_map. Non ri-aggiunto.")
-
-                elif not add_to_open:
-                    d_print(
-                        f"      [A*] Genitore P {actual_parent_P_node.get_state_tuple()} (key: {parent_P_full_key}) è in closed_list con costo migliore/uguale. Non aggiunto a Open.")
-
-    d_print(f"[A*] Fine ricerca. Nodi processati: {nodes_processed_count}. Open list vuota o max nodi raggiunti.")
-
-    # After the loop, check if the start_node (target) was ever resolved with a finite cost.
-    # Iterate through all versions of the start_node state in the closed_list
-    # (differing by used_owned_pokemon_ids)
-    best_resolved_start_node = None
-    for key, node_in_closed in closed_list.items():
-        if (node_in_closed.species == start_node.species and
-                node_in_closed.ivs == start_node.ivs and
-                node_in_closed.nature == start_node.nature and
-                node_in_closed.g_cost != float('inf')):
-            if best_resolved_start_node is None or node_in_closed.g_cost < best_resolved_start_node.g_cost:
-                best_resolved_start_node = node_in_closed
-            # If costs are equal, prefer one with fewer used owned IDs as a tie-breaker (implicitly handled by A* if h_cost is good)
-            # Or prefer one with shallower depth if costs are equal.
-            elif node_in_closed.g_cost == best_resolved_start_node.g_cost:
-                if len(node_in_closed.used_owned_pokemon_ids) < len(best_resolved_start_node.used_owned_pokemon_ids):
-                    best_resolved_start_node = node_in_closed
-                elif len(node_in_closed.used_owned_pokemon_ids) == len(
-                        best_resolved_start_node.used_owned_pokemon_ids) and node_in_closed.depth < best_resolved_start_node.depth:
-                    best_resolved_start_node = node_in_closed
-
-    if best_resolved_start_node:
-        d_print(
-            f"[A*] Target finale ({best_resolved_start_node.get_state_tuple()} con used_ids {best_resolved_start_node.used_owned_pokemon_ids}) trovato nella closed list con g_cost={best_resolved_start_node.g_cost}. Ricostruzione piano...")
-        return reconstruct_plan(best_resolved_start_node, target_gender, {p.id: p for p in owned_pokemon_list},
-                                closed_list)
-
-    d_print("[A*] Target finale non trovato con costo finito.")
-    return None
-
-
-def test_intermediate_figlia1():
-    """
-    Tests a specific intermediate step based on "Figlia 1" from an example.
-    Target: Charizard, Femmina, NEUTRAL, {DEF, SPE}
-    Owned: P4: Charizard, Quiet, F, {SPE} (ID: 3)
-    Expected plan: Buy a Charizard M:{DEF}, NEUTRAL (cost 1). Breed with P4.
-    The g_cost of the target node itself should be 1 (cost of bought parent + 0 for owned P4).
-    """
-    print("\n--- Esecuzione test_intermediate_figlia1 ---")
-    Pokemon._id_counter = 0
-
-    target_species = "Charizard"
-    target_ivs = {"DEF", "SPE"}
-    target_nature = "NEUTRAL" # Target nature is Neutral
-    target_gender = "Femmina"
-
-    # Owned Pokemon
-    p4_owned = Pokemon("Charizard", {"SPE"}, "Quiet", "Femmina", name="P4_Owned_Quiet_SPE", is_owned=True, source_info="Owned P4")
-    p4_owned.id = 3 # Manually assign ID for consistency with example context
-    Pokemon._id_counter = 4 # Ensure next auto-IDs start from 4
-
-    owned_pokemon_list = [p4_owned]
-
-    print(f"Target: {target_species} ({target_gender}), Nature: {target_nature}, IVs: {target_ivs}")
-    print("Owned Pokémon:")
-    for p in owned_pokemon_list:
-        print(f"  - {p}")
-
-    # We need to capture the final node from find_optimal_breeding_plan to check its g_cost and used_owned_ids
-    # This requires a slight modification or a different way to access this info.
-    # For now, we'll proceed and try to infer from the plan.
-    # Let's modify find_optimal_breeding_plan to return the goal_node as well for testing purposes.
-    # This is a temporary workaround for the test.
-    # Ideally, the test setup or the function itself would provide this.
-
-    # --- Temporary modification to find_optimal_breeding_plan for this test ---
-    # This is not ideal, but necessary to fulfill the test's specific assertions on the final node.
-    # In a real scenario, we'd consider if this info should always be part of the return.
-    
-    # Call the original function
-    plan_steps = find_optimal_breeding_plan(
+    final_pokemon_obj_template, plan_steps, total_cost, final_consumed_ids = get_pokemon_with_minimal_cost(
         target_species=target_species,
         target_ivs=target_ivs,
         target_nature=target_nature,
-        target_gender=target_gender,
-        owned_pokemon_list=owned_pokemon_list,
-        max_depth=5,
-        max_nodes_to_explore=2000
+        owned_pokemon_map=owned_pokemon_map,
+        consumed_owned_ids=frozenset(),
+        depth=0
     )
 
-    if plan_steps:
-        print("\n[SUCCESS] Piano di breeding trovato per test_intermediate_figlia1!")
-        print(f"Numero totale di passi: {len(plan_steps)}")
-        
-        final_child_pokemon = plan_steps[-1].child
-        print(f"Pokémon finale generato: {final_child_pokemon}")
+    if final_pokemon_obj_template and total_cost != float('inf'):
+        d_print(f"\n--- PIANO RICORSIVO TROVATO ({target_species}) ---")
+        d_print(f"Costo Totale Acquisti Stimato: {total_cost}")
+        d_print(f"ID Pokémon Posseduti Consumati (dal set finale): {list(final_consumed_ids)}")
+        d_print(f"Template del Pokémon finale ottenuto dalla ricorsione: {final_pokemon_obj_template}")
 
-        # Assertions on the final child
-        assert final_child_pokemon.species == target_species, f"Specie finale errata: {final_child_pokemon.species}"
-        assert final_child_pokemon.nature == target_nature, f"Natura finale errata: {final_child_pokemon.nature}"
-        assert final_child_pokemon.ivs == target_ivs, f"IV finali errati: {final_child_pokemon.ivs}"
-        if target_species.lower() != "ditto":
-            assert final_child_pokemon.gender == target_gender, f"Genere finale errato: {final_child_pokemon.gender}"
+        final_pokemon_for_plan: Pokemon
 
-        # Inferring g_cost and used_owned_ids based on expected plan structure
-        # Expected: 1. Buy Charizard M:{DEF}, Neutral (cost 1)
-        #           2. Breed M:{DEF} (VigorFascia) + P4 F:{SPE} (no item) -> Target F:{DEF, SPE}
-        # Cost of plan should be 1.
-        # The 'source_info' of the final child in the plan details often includes "(Costo Nodo Orig:X)".
-        # This X is the g_cost of the node that produced this child.
-        
-        # We expect two steps if P4 is used and one Pokemon is bought.
-        # Step 1: P4 (owned, ID 3) is used.
-        # Step 2: A {DEF} Pokemon is bought (cost 1) and bred with P4.
-        # The final child comes from this breeding step.
-        # The g_cost of this final child's node would be g_cost(P4_node) + g_cost(bought_DEF_node) = 0 + 1 = 1.
-        
-        # Check if P4 was used by looking through the plan steps for its involvement as a parent.
-        p4_used_in_plan = False
-        cost_of_bought_pokemon = 0
-        
+        if not plan_steps:
+            d_print("Il piano non ha passi, il target era posseduto o acquistato base.")
+            final_pokemon_for_plan = Pokemon(
+                final_pokemon_obj_template.species,
+                final_pokemon_obj_template.ivs,
+                final_pokemon_obj_template.nature,
+                target_gender,
+                name=f"TARGET_{final_pokemon_obj_template.species[:3]}",
+                is_owned=final_pokemon_obj_template.is_owned,
+                source_info=f"FINALE ({final_pokemon_obj_template.source_info}, Costo Piano: {total_cost:.1f})",
+                internal_id=final_pokemon_obj_template.id
+            )
+            final_pokemon_for_plan.cost_to_produce = total_cost
+
+            dummy_p_na_id_1 = Pokemon._id_counter;
+            Pokemon._id_counter += 1
+            dummy_p_na_id_2 = Pokemon._id_counter;
+            Pokemon._id_counter += 1
+            dummy_p_na1 = Pokemon("N/A", set(), "NEUTRAL", "N/A", name="N/A_P1", internal_id=dummy_p_na_id_1,
+                                  source_info="Dummy")
+            dummy_p_na2 = Pokemon("N/A", set(), "NEUTRAL", "N/A", name="N/A_P2", internal_id=dummy_p_na_id_2,
+                                  source_info="Dummy")
+            step0 = BreedingStepDetailed(final_pokemon_for_plan, dummy_p_na1, None, dummy_p_na2, None, step_number=0)
+            plan_steps = [step0]
+            d_print(f"Creato passo fittizio 0 per il target: {final_pokemon_for_plan}")
+        else:
+            final_child_in_plan = plan_steps[-1].child
+            final_child_in_plan.gender = target_gender
+            final_child_in_plan.name = f"TARGET_{final_child_in_plan.species[:3]}"
+            final_child_in_plan.source_info = f"FINALE (Costo Piano: {total_cost:.1f}, ID:{final_child_in_plan.id})"
+            final_child_in_plan.cost_to_produce = total_cost
+            final_pokemon_for_plan = final_child_in_plan
+            d_print(f"Aggiornato l'ultimo figlio del piano: {final_pokemon_for_plan}")
+
+        child_to_step_map: Dict[int, int] = {}
+        for i, step in enumerate(plan_steps):
+            step.step_number = i + 1 if plan_steps[0].step_number != 0 else i
+            if step.child:
+                child_to_step_map[step.child.id] = step.step_number
+                if not step.child.source_info.startswith("FINALE") and \
+                        not step.child.source_info.startswith("Figlio del Passo") and \
+                        not step.child.source_info.startswith("Acquistato Base") and \
+                        not step.child.source_info.startswith("Posseduto"):
+                    step.child.source_info = f"Figlio del Passo {step.step_number} (ID:{step.child.id}, Costo prod.:{step.child.cost_to_produce:.1f})"
+
         for step in plan_steps:
-            print(step) # Print each step for debugging
-            if step.parent1.id == p4_owned.id or step.parent2.id == p4_owned.id:
-                p4_used_in_plan = True
-            if "Acquistato Base" in step.parent1.source_info and step.parent1.name.startswith("Acq_"):
-                # Crude way to check if a parent was bought.
-                # A better check would be if its node had type 'bought_base'
-                # This assumes the naming convention Acq_ for bought pokemon.
-                # The cost '1' is associated with the node that *became* this bought Pokemon.
-                # If this bought Pokemon is a parent, its node cost was 1.
-                # We need to find the *actual* g_cost of the target node.
-                # The source_info of the *final_child_pokemon* should contain its original node's g_cost.
-                pass # This check is becoming complicated without direct node access.
+            for parent_obj in [step.parent1, step.parent2]:
+                if parent_obj.name.startswith("N/A_P"): continue
+                if not parent_obj.is_owned and \
+                        not parent_obj.source_info.startswith("Acquistato Base") and \
+                        not parent_obj.source_info.startswith("Posseduto") and \
+                        not parent_obj.source_info.startswith("Da Passo") and \
+                        not parent_obj.source_info.startswith("Figlio del Passo"):
+                    if parent_obj.id in child_to_step_map:
+                        parent_obj.source_info = f"Da Passo {child_to_step_map[parent_obj.id]} (ID:{parent_obj.id}, Costo prod.:{parent_obj.cost_to_produce:.1f})"
 
-        # Simplified assertion: The plan should exist, and P4 should be used.
-        # The overall cost is harder to assert directly without modifying find_optimal_breeding_plan.
-        # However, if the plan involves using P4 and buying one {DEF} Pokemon, the cost is 1.
-        # Let's check the source_info of the final child, which often has the cost of the node producing it.
-        # Example: "Generato per target (Costo Nodo Orig:1.0)"
-        # assert "(Costo Nodo Orig:1.0)" in final_child_pokemon.source_info, f"Costo finale del nodo non è 1.0, source_info: {final_child_pokemon.source_info}"
-        # assert p4_used_in_plan, "P4 (ID 3) non è stato usato nel piano." # This was already implicitly checked by parent check
+        d_print(f"\n--- Dettagli del Piano Finale ({target_species}) ---")
+        for step in plan_steps:
+            d_print(str(step))
 
-        # New direct assertions on plan structure
-        assert len(plan_steps) == 1, f"Plan for Figlia1 should have exactly one step, found {len(plan_steps)}"
-        first_step = plan_steps[0]
-        
-        parent1_is_bought = "Acquistato Base" in first_step.parent1.source_info
-        parent2_is_owned_p4 = first_step.parent2.id == 3 and "Owned P4" in first_step.parent2.source_info
-        
-        parent1_is_owned_p4 = first_step.parent1.id == 3 and "Owned P4" in first_step.parent1.source_info
-        parent2_is_bought = "Acquistato Base" in first_step.parent2.source_info
-        
-        assert (parent1_is_bought and parent2_is_owned_p4) or \
-               (parent1_is_owned_p4 and parent2_is_bought), \
-               "Plan should involve P4 (ID 3) and one bought Pokemon. \n" + \
-               f"P1: {first_step.parent1.name} (ID {first_step.parent1.id}, Source: {first_step.parent1.source_info}), \n" + \
-               f"P2: {first_step.parent2.name} (ID {first_step.parent2.id}, Source: {first_step.parent2.source_info})"
-        
-        # We can also check that the owned pokemon (P4) is used in the used_owned_pokemon_ids of the final node if we had access to it.
-        # For now, checking the parents in the step is a good proxy.
-
-
+        return plan_steps
     else:
-        print("\n[FAILURE] Nessun piano di breeding trovato per test_intermediate_figlia1.")
-
-    assert plan_steps is not None, "Il piano di breeding (test_intermediate_figlia1) non dovrebbe essere None"
-    print("--- Fine test_intermediate_figlia1 ---\n")
-
-
-def test_regole2_example_4iv_plan():
-    """
-    Tests the breeding plan generation based on the 4IV Charizard example
-    from regole2.txt.
-    Target: Charizard, Adamant, {SPA, DEF, SPD, SPE}
-    Owned:
-    P1: Charizard, Adamant, M, {SPA, SPE}
-    P2: Charizard, Quiet, M, {SPA, SPE}
-    P3: Charizard, Quiet, F, {SPD, DEF}
-    P4: Charizard, Quiet, F, {SPE}
-    """
-    print("\n--- Esecuzione test_regole2_example_4iv_plan ---")
-    Pokemon._id_counter = 0 # Reset ID counter
-
-    target_species = "Charizard"
-    target_ivs = {"SPA", "DEF", "SPD", "SPE"}
-    target_nature = "Adamant"
-    target_gender = "Maschio"
-
-    # Define owned Pokemon as per regole2.txt example
-    p1_owned = Pokemon("Charizard", {"SPA", "SPE"}, "Adamant", "Maschio", name="P1_Own_Ada_SPA_SPE", is_owned=True, source_info="Owned P1")
-    p1_owned.id = 0
-    p2_owned = Pokemon("Charizard", {"SPA", "SPE"}, "Quiet", "Maschio", name="P2_Own_Quiet_SPA_SPE", is_owned=True, source_info="Owned P2")
-    p2_owned.id = 1
-    p3_owned = Pokemon("Charizard", {"SPD", "DEF"}, "Quiet", "Femmina", name="P3_Own_Quiet_SPD_DEF", is_owned=True, source_info="Owned P3")
-    p3_owned.id = 2
-    p4_owned = Pokemon("Charizard", {"SPE"}, "Quiet", "Femmina", name="P4_Own_Quiet_SPE", is_owned=True, source_info="Owned P4")
-    p4_owned.id = 3
-    Pokemon._id_counter = 4 # Ensure next auto-IDs start from 4
-
-    owned_pokemon_list = [p1_owned, p2_owned, p3_owned, p4_owned]
-
-    print(f"Target: {target_species} ({target_gender}), Nature: {target_nature}, IVs: {target_ivs}")
-    print("Owned Pokémon:")
-    for p in owned_pokemon_list:
-        print(f"  - {p}")
-
-    plan = find_optimal_breeding_plan(
-        target_species=target_species,
-        target_ivs=target_ivs,
-        target_nature=target_nature,
-        target_gender=target_gender,
-        owned_pokemon_list=owned_pokemon_list,
-        max_depth=15, # Example plan has 10 steps, so 15 should be sufficient
-        max_nodes_to_explore=200000
-    )
-
-    if plan:
-        print("\n[SUCCESS] Piano di breeding trovato per test_regole2_example_4iv_plan!")
-        final_node_in_plan = plan[-1] # This is a BreedingStepDetailed object
-        final_pokemon_in_plan = final_node_in_plan.child
-
-        # To get the g_cost of the final node, we need to find it in the closed_list from the algorithm
-        # However, the plan reconstruction already stores source_info that might contain cost,
-        # or we can infer it from the sum of costs of base pokemon if the plan is simple.
-        # For this test, we'll just print the source_info which often has the original node cost.
-        print(f"Source info of final Pokemon (may contain cost context): {final_pokemon_in_plan.source_info}")
-        print(f"Numero totale di passi: {len(plan)}")
-        print("Dettagli del Pokémon Finale dal Piano:")
-        print(f"  - {final_pokemon_in_plan.get_display_string()}")
-
-        assert final_pokemon_in_plan.species == target_species
-        assert final_pokemon_in_plan.nature == target_nature
-        assert final_pokemon_in_plan.ivs == target_ivs
-        if target_species.lower() != "ditto":
-            assert final_pokemon_in_plan.gender == target_gender
-
-        print("--- Dettagli del Piano Completo (test_regole2_example_4iv_plan): ---")
-        for step in plan:
-            print(step)
-    else:
-        print("\n[FAILURE] Nessun piano di breeding trovato per test_regole2_example_4iv_plan.")
-
-    assert plan is not None, "Il piano di breeding (test_regole2_example_4iv_plan) non dovrebbe essere None"
-    print("--- Fine test_regole2_example_4iv_plan ---\n")
+        d_print(f"\n--- NESSUN PIANO RICORSIVO TROVATO per {target_species} {target_ivs} {target_nature} ---")
+        d_print(f"Costo riscontrato: {total_cost}")
+        return None
 
 
-def test_4iv_plus_nature_plan():
-    """
-    Tests the breeding plan generation for a 4IV Charizard with a specific nature,
-    leveraging the 'buy 1 IV + Nature' logic.
-    """
-    print("\n--- Esecuzione test_4iv_plus_nature_plan ---")
-    # global DEBUG_ASTAR
-    # original_debug_astar = DEBUG_ASTAR
-    # DEBUG_ASTAR = False  # Disable verbose A* logging for this test
+find_optimal_breeding_plan = plan_breeding_recursively_phased
 
-    # Reset Pokemon ID counter for consistent IDs if tests are run multiple times in same session (if needed)
+
+def run_complex_test():
+    """Esegue test complessi per verificare la logica di breeding."""
+    print("\n" + "=" * 30 + " ESECUZIONE TEST COMPLESSO (Output su debug.txt) " + "=" * 30)
+
+    clear_debug_log_once_for_suite()
+    d_print("\n" + "=" * 30 + " ESECUZIONE TEST COMPLESSO (Inizio Suite) " + "=" * 30)
+
     Pokemon._id_counter = 0
-
-    target_species = "Charizard"
-    target_ivs = {"PS", "ATK", "DEF", "SPE"}
-    target_nature = "Adamant"
-    target_gender = "Maschio" # Gender for the final Pokemon
-
-    owned_pokemon = [
-        Pokemon("Charizard", {"PS"}, "Adamant", "Maschio", name="OwnedAdaPS", is_owned=True, source_info="OwnedInitial1"),
-        Pokemon("Charizard", {"ATK", "PS"}, "NEUTRAL", "Maschio", name="OwnedNeutAtkPS", is_owned=True, source_info="OwnedInitial2")
+    owned_test1 = [
+        Pokemon(species="Charizard", ivs={"PS"}, nature="Adamant", gender="Maschio", name="AdaChar1_PS", is_owned=True,
+                internal_id=0),
+        Pokemon(species="Ditto", ivs={"ATK", "DEF"}, nature="NEUTRAL", gender="Genderless", name="Ditto_AD",
+                is_owned=True, internal_id=1),
+        Pokemon(species="Charizard", ivs={"SPE"}, nature="Jolly", gender="Femmina", name="JolChar_SPE", is_owned=True,
+                internal_id=2),
+        Pokemon(species="Arcanine", ivs={"PS", "DEF"}, nature="Serious", gender="Maschio", name="Arca_PSDEF",
+                is_owned=True, internal_id=3),
+        Pokemon(species="Nidoqueen", ivs={"ATK"}, nature="Adamant", gender="Femmina", name="Nido_ATKAda", is_owned=True,
+                internal_id=4),
+        Pokemon(species="Blastoise", ivs={"SPD"}, nature="Modest", gender="Femmina", name="Blast_SPD", is_owned=True,
+                internal_id=5)
     ]
-    # Manually assign IDs for very precise test control if required, though automatic assignment is usually fine.
-    # owned_pokemon[0].id = 0
-    # owned_pokemon[1].id = 1
-    # Pokemon._id_counter = 2 # Ensure next auto-IDs don't collide if more Pokemon are created manually
 
-    print(f"Target: {target_species} ({target_gender}), Nature: {target_nature}, IVs: {target_ivs}")
-    print("Owned Pokémon:")
-    for p in owned_pokemon:
-        print(f"  - {p}")
+    target_species_t1 = "Charizard"
+    target_ivs_t1 = {"PS", "ATK", "DEF", "SPE"}
+    target_nature_t1 = "Adamant"
+    target_gender_t1 = "Maschio"
 
-    plan = find_optimal_breeding_plan(
-        target_species=target_species,
-        target_ivs=target_ivs,
-        target_nature=target_nature,
-        target_gender=target_gender,
-        owned_pokemon_list=owned_pokemon,
-        max_depth=10, # Default max_depth
-        max_nodes_to_explore=100000 # Default max_nodes
+    print(f"\n--- Test 1: {target_species_t1} {target_ivs_t1} N:{target_nature_t1} G:{target_gender_t1} ---")
+
+    plan1 = plan_breeding_recursively_phased(
+        target_species_t1, target_ivs_t1, target_nature_t1, target_gender_t1, owned_test1
     )
 
-    if plan:
-        print("\n[SUCCESS] Piano di breeding trovato!")
-        print(f"Numero totale di passi: {len(plan)}")
-        final_pokemon_in_plan = plan[-1].child
-        print(f"Costo totale stimato (g_cost del nodo finale): {final_pokemon_in_plan.source_info}") # g_cost is in source_info for target
-
-        # Basic check: The final Pokemon in the plan should match the target specs
-        assert final_pokemon_in_plan.species == target_species
-        assert final_pokemon_in_plan.nature == target_nature
-        assert final_pokemon_in_plan.ivs == target_ivs
-        # Gender check might be more complex if the plan involves Dittos and gender assignment rules
-        # For this specific test, we expect the target gender.
-        if target_species.lower() != "ditto": # Dittos are genderless
-             assert final_pokemon_in_plan.gender == target_gender
-
-
-        print("--- Dettagli del Piano: ---")
-        for step in plan:
-            print(step)
+    if plan1:
+        print(f"Piano Test 1 trovato. Numero di passi: {len(plan1)}. Vedere debug.txt per dettagli.")
+        final_cost_t1 = 0
+        if plan1 and plan1[-1].child: final_cost_t1 = plan1[-1].child.cost_to_produce
+        summary_t1 = f"Piano Test 1 completato. Numero di passi: {len(plan1)}. Costo Totale Acquisti: {final_cost_t1:.1f}"
+        d_print(f"\nRIEPILOGO TEST 1: {summary_t1}\n")
     else:
-        print("\n[FAILURE] Nessun piano di breeding trovato.")
+        print("\n--- Nessun Piano Trovato per Test 1 ---")
+        d_print("\n--- Nessun Piano Trovato per Test 1 ---\n")
 
-    assert plan is not None, "Il piano di breeding non dovrebbe essere None"
+    owned_test2 = [
+        Pokemon(species="Dragonair", ivs={"PS", "ATK"}, nature="Hardy", gender="Maschio", name="Dra_PA_Hardy",
+                is_owned=True, internal_id=10),
+        Pokemon(species="Ditto", ivs={"SPA", "SPD"}, nature="NEUTRAL", gender="Genderless", name="Ditto_SpASpD",
+                is_owned=True, internal_id=11),
+        Pokemon(species="Gyarados", ivs={"DEF"}, nature="Timid", gender="Femmina", name="Gya_DEF_Timid", is_owned=True,
+                internal_id=12),
+        Pokemon(species="Kingdra", ivs={"SPE"}, nature="Modest", gender="Maschio", name="King_SPE_Mod", is_owned=True,
+                internal_id=13),
+        Pokemon(species="Altaria", ivs={"ATK"}, nature="NEUTRAL", gender="Femmina", name="Alta_ATK_N", is_owned=True,
+                internal_id=14),
+        Pokemon(species="Salamence", ivs={"PS", "SPA"}, nature="Jolly", gender="Maschio", name="Sala_PSSpA_Jol",
+                is_owned=True, internal_id=15),
+        Pokemon(species="Dragonite", ivs={"DEF"}, nature="NEUTRAL", gender="Femmina", name="Dnite_DEF", is_owned=True,
+                internal_id=16)
+    ]
 
-    # DEBUG_ASTAR = original_debug_astar # Restore original A* debug state
-    print("--- Fine test_4iv_plus_nature_plan ---\n")
+    target_species_t2 = "Dragonite"
+    target_ivs_t2 = {"PS", "ATK", "DEF", "SPA", "SPE"}
+    target_nature_t2 = "Timid"
+    target_gender_t2 = "Femmina"
+
+    print(f"\n--- Test 2: {target_species_t2} {target_ivs_t2} N:{target_nature_t2} G:{target_gender_t2} ---")
+
+    plan2 = plan_breeding_recursively_phased(
+        target_species_t2, target_ivs_t2, target_nature_t2, target_gender_t2, owned_test2
+    )
+    if plan2:
+        print(f"Piano Test 2 trovato. Numero di passi: {len(plan2)}. Vedere debug.txt per dettagli.")
+        final_cost_t2 = 0
+        if plan2 and plan2[-1].child: final_cost_t2 = plan2[-1].child.cost_to_produce
+        summary_t2 = f"Piano Test 2 completato. Numero di passi: {len(plan2)}. Costo Totale Acquisti: {final_cost_t2:.1f}"
+        d_print(f"\nRIEPILOGO TEST 2: {summary_t2}\n")
+    else:
+        print("\n--- Nessun Piano Trovato per Test 2 ---")
+        d_print("\n--- Nessun Piano Trovato per Test 2 ---\n")
+
+    d_print("\n" + "=" * 30 + " ESECUZIONE TEST COMPLESSO (Fine Suite) " + "=" * 30)
 
 
 if __name__ == "__main__":
-    # Example of how to run the test
-    # You might want to load POKEMON_EGG_GROUPS_RAW here if it's not loaded globally
-    # or ensure it's loaded before find_optimal_breeding_plan is called.
-    # Global loading at the top of the script is typical.
-    if not POKEMON_EGG_GROUPS_RAW:
-        print("Dati Pokémon non caricati. Caricamento in corso...")
-        POKEMON_EGG_GROUPS_RAW = load_pokemon_data()
-        if not POKEMON_EGG_GROUPS_RAW:
-            print("ERRORE: Impossibile caricare i dati dei Pokémon. Test annullato.")
-            exit(1)
-        # Re-initialize ALL_POKEMON_NAMES if necessary, though it's not directly used by the algorithm itself
-        ALL_POKEMON_NAMES = sorted([name.capitalize() for name in POKEMON_EGG_GROUPS_RAW.keys()])
-
-    # test_4iv_plus_nature_plan()
-    # test_regole2_example_4iv_plan()
-    test_intermediate_figlia1()
+    run_complex_test()
