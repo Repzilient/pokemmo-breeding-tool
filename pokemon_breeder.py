@@ -983,6 +983,116 @@ def find_optimal_breeding_plan(
     return None
 
 
+def test_intermediate_figlia1():
+    """
+    Tests a specific intermediate step based on "Figlia 1" from an example.
+    Target: Charizard, Femmina, NEUTRAL, {DEF, SPE}
+    Owned: P4: Charizard, Quiet, F, {SPE} (ID: 3)
+    Expected plan: Buy a Charizard M:{DEF}, NEUTRAL (cost 1). Breed with P4.
+    The g_cost of the target node itself should be 1 (cost of bought parent + 0 for owned P4).
+    """
+    print("\n--- Esecuzione test_intermediate_figlia1 ---")
+    Pokemon._id_counter = 0
+
+    target_species = "Charizard"
+    target_ivs = {"DEF", "SPE"}
+    target_nature = "NEUTRAL" # Target nature is Neutral
+    target_gender = "Femmina"
+
+    # Owned Pokemon
+    p4_owned = Pokemon("Charizard", {"SPE"}, "Quiet", "Femmina", name="P4_Owned_Quiet_SPE", is_owned=True, source_info="Owned P4")
+    p4_owned.id = 3 # Manually assign ID for consistency with example context
+    Pokemon._id_counter = 4 # Ensure next auto-IDs start from 4
+
+    owned_pokemon_list = [p4_owned]
+
+    print(f"Target: {target_species} ({target_gender}), Nature: {target_nature}, IVs: {target_ivs}")
+    print("Owned Pokémon:")
+    for p in owned_pokemon_list:
+        print(f"  - {p}")
+
+    # We need to capture the final node from find_optimal_breeding_plan to check its g_cost and used_owned_ids
+    # This requires a slight modification or a different way to access this info.
+    # For now, we'll proceed and try to infer from the plan.
+    # Let's modify find_optimal_breeding_plan to return the goal_node as well for testing purposes.
+    # This is a temporary workaround for the test.
+    # Ideally, the test setup or the function itself would provide this.
+
+    # --- Temporary modification to find_optimal_breeding_plan for this test ---
+    # This is not ideal, but necessary to fulfill the test's specific assertions on the final node.
+    # In a real scenario, we'd consider if this info should always be part of the return.
+    
+    # Call the original function
+    plan_steps = find_optimal_breeding_plan(
+        target_species=target_species,
+        target_ivs=target_ivs,
+        target_nature=target_nature,
+        target_gender=target_gender,
+        owned_pokemon_list=owned_pokemon_list,
+        max_depth=5,
+        max_nodes_to_explore=2000
+    )
+
+    if plan_steps:
+        print("\n[SUCCESS] Piano di breeding trovato per test_intermediate_figlia1!")
+        print(f"Numero totale di passi: {len(plan_steps)}")
+        
+        final_child_pokemon = plan_steps[-1].child
+        print(f"Pokémon finale generato: {final_child_pokemon}")
+
+        # Assertions on the final child
+        assert final_child_pokemon.species == target_species, f"Specie finale errata: {final_child_pokemon.species}"
+        assert final_child_pokemon.nature == target_nature, f"Natura finale errata: {final_child_pokemon.nature}"
+        assert final_child_pokemon.ivs == target_ivs, f"IV finali errati: {final_child_pokemon.ivs}"
+        if target_species.lower() != "ditto":
+            assert final_child_pokemon.gender == target_gender, f"Genere finale errato: {final_child_pokemon.gender}"
+
+        # Inferring g_cost and used_owned_ids based on expected plan structure
+        # Expected: 1. Buy Charizard M:{DEF}, Neutral (cost 1)
+        #           2. Breed M:{DEF} (VigorFascia) + P4 F:{SPE} (no item) -> Target F:{DEF, SPE}
+        # Cost of plan should be 1.
+        # The 'source_info' of the final child in the plan details often includes "(Costo Nodo Orig:X)".
+        # This X is the g_cost of the node that produced this child.
+        
+        # We expect two steps if P4 is used and one Pokemon is bought.
+        # Step 1: P4 (owned, ID 3) is used.
+        # Step 2: A {DEF} Pokemon is bought (cost 1) and bred with P4.
+        # The final child comes from this breeding step.
+        # The g_cost of this final child's node would be g_cost(P4_node) + g_cost(bought_DEF_node) = 0 + 1 = 1.
+        
+        # Check if P4 was used by looking through the plan steps for its involvement as a parent.
+        p4_used_in_plan = False
+        cost_of_bought_pokemon = 0
+        
+        for step in plan_steps:
+            print(step) # Print each step for debugging
+            if step.parent1.id == p4_owned.id or step.parent2.id == p4_owned.id:
+                p4_used_in_plan = True
+            if "Acquistato Base" in step.parent1.source_info and step.parent1.name.startswith("Acq_"):
+                # Crude way to check if a parent was bought.
+                # A better check would be if its node had type 'bought_base'
+                # This assumes the naming convention Acq_ for bought pokemon.
+                # The cost '1' is associated with the node that *became* this bought Pokemon.
+                # If this bought Pokemon is a parent, its node cost was 1.
+                # We need to find the *actual* g_cost of the target node.
+                # The source_info of the *final_child_pokemon* should contain its original node's g_cost.
+                pass # This check is becoming complicated without direct node access.
+
+        # Simplified assertion: The plan should exist, and P4 should be used.
+        # The overall cost is harder to assert directly without modifying find_optimal_breeding_plan.
+        # However, if the plan involves using P4 and buying one {DEF} Pokemon, the cost is 1.
+        # Let's check the source_info of the final child, which often has the cost of the node producing it.
+        # Example: "Generato per target (Costo Nodo Orig:1.0)"
+        assert "Costo Nodo Orig:1.0)" in final_child_pokemon.source_info, f"Costo finale del nodo non è 1.0, source_info: {final_child_pokemon.source_info}"
+        assert p4_used_in_plan, "P4 (ID 3) non è stato usato nel piano."
+
+    else:
+        print("\n[FAILURE] Nessun piano di breeding trovato per test_intermediate_figlia1.")
+
+    assert plan_steps is not None, "Il piano di breeding (test_intermediate_figlia1) non dovrebbe essere None"
+    print("--- Fine test_intermediate_figlia1 ---\n")
+
+
 def test_regole2_example_4iv_plan():
     """
     Tests the breeding plan generation based on the 4IV Charizard example
@@ -1145,4 +1255,5 @@ if __name__ == "__main__":
         ALL_POKEMON_NAMES = sorted([name.capitalize() for name in POKEMON_EGG_GROUPS_RAW.keys()])
 
     # test_4iv_plus_nature_plan()
-    test_regole2_example_4iv_plan()
+    # test_regole2_example_4iv_plan()
+    test_intermediate_figlia1()
