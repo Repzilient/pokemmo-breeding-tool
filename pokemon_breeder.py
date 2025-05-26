@@ -1017,7 +1017,7 @@ def test_4iv_plus_nature_plan():
              assert final_pokemon_in_plan.gender == target_gender
 
 
-        print("\Dettagli del Piano:")
+        print("--- Dettagli del Piano: ---")
         for step in plan:
             print(step)
     else:
