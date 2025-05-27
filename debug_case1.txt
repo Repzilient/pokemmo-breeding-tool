@@ -1,0 +1,230 @@
+--- Inizio Nuovo Log A* Full Upgrade (2025-05-27 10:28:49) ---
+
+====================== EXECUTING TEST CASE 1: GENGAR ======================
+
+--- Obiettivo Gengar Test Case: Gengar (Gengar, G:Femmina, N:Timid, IVs:['SPA', 'SPD', 'SPE'], ID:1000, Src:) ---
+
+<<<<< GENGAR TEST META-TENTATIVO N. 1 (Costo acquisti meta già effettuati: 0) >>>>>
+
+--- Inizio A* v4 (g_cost iniziale: 0) per Gengar (Gengar, G:Femmina, N:Timid, IVs:['SPA', 'SPD', 'SPE'], ID:1000, Src:) ---
+Iter: 2000, Frontiera: 8443, g: 7, h: 3.00, f: 10.00, Pool: 3
+Iter: 4000, Frontiera: 14152, g: 8, h: 9.00, f: 17.00, Pool: 4
+Iter: 6000, Frontiera: 19015, g: 8, h: 10.00, f: 18.00, Pool: 5
+Iter: 8000, Frontiera: 24321, g: 8, h: 6.00, f: 14.00, Pool: 4
+Iter: 10000, Frontiera: 29989, g: 8, h: 6.00, f: 14.00, Pool: 4
+Iter: 12000, Frontiera: 34811, g: 8, h: 6.00, f: 14.00, Pool: 4
+Iter: 14000, Frontiera: 39792, g: 9, h: 6.00, f: 15.00, Pool: 5
+Iter: 16000, Frontiera: 44568, g: 9, h: 9.00, f: 18.00, Pool: 5
+Iter: 18000, Frontiera: 48232, g: 9, h: 9.00, f: 18.00, Pool: 5
+Iter: 20000, Frontiera: 51490, g: 9, h: 6.00, f: 15.00, Pool: 5
+Iter: 22000, Frontiera: 55425, g: 9, h: 10.00, f: 19.00, Pool: 7
+Iter: 24000, Frontiera: 59055, g: 9, h: 9.00, f: 18.00, Pool: 6
+Iter: 26000, Frontiera: 63213, g: 9, h: 6.00, f: 15.00, Pool: 5
+Iter: 28000, Frontiera: 67102, g: 9, h: 9.00, f: 18.00, Pool: 5
+Iter: 30000, Frontiera: 70911, g: 9, h: 6.00, f: 15.00, Pool: 5
+Iter: 32000, Frontiera: 74648, g: 9, h: 10.00, f: 19.00, Pool: 6
+Iter: 34000, Frontiera: 78373, g: 9, h: 6.00, f: 15.00, Pool: 6
+Iter: 36000, Frontiera: 83785, g: 9, h: 9.00, f: 18.00, Pool: 5
+Iter: 38000, Frontiera: 88289, g: 9, h: 9.00, f: 18.00, Pool: 5
+Iter: 40000, Frontiera: 92888, g: 9, h: 9.00, f: 18.00, Pool: 6
+Iter: 42000, Frontiera: 97110, g: 9, h: 6.00, f: 15.00, Pool: 5
+Iter: 44000, Frontiera: 101256, g: 9, h: 6.00, f: 15.00, Pool: 5
+Iter: 46000, Frontiera: 104681, g: 9, h: 9.00, f: 18.00, Pool: 5
+Iter: 48000, Frontiera: 108524, g: 9, h: 3.00, f: 12.00, Pool: 5
+Iter: 50000, Frontiera: 111996, g: 9, h: 9.00, f: 18.00, Pool: 5
+Iter: 52000, Frontiera: 115648, g: 9, h: 6.00, f: 15.00, Pool: 5
+Iter: 54000, Frontiera: 118838, g: 10, h: 9.00, f: 19.00, Pool: 6
+Iter: 56000, Frontiera: 122165, g: 10, h: 9.00, f: 19.00, Pool: 6
+Iter: 58000, Frontiera: 124709, g: 8, h: 3.00, f: 11.00, Pool: 3
+Iter: 60000, Frontiera: 128091, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 62000, Frontiera: 131187, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 64000, Frontiera: 134946, g: 10, h: 10.00, f: 20.00, Pool: 7
+Iter: 66000, Frontiera: 138369, g: 10, h: 9.00, f: 19.00, Pool: 7
+Iter: 68000, Frontiera: 142046, g: 10, h: 9.00, f: 19.00, Pool: 6
+Iter: 70000, Frontiera: 144891, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 72000, Frontiera: 148678, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 74000, Frontiera: 152229, g: 10, h: 9.00, f: 19.00, Pool: 6
+Iter: 76000, Frontiera: 155377, g: 10, h: 9.00, f: 19.00, Pool: 7
+Iter: 78000, Frontiera: 158465, g: 10, h: 9.00, f: 19.00, Pool: 6
+Iter: 80000, Frontiera: 161267, g: 10, h: 9.00, f: 19.00, Pool: 6
+Iter: 82000, Frontiera: 164842, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 84000, Frontiera: 167793, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 86000, Frontiera: 170647, g: 10, h: 10.00, f: 20.00, Pool: 7
+Iter: 88000, Frontiera: 173183, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 90000, Frontiera: 176200, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 92000, Frontiera: 179825, g: 10, h: 9.00, f: 19.00, Pool: 7
+Iter: 94000, Frontiera: 182494, g: 10, h: 3.00, f: 13.00, Pool: 6
+Iter: 96000, Frontiera: 185386, g: 10, h: 3.00, f: 13.00, Pool: 6
+Iter: 98000, Frontiera: 188423, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 100000, Frontiera: 190776, g: 10, h: 9.00, f: 19.00, Pool: 6
+Iter: 102000, Frontiera: 194014, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 104000, Frontiera: 197208, g: 10, h: 9.00, f: 19.00, Pool: 7
+Iter: 106000, Frontiera: 200542, g: 10, h: 3.00, f: 13.00, Pool: 6
+Iter: 108000, Frontiera: 204310, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 110000, Frontiera: 207558, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 112000, Frontiera: 210705, g: 10, h: 10.00, f: 20.00, Pool: 7
+Iter: 114000, Frontiera: 214099, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 116000, Frontiera: 217597, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 118000, Frontiera: 220388, g: 10, h: 9.00, f: 19.00, Pool: 6
+Iter: 120000, Frontiera: 222912, g: 10, h: 6.00, f: 16.00, Pool: 6
+Iter: 122000, Frontiera: 225861, g: 10, h: 3.00, f: 13.00, Pool: 6
+Iter: 124000, Frontiera: 229417, g: 10, h: 9.00, f: 19.00, Pool: 6
+Ricerca A* v4 terminata. Limite (125000 nodi) raggiunto o frontiera vuota.
+  Tempo A* per tentativo 1: 23.60 secondi.
+  A* non ha trovato un piano nel tentativo 1. Eseguo meta-analisi...
+
+--- Inizio Meta-Analisi v2 (Analizzando 150 nodi) ---
+Meta-Suggerimento (IV su Specie Naturata): MetaAcq_Ditto_SPD_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPD'], ID:452095, Src:MetaAcquisto)
+  Meta-Analisi suggerisce l'acquisto di: MetaAcq_Ditto_SPD_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPD'], ID:452095, Src:MetaAcquisto)
+
+<<<<< GENGAR TEST META-TENTATIVO N. 2 (Costo acquisti meta già effettuati: 1) >>>>>
+  Inventario potenziato con: ["MetaAcq_Ditto_SPD_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPD'], ID:452095, Src:MetaAcquisto)"]
+
+--- Inizio A* v4 (g_cost iniziale: 1) per Gengar (Gengar, G:Femmina, N:Timid, IVs:['SPA', 'SPD', 'SPE'], ID:1000, Src:) ---
+Inventario potenziato dalla meta-analisi: ["MetaAcq_Ditto_SPD_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPD'], ID:452095, Src:MetaAcquisto)"]
+Iter: 2000, Frontiera: 6976, g: 8, h: 3.00, f: 11.00, Pool: 5
+Iter: 4000, Frontiera: 12880, g: 9, h: 6.00, f: 15.00, Pool: 7
+Iter: 6000, Frontiera: 18715, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 8000, Frontiera: 24503, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 10000, Frontiera: 30028, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 12000, Frontiera: 37245, g: 11, h: 3.00, f: 14.00, Pool: 8
+Iter: 14000, Frontiera: 46887, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 16000, Frontiera: 55532, g: 11, h: 3.00, f: 14.00, Pool: 8
+Iter: 18000, Frontiera: 65210, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 20000, Frontiera: 75043, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 22000, Frontiera: 84873, g: 7, h: 6.00, f: 13.00, Pool: 5
+Iter: 24000, Frontiera: 90468, g: 8, h: 6.00, f: 14.00, Pool: 5
+Iter: 26000, Frontiera: 95746, g: 9, h: 6.00, f: 15.00, Pool: 6
+Iter: 28000, Frontiera: 100576, g: 9, h: 3.00, f: 12.00, Pool: 6
+Iter: 30000, Frontiera: 105579, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 32000, Frontiera: 110465, g: 10, h: 3.00, f: 13.00, Pool: 7
+Iter: 34000, Frontiera: 115732, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 36000, Frontiera: 125117, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 38000, Frontiera: 134038, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 40000, Frontiera: 142541, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 42000, Frontiera: 148556, g: 11, h: 6.00, f: 17.00, Pool: 9
+Iter: 44000, Frontiera: 157874, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 46000, Frontiera: 168737, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 48000, Frontiera: 177760, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 50000, Frontiera: 186494, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 52000, Frontiera: 195700, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 54000, Frontiera: 201396, g: 12, h: 7.00, f: 19.00, Pool: 11
+Iter: 56000, Frontiera: 209549, g: 12, h: 3.00, f: 15.00, Pool: 9
+Iter: 58000, Frontiera: 218625, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 60000, Frontiera: 227005, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 62000, Frontiera: 237299, g: 12, h: 6.00, f: 18.00, Pool: 10
+Iter: 64000, Frontiera: 246598, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 66000, Frontiera: 255080, g: 12, h: 6.00, f: 18.00, Pool: 10
+Iter: 68000, Frontiera: 264336, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 70000, Frontiera: 273350, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 72000, Frontiera: 283265, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 74000, Frontiera: 291818, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 76000, Frontiera: 297946, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 78000, Frontiera: 306564, g: 7, h: 6.00, f: 13.00, Pool: 4
+Iter: 80000, Frontiera: 313831, g: 9, h: 3.00, f: 12.00, Pool: 6
+Iter: 82000, Frontiera: 320389, g: 9, h: 7.00, f: 16.00, Pool: 8
+Iter: 84000, Frontiera: 327234, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 86000, Frontiera: 333764, g: 10, h: 7.00, f: 17.00, Pool: 8
+Iter: 88000, Frontiera: 343995, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 90000, Frontiera: 355370, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 92000, Frontiera: 363107, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 94000, Frontiera: 373898, g: 11, h: 3.00, f: 14.00, Pool: 8
+Iter: 96000, Frontiera: 384512, g: 12, h: 3.00, f: 15.00, Pool: 9
+Iter: 98000, Frontiera: 395376, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 100000, Frontiera: 402316, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 102000, Frontiera: 412214, g: 12, h: 7.00, f: 19.00, Pool: 10
+Iter: 104000, Frontiera: 424539, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 106000, Frontiera: 436912, g: 7, h: 13.00, f: 20.00, Pool: 3
+Iter: 108000, Frontiera: 450652, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 110000, Frontiera: 462369, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 112000, Frontiera: 474797, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 114000, Frontiera: 484926, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 116000, Frontiera: 491552, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 118000, Frontiera: 500374, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 120000, Frontiera: 509602, g: 13, h: 7.00, f: 20.00, Pool: 11
+Iter: 122000, Frontiera: 521457, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 124000, Frontiera: 530716, g: 13, h: 6.00, f: 19.00, Pool: 10
+Ricerca A* v4 terminata. Limite (125000 nodi) raggiunto o frontiera vuota.
+  Tempo A* per tentativo 2: 45.84 secondi.
+  A* non ha trovato un piano nel tentativo 2. Eseguo meta-analisi...
+
+--- Inizio Meta-Analisi v2 (Analizzando 150 nodi) ---
+Meta-Suggerimento (IV su Specie Naturata): MetaAcq_Ditto_SPA_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPA'], ID:1206706, Src:MetaAcquisto)
+  Meta-Analisi suggerisce l'acquisto di: MetaAcq_Ditto_SPA_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPA'], ID:1206706, Src:MetaAcquisto)
+
+<<<<< GENGAR TEST META-TENTATIVO N. 3 (Costo acquisti meta già effettuati: 2) >>>>>
+  Inventario potenziato con: ["MetaAcq_Ditto_SPD_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPD'], ID:452095, Src:MetaAcquisto)", "MetaAcq_Ditto_SPA_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPA'], ID:1206706, Src:MetaAcquisto)"]
+
+--- Inizio A* v4 (g_cost iniziale: 2) per Gengar (Gengar, G:Femmina, N:Timid, IVs:['SPA', 'SPD', 'SPE'], ID:1000, Src:) ---
+Inventario potenziato dalla meta-analisi: ["MetaAcq_Ditto_SPD_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPD'], ID:452095, Src:MetaAcquisto)", "MetaAcq_Ditto_SPA_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPA'], ID:1206706, Src:MetaAcquisto)"]
+Iter: 2000, Frontiera: 6099, g: 8, h: 6.00, f: 14.00, Pool: 6
+Iter: 4000, Frontiera: 11403, g: 9, h: 6.00, f: 15.00, Pool: 6
+Iter: 6000, Frontiera: 16209, g: 9, h: 6.00, f: 15.00, Pool: 6
+Iter: 8000, Frontiera: 21064, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 10000, Frontiera: 26622, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 12000, Frontiera: 31716, g: 10, h: 3.00, f: 13.00, Pool: 7
+Iter: 14000, Frontiera: 38360, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 16000, Frontiera: 48433, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 18000, Frontiera: 57754, g: 11, h: 6.00, f: 17.00, Pool: 9
+Iter: 20000, Frontiera: 64686, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 22000, Frontiera: 74763, g: 11, h: 3.00, f: 14.00, Pool: 8
+Iter: 24000, Frontiera: 80503, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 26000, Frontiera: 89161, g: 6, h: 13.00, f: 19.00, Pool: 2
+Iter: 28000, Frontiera: 99642, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 30000, Frontiera: 109961, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 32000, Frontiera: 117717, g: 12, h: 7.00, f: 19.00, Pool: 10
+Iter: 34000, Frontiera: 126339, g: 12, h: 7.00, f: 19.00, Pool: 10
+Iter: 36000, Frontiera: 137077, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 38000, Frontiera: 147605, g: 12, h: 3.00, f: 15.00, Pool: 9
+Iter: 40000, Frontiera: 156841, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 42000, Frontiera: 165652, g: 8, h: 3.00, f: 11.00, Pool: 4
+Iter: 44000, Frontiera: 173930, g: 13, h: 3.00, f: 16.00, Pool: 10
+Iter: 46000, Frontiera: 182884, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 48000, Frontiera: 192782, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 50000, Frontiera: 201921, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 52000, Frontiera: 210724, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 54000, Frontiera: 221231, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 56000, Frontiera: 226365, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 58000, Frontiera: 234142, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 60000, Frontiera: 243612, g: 13, h: 3.00, f: 16.00, Pool: 10
+Iter: 62000, Frontiera: 254468, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 64000, Frontiera: 265166, g: 6, h: 6.00, f: 12.00, Pool: 3
+Iter: 66000, Frontiera: 270745, g: 8, h: 6.00, f: 14.00, Pool: 6
+Iter: 68000, Frontiera: 276381, g: 9, h: 6.00, f: 15.00, Pool: 6
+Iter: 70000, Frontiera: 281858, g: 9, h: 6.00, f: 15.00, Pool: 6
+Iter: 72000, Frontiera: 287498, g: 10, h: 3.00, f: 13.00, Pool: 7
+Iter: 74000, Frontiera: 293527, g: 10, h: 7.00, f: 17.00, Pool: 8
+Iter: 76000, Frontiera: 300448, g: 10, h: 6.00, f: 16.00, Pool: 7
+Iter: 78000, Frontiera: 309388, g: 11, h: 3.00, f: 14.00, Pool: 8
+Iter: 80000, Frontiera: 322906, g: 11, h: 6.00, f: 17.00, Pool: 8
+Iter: 82000, Frontiera: 336864, g: 11, h: 7.00, f: 18.00, Pool: 10
+Iter: 84000, Frontiera: 349134, g: 11, h: 3.00, f: 14.00, Pool: 8
+Iter: 86000, Frontiera: 361152, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 88000, Frontiera: 375114, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 90000, Frontiera: 390713, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 92000, Frontiera: 400267, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 94000, Frontiera: 414095, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 96000, Frontiera: 427835, g: 12, h: 6.00, f: 18.00, Pool: 9
+Iter: 98000, Frontiera: 437696, g: 8, h: 3.00, f: 11.00, Pool: 4
+Iter: 100000, Frontiera: 446926, g: 13, h: 3.00, f: 16.00, Pool: 10
+Iter: 102000, Frontiera: 459096, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 104000, Frontiera: 473743, g: 13, h: 3.00, f: 16.00, Pool: 10
+Iter: 106000, Frontiera: 488007, g: 13, h: 7.00, f: 20.00, Pool: 11
+Iter: 108000, Frontiera: 500952, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 110000, Frontiera: 510467, g: 13, h: 7.00, f: 20.00, Pool: 11
+Iter: 112000, Frontiera: 524654, g: 13, h: 3.00, f: 16.00, Pool: 10
+Iter: 114000, Frontiera: 538314, g: 13, h: 7.00, f: 20.00, Pool: 11
+Iter: 116000, Frontiera: 550018, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 118000, Frontiera: 563239, g: 13, h: 6.00, f: 19.00, Pool: 10
+Iter: 120000, Frontiera: 575379, g: 8, h: 3.00, f: 11.00, Pool: 5
+Iter: 122000, Frontiera: 583193, g: 13, h: 3.00, f: 16.00, Pool: 10
+Iter: 124000, Frontiera: 595054, g: 13, h: 6.00, f: 19.00, Pool: 10
+Ricerca A* v4 terminata. Limite (125000 nodi) raggiunto o frontiera vuota.
+  Tempo A* per tentativo 3: 40.17 secondi.
+  A* non ha trovato un piano nel tentativo 3. Eseguo meta-analisi...
+
+--- Inizio Meta-Analisi v2 (Analizzando 150 nodi) ---
+Meta-Suggerimento (IV su Specie Naturata): MetaAcq_Ditto_SPE_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPE'], ID:2037904, Src:MetaAcquisto)
+  Meta-Analisi suggerisce l'acquisto di: MetaAcq_Ditto_SPE_Timid (Ditto, G:Genderless, N:Timid, IVs:['SPE'], ID:2037904, Src:MetaAcquisto)
+
+NESSUN PIANO TROVATO PER GENGAR ANCHE DOPO I TENTATIVI DI META-ANALISI.

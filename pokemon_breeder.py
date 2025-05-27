@@ -6,6 +6,7 @@ import heapq
 import time
 from dataclasses import dataclass, field
 import collections
+import shutil # Added for copying debug files
 
 # --- Costanti e Configurazione ---
 DEBUG = True
@@ -174,10 +175,10 @@ def is_goal(pool: frozenset[Pokemon], target: Pokemon) -> Optional[Pokemon]:
 
 # --- A* Planner v4 (con correzione KeyError) ---
 def a_star_planner_v4(initial_inventory: List[Pokemon], target: Pokemon, initial_g_cost: int = 0):
-    # clear_debug_log() # Rimosso da qui, chiamato solo una volta in run_gyarados_test_with_meta_analysis
+    # clear_debug_log() # Rimosso da qui, gestito per test case
     global ID_COUNTER
     max_initial_id = 0
-    if initial_inventory: max_initial_id = max(p.id for p in initial_inventory if hasattr(p, 'id')) # Aggiunto hasattr per sicurezza
+    if initial_inventory: max_initial_id = max(p.id for p in initial_inventory if hasattr(p, 'id')) 
     ID_COUNTER = max(ID_COUNTER, max_initial_id + 100) 
 
     start_pool = frozenset(initial_inventory)
@@ -248,17 +249,14 @@ def a_star_planner_v4(initial_inventory: List[Pokemon], target: Pokemon, initial
             if not child_species_for_pair: continue
 
             item_combos_to_try = []
-            # Combo 1: p1 Pietrastante, p2 Vigor 
             if p1.nature == target.nature or target.nature == "NEUTRAL":
                 p1_stone = "Pietrastante" if p1.nature == target.nature else "Nessuno"
-                for iv_p2_stat in IV_STATS: # Itera su tutti gli stats per Vigor
-                    if iv_p2_stat in p2.ivs and iv_p2_stat in target.ivs: # IV utile da passare
-                         # Non passare IV che p1 ha già se p1 tiene Pietrastante per natura target
+                for iv_p2_stat in IV_STATS: 
+                    if iv_p2_stat in p2.ivs and iv_p2_stat in target.ivs: 
                         if not (p1_stone == "Pietrastante" and iv_p2_stat in p1.ivs):
                              item_combos_to_try.append({"p1_item": p1_stone, "p2_item": f"Vigor {iv_p2_stat}"})
                 item_combos_to_try.append({"p1_item": p1_stone, "p2_item": "Nessuno"})
 
-            # Combo 2: p2 Pietrastante, p1 Vigor
             if p2.nature == target.nature or target.nature == "NEUTRAL":
                 p2_stone = "Pietrastante" if p2.nature == target.nature else "Nessuno"
                 for iv_p1_stat in IV_STATS:
@@ -267,8 +265,7 @@ def a_star_planner_v4(initial_inventory: List[Pokemon], target: Pokemon, initial
                             item_combos_to_try.append({"p1_item": f"Vigor {iv_p1_stat}", "p2_item": p2_stone})
                 item_combos_to_try.append({"p1_item": "Nessuno", "p2_item": p2_stone})
             
-            # Combo 3: Due Vigor
-            if target.nature == "NEUTRAL" or target.nature in {p1.nature, p2.nature}: # Se la natura non è un problema o è già coperta
+            if target.nature == "NEUTRAL" or target.nature in {p1.nature, p2.nature}: 
                 for iv_p1_stat in IV_STATS:
                     if iv_p1_stat not in p1.ivs or iv_p1_stat not in target.ivs: continue
                     for iv_p2_stat in IV_STATS:
@@ -276,13 +273,11 @@ def a_star_planner_v4(initial_inventory: List[Pokemon], target: Pokemon, initial
                         if iv_p1_stat == iv_p2_stat: continue 
                         item_combos_to_try.append({"p1_item": f"Vigor {iv_p1_stat}", "p2_item": f"Vigor {iv_p2_stat}"})
             
-            # Combo 4: Un solo Vigor
             for iv_s_single in IV_STATS:
                 if iv_s_single in p1.ivs and iv_s_single in target.ivs: item_combos_to_try.append({"p1_item": f"Vigor {iv_s_single}", "p2_item": "Nessuno"})
                 if iv_s_single in p2.ivs and iv_s_single in target.ivs: item_combos_to_try.append({"p1_item": "Nessuno", "p2_item": f"Vigor {iv_s_single}"})
 
             item_combos_to_try.append({"p1_item": "Nessuno", "p2_item": "Nessuno"})
-
             generated_children_in_combo = set()
 
             for combo in item_combos_to_try:
@@ -295,22 +290,16 @@ def a_star_planner_v4(initial_inventory: List[Pokemon], target: Pokemon, initial
                 elif target.nature == "NEUTRAL": child_nature = "NEUTRAL"
                 else: child_nature = p1.nature 
 
-                # CORREZIONE KeyError: Estrarre lo stat dalla stringa "Vigor STAT"
                 if p1_item_str and p1_item_str.startswith("Vigor "):
                     iv_stat_to_add = p1_item_str.split(" ")[1] 
-                    if iv_stat_to_add in IV_STATS: 
-                        child_ivs.add(iv_stat_to_add)
+                    if iv_stat_to_add in IV_STATS: child_ivs.add(iv_stat_to_add)
                 if p2_item_str and p2_item_str.startswith("Vigor "):
                     iv_stat_to_add = p2_item_str.split(" ")[1]
-                    if iv_stat_to_add in IV_STATS:
-                        child_ivs.add(iv_stat_to_add)
+                    if iv_stat_to_add in IV_STATS: child_ivs.add(iv_stat_to_add)
                 
                 child_ivs.update(p1.ivs.intersection(p2.ivs))
                 child_gender_final = target.gender if target.gender != "Any" else ("Femmina" if child_species_for_pair != "Ditto" else "Genderless")
-
-                child = Pokemon(child_species_for_pair, child_ivs, child_nature, child_gender_final,
-                                f"Bred_{p1.id}_{p2.id}", source_info="Bred")
-
+                child = Pokemon(child_species_for_pair, child_ivs, child_nature, child_gender_final, f"Bred_{p1.id}_{p2.id}", source_info="Bred")
                 child_sig = (child.species, child.ivs, child.nature, child.gender)
                 if child_sig in generated_children_in_combo: continue
                 generated_children_in_combo.add(child_sig)
@@ -318,7 +307,6 @@ def a_star_planner_v4(initial_inventory: List[Pokemon], target: Pokemon, initial
                 new_pool_c = current_node.available_pool - {p1, p2} | {child}
                 new_g_c = current_node.g_cost
                 new_h_c = calculate_heuristic_v3(new_pool_c, target)
-                
                 new_pool_c_tuple = tuple(sorted(p.id for p in new_pool_c))
                 if new_pool_c_tuple not in visited_states or visited_states[new_pool_c_tuple] > new_g_c:
                     new_plan_c = current_node.plan + (f"Accoppiamento: {repr(p1)} [{p1_item_str}] + {repr(p2)} [{p2_item_str}] -> {repr(child)}",)
@@ -328,71 +316,50 @@ def a_star_planner_v4(initial_inventory: List[Pokemon], target: Pokemon, initial
     promising_nodes_for_meta = sorted(frontier, key=lambda node: node.f_cost)[:NODES_FOR_META_ANALYSIS]
     return None, None, promising_nodes_for_meta
 
-
 # --- Meta-Analisi v2 (invariata) ---
 def meta_analyzer_v2(promising_nodes: List[BreedingNode], target: Pokemon, past_meta_suggestions: List[Pokemon]) -> Optional[Pokemon]:
     d_print(f"\n--- Inizio Meta-Analisi v2 (Analizzando {len(promising_nodes)} nodi) ---")
     if not promising_nodes:
         d_print("Nessun nodo promettente da analizzare.")
         return None
-
     nature_on_target_species_missing = 0 
     specific_iv_on_natured_target_species_missing = collections.defaultdict(int) 
     general_nature_missing = 0 
     general_iv_missing = collections.defaultdict(int) 
-
     for node in promising_nodes:
         pool_natures = {p.nature for p in node.available_pool}
         pool_ivs_total = frozenset().union(*(p.ivs for p in node.available_pool))
-        if target.nature != "NEUTRAL" and target.nature not in pool_natures:
-            general_nature_missing += 1
+        if target.nature != "NEUTRAL" and target.nature not in pool_natures: general_nature_missing += 1
         for iv in target.ivs:
-            if iv not in pool_ivs_total:
-                general_iv_missing[iv] += 1
+            if iv not in pool_ivs_total: general_iv_missing[iv] += 1
         found_candidate_with_nature_and_species = False
         for pkm in node.available_pool:
             if (pkm.species == target.species or pkm.species == "Ditto"):
                 if pkm.nature == target.nature:
                     found_candidate_with_nature_and_species = True
                     for iv_target in target.ivs:
-                        if iv_target not in pkm.ivs:
-                            specific_iv_on_natured_target_species_missing[iv_target] +=1
+                        if iv_target not in pkm.ivs: specific_iv_on_natured_target_species_missing[iv_target] +=1
                     break 
-        if target.nature != "NEUTRAL" and not found_candidate_with_nature_and_species:
-            nature_on_target_species_missing +=1
-            
+        if target.nature != "NEUTRAL" and not found_candidate_with_nature_and_species: nature_on_target_species_missing +=1
     num_nodes = len(promising_nodes)
-    if num_nodes == 0: num_nodes = 1 # Evita divisione per zero
-
-    already_suggested_specific_nature_transfer = any(
-        p.nature == target.nature and (p.species == "Ditto" or p.species == target.species) and p.source_info.startswith("MetaAcquisto") 
-        for p in past_meta_suggestions
-    )
+    if num_nodes == 0: num_nodes = 1 
+    already_suggested_specific_nature_transfer = any(p.nature == target.nature and (p.species == "Ditto" or p.species == target.species) and p.source_info.startswith("MetaAcquisto") for p in past_meta_suggestions)
     if target.nature != "NEUTRAL" and (nature_on_target_species_missing / num_nodes > 0.6) and not already_suggested_specific_nature_transfer:
-        suggestion = Pokemon("Ditto", set(), target.nature, "Genderless", 
-                             f"MetaAcq_Ditto_{target.nature}", source_info=f"MetaAcquisto_NaturaPerSpecie_{target.nature}")
+        suggestion = Pokemon("Ditto", set(), target.nature, "Genderless", f"MetaAcq_Ditto_{target.nature}", source_info=f"MetaAcquisto_NaturaPerSpecie_{target.nature}")
         d_print(f"Meta-Suggerimento (Natura su Specie): {repr(suggestion)}")
         return suggestion
-
     if specific_iv_on_natured_target_species_missing:
         most_needed_iv_on_good_candidate = max(specific_iv_on_natured_target_species_missing, key=specific_iv_on_natured_target_species_missing.get)
-        already_suggested_this_iv_compound = any(
-            most_needed_iv_on_good_candidate in p.ivs and p.nature == target.nature and p.source_info.startswith("MetaAcquisto")
-            for p in past_meta_suggestions
-        )
+        already_suggested_this_iv_compound = any(most_needed_iv_on_good_candidate in p.ivs and p.nature == target.nature and p.source_info.startswith("MetaAcquisto") for p in past_meta_suggestions)
         if (specific_iv_on_natured_target_species_missing[most_needed_iv_on_good_candidate] / num_nodes > 0.5) and not already_suggested_this_iv_compound:
-            suggestion = Pokemon("Ditto", {most_needed_iv_on_good_candidate}, target.nature, "Genderless", 
-                                 f"MetaAcq_Ditto_{most_needed_iv_on_good_candidate}_{target.nature}", 
-                                 source_info=f"MetaAcquisto_IVNatura_{most_needed_iv_on_good_candidate}_{target.nature}")
+            suggestion = Pokemon("Ditto", {most_needed_iv_on_good_candidate}, target.nature, "Genderless", f"MetaAcq_Ditto_{most_needed_iv_on_good_candidate}_{target.nature}", source_info=f"MetaAcquisto_IVNatura_{most_needed_iv_on_good_candidate}_{target.nature}")
             d_print(f"Meta-Suggerimento (IV su Specie Naturata): {repr(suggestion)}")
             return suggestion
-
     already_suggested_general_nature = any(p.nature == target.nature and p.source_info.startswith("MetaAcquisto_NaturaMancante") for p in past_meta_suggestions)
     if target.nature != "NEUTRAL" and (general_nature_missing / num_nodes > 0.7) and not already_suggested_specific_nature_transfer and not already_suggested_general_nature:
         suggestion = Pokemon("Ditto", set(), target.nature, "Genderless", f"MetaAcq_Ditto_N_Gen_{target.nature}", source_info=f"MetaAcquisto_NaturaMancante_{target.nature}")
         d_print(f"Meta-Suggerimento (Natura Generale): {repr(suggestion)}")
         return suggestion
-        
     if general_iv_missing:
         most_missing_general_iv = max(general_iv_missing, key=general_iv_missing.get)
         already_suggested_this_general_iv = any(most_missing_general_iv in p.ivs and p.source_info.startswith("MetaAcquisto_IVMancante") for p in past_meta_suggestions)
@@ -400,90 +367,231 @@ def meta_analyzer_v2(promising_nodes: List[BreedingNode], target: Pokemon, past_
             suggestion = Pokemon("Ditto", {most_missing_general_iv}, "NEUTRAL", "Genderless", f"MetaAcq_Ditto_IV_Gen_{most_missing_general_iv}", source_info=f"MetaAcquisto_IVMancante_{most_missing_general_iv}")
             d_print(f"Meta-Suggerimento (IV Generale): {repr(suggestion)}")
             return suggestion
-            
     d_print("Meta-Analisi v2 non ha prodotto nuovi suggerimenti chiari.")
     return None
 
-# --- Entry Point Principale con Ciclo di Meta-Analisi (invariato) ---
-def run_gyarados_test_with_meta_analysis():
-    clear_debug_log() 
-    print("\n====================== ESECUZIONE TEST GYARADOS (A* + Meta-Analisi v2 Corretto) ======================")
+# --- Test Case 1: Gengar ---
+def run_test_case_1_gengar():
+    clear_debug_log()
+    header_msg = "====================== EXECUTING TEST CASE 1: GENGAR ======================"
+    print(f"\n{header_msg}")
+    d_print(f"\n{header_msg}\n")
     
-    initial_inventory_base = [
-        Pokemon(species="Magikarp", ivs={"ATK"}, nature="Adamant", gender="Maschio", name="Karp_ATKAda", is_owned=True, source_info="Posseduto"),
-        Pokemon(species="Ditto", ivs={"PS", "SPD", "SPE"}, nature="Jolly", gender="Genderless", name="Ditto_PSSDSP_Jol", is_owned=True, source_info="Posseduto"),
-        Pokemon(species="Dragonite", ivs={"PS", "SPE"}, nature="NEUTRAL", gender="Maschio", name="Dnite_PSSPE", is_owned=True, source_info="Posseduto"),
-        Pokemon(species="Gyarados", ivs={"ATK", "SPD"}, nature="NEUTRAL", gender="Maschio", name="Gya_ATKSPD", is_owned=True, source_info="Posseduto")
-    ]
-    target_pokemon = Pokemon(species="Gyarados", ivs={"PS", "ATK", "SPD", "SPE"}, nature="Adamant", gender="Femmina")
+    initial_inventory_base_case1 = []
+    target_pokemon_case1 = Pokemon(species="Gengar", ivs={"SPA", "SPD", "SPE"}, nature="Timid", gender="Femmina")
     
-    print(f"\n--- Obiettivo: {repr(target_pokemon)} ---")
+    d_print(f"--- Obiettivo Gengar Test Case: {repr(target_pokemon_case1)} ---")
+    print(f"\n--- Obiettivo Gengar Test Case: {repr(target_pokemon_case1)} ---")
     
-    current_inventory = list(initial_inventory_base) 
-    accumulated_meta_suggestions: List[Pokemon] = [] 
-    accumulated_meta_purchases_cost = 0
-    final_plan_overall: Optional[Tuple[str, ...]] = None
-    final_pokemon_obj_overall: Optional[Pokemon] = None
+    accumulated_meta_suggestions_case1: List[Pokemon] = [] 
+    accumulated_meta_purchases_cost_case1 = 0
+    final_plan_overall_case1: Optional[Tuple[str, ...]] = None
+    final_pokemon_obj_overall_case1: Optional[Pokemon] = None
 
     for attempt in range(META_ANALYSIS_ATTEMPTS):
-        d_print(f"\n<<<<< META-TENTATIVO N. {attempt + 1} (Costo acquisti meta già effettuati: {accumulated_meta_purchases_cost}) >>>>>")
-        print(f"\nMeta-Tentativo N. {attempt + 1}...")
+        d_print(f"\n<<<<< GENGAR TEST META-TENTATIVO N. {attempt + 1} (Costo acquisti meta già effettuati: {accumulated_meta_purchases_cost_case1}) >>>>>")
+        print(f"\nGengar Test Meta-Tentativo N. {attempt + 1}...")
         
-        effective_inventory_for_a_star = list(initial_inventory_base) + accumulated_meta_suggestions
+        effective_inventory_for_a_star_case1 = list(initial_inventory_base_case1) + accumulated_meta_suggestions_case1
         
-        if accumulated_meta_suggestions:
-             print(f"  Inventario potenziato con: {[repr(p) for p in accumulated_meta_suggestions]}")
+        if accumulated_meta_suggestions_case1:
+             print(f"  Inventario potenziato con: {[repr(p) for p in accumulated_meta_suggestions_case1]}")
+             d_print(f"  Inventario potenziato con: {[repr(p) for p in accumulated_meta_suggestions_case1]}")
 
         start_time = time.time()
         plan_from_a_star, goal_pokemon_from_a_star, promising_nodes = a_star_planner_v4(
-            effective_inventory_for_a_star, 
-            target_pokemon,
-            initial_g_cost=accumulated_meta_purchases_cost 
+            effective_inventory_for_a_star_case1, 
+            target_pokemon_case1,
+            initial_g_cost=accumulated_meta_purchases_cost_case1
         )
         end_time = time.time()
         print(f"  Tempo A* per tentativo {attempt+1}: {end_time - start_time:.2f} secondi.")
+        d_print(f"  Tempo A* per tentativo {attempt+1}: {end_time - start_time:.2f} secondi.")
 
         if plan_from_a_star:
             print(f"  SUCCESSO nel tentativo {attempt+1}!")
-            final_plan_overall = plan_from_a_star
-            final_pokemon_obj_overall = goal_pokemon_from_a_star
+            d_print(f"  SUCCESSO nel tentativo {attempt+1}!")
+            final_plan_overall_case1 = plan_from_a_star
+            final_pokemon_obj_overall_case1 = goal_pokemon_from_a_star
             break 
         
         print(f"  A* non ha trovato un piano nel tentativo {attempt+1}. Eseguo meta-analisi...")
+        d_print(f"  A* non ha trovato un piano nel tentativo {attempt+1}. Eseguo meta-analisi...")
         if not promising_nodes:
             print("  Nessun nodo promettente fornito da A* per la meta-analisi. Interrompo.")
+            d_print("  Nessun nodo promettente fornito da A* per la meta-analisi. Interrompo.")
             break
 
-        meta_suggestion = meta_analyzer_v2(promising_nodes, target_pokemon, accumulated_meta_suggestions)
+        meta_suggestion = meta_analyzer_v2(promising_nodes, target_pokemon_case1, accumulated_meta_suggestions_case1)
         
         if meta_suggestion:
             is_redundant_suggestion = False
-            for prev_sugg in accumulated_meta_suggestions:
+            for prev_sugg in accumulated_meta_suggestions_case1:
                 if prev_sugg.nature == meta_suggestion.nature and prev_sugg.ivs == meta_suggestion.ivs and prev_sugg.species == meta_suggestion.species:
                     is_redundant_suggestion = True
                     break
             if is_redundant_suggestion:
                 print(f"  Meta-Analisi ha suggerito un Pokémon ({repr(meta_suggestion)}) già considerato. Interrompo.")
+                d_print(f"  Meta-Analisi ha suggerito un Pokémon ({repr(meta_suggestion)}) già considerato. Interrompo.")
                 break
             print(f"  Meta-Analisi suggerisce l'acquisto di: {repr(meta_suggestion)}")
-            accumulated_meta_suggestions.append(meta_suggestion)
-            accumulated_meta_purchases_cost += 1 
+            d_print(f"  Meta-Analisi suggerisce l'acquisto di: {repr(meta_suggestion)}")
+            accumulated_meta_suggestions_case1.append(meta_suggestion)
+            accumulated_meta_purchases_cost_case1 += 1 
         else:
             print("  Meta-Analisi non ha nuovi suggerimenti. Interrompo.")
+            d_print("  Meta-Analisi non ha nuovi suggerimenti. Interrompo.")
             break 
     
-    if final_plan_overall:
-        actual_purchases_in_plan = len([s for s in final_plan_overall if 'Acquisto' in s or 'MetaAcquisto' in s])
-        print(f"\nPIANO FINALE TROVATO DOPO META-ANALISI!")
-        print(f"Costo Totale Effettivo (contando 'Acquisto' nel piano): {actual_purchases_in_plan} acquisti.")
+    if final_plan_overall_case1:
+        actual_purchases_in_plan = len([s for s in final_plan_overall_case1 if 'Acquisto' in s or 'MetaAcquisto' in s])
+        summary_msg_gengar = f"\nPIANO FINALE TROVATO PER GENGAR!\nCosto Totale Effettivo (contando 'Acquisto' nel piano): {actual_purchases_in_plan} acquisti."
+        print(summary_msg_gengar)
+        d_print(summary_msg_gengar)
+        
         print("--------------------------------------------------")
-        for i, step in enumerate(final_plan_overall):
+        d_print("--------------------------------------------------")
+        for i, step in enumerate(final_plan_overall_case1):
             if "OBIETTIVO RAGGIUNTO" not in step : 
                  print(f"  Passo {i+1}: {step}")
+                 d_print(f"  Passo {i+1}: {step}")
         print("--------------------------------------------------")
-        print(f"Pokémon Finale Ottenuto: {repr(final_pokemon_obj_overall)}")
+        d_print("--------------------------------------------------")
+        
+        final_pokemon_msg_gengar = f"Pokémon Finale Ottenuto: {repr(final_pokemon_obj_overall_case1)}"
+        print(final_pokemon_msg_gengar)
+        d_print(final_pokemon_msg_gengar)
     else:
-        print("\nNESSUN PIANO TROVATO ANCHE DOPO I TENTATIVI DI META-ANALISI.")
+        no_plan_msg_gengar = "\nNESSUN PIANO TROVATO PER GENGAR ANCHE DOPO I TENTATIVI DI META-ANALISI."
+        print(no_plan_msg_gengar)
+        d_print(no_plan_msg_gengar)
+
+# --- Test Case 2: Dragonite ---
+def run_test_case_2_dragonite():
+    clear_debug_log() 
+    header_msg = "====================== EXECUTING TEST CASE 2: DRAGONITE ======================"
+    print(f"\n{header_msg}")
+    d_print(f"\n{header_msg}\n")
+
+    initial_inventory_base_case2 = [
+        Pokemon(species="Dragonair", ivs={"ATK", "SPE"}, nature="Adamant", gender="Femmina", name="Owned_Dragonair_ATKSPE_Ada", is_owned=True, source_info="Owned"),
+        Pokemon(species="Gyarados", ivs={"DEF", "PS"}, nature="Jolly", gender="Maschio", name="Owned_Gyarados_DEFPS_Jol", is_owned=True, source_info="Owned"),
+        Pokemon(species="Ditto", ivs={"SPE", "SPA"}, nature="Modest", gender="Genderless", name="Owned_Ditto_SPESPA_Mod", is_owned=True, source_info="Owned"),
+        Pokemon(species="Magikarp", ivs={"PS"}, nature="Bashful", gender="Maschio", name="Owned_Magikarp_PS", is_owned=True, source_info="Owned")
+    ]
+    target_pokemon_case2 = Pokemon(species="Dragonite", ivs={"ATK", "SPE", "DEF"}, nature="Adamant", gender="Maschio")
+
+    d_print(f"--- Obiettivo Dragonite Test Case: {repr(target_pokemon_case2)} ---")
+    print(f"\n--- Obiettivo Dragonite Test Case: {repr(target_pokemon_case2)} ---")
+    
+    accumulated_meta_suggestions_case2: List[Pokemon] = [] 
+    accumulated_meta_purchases_cost_case2 = 0
+    final_plan_overall_case2: Optional[Tuple[str, ...]] = None
+    final_pokemon_obj_overall_case2: Optional[Pokemon] = None
+
+    for attempt in range(META_ANALYSIS_ATTEMPTS):
+        d_print(f"\n<<<<< DRAGONITE TEST META-TENTATIVO N. {attempt + 1} (Costo acquisti meta già effettuati: {accumulated_meta_purchases_cost_case2}) >>>>>")
+        print(f"\nDragonite Test Meta-Tentativo N. {attempt + 1}...")
+        
+        effective_inventory_for_a_star_case2 = list(initial_inventory_base_case2) + accumulated_meta_suggestions_case2
+        
+        if accumulated_meta_suggestions_case2:
+             print(f"  Inventario potenziato con: {[repr(p) for p in accumulated_meta_suggestions_case2]}")
+             d_print(f"  Inventario potenziato con: {[repr(p) for p in accumulated_meta_suggestions_case2]}")
+
+        start_time = time.time()
+        plan_from_a_star, goal_pokemon_from_a_star, promising_nodes = a_star_planner_v4(
+            effective_inventory_for_a_star_case2, 
+            target_pokemon_case2,
+            initial_g_cost=accumulated_meta_purchases_cost_case2 
+        )
+        end_time = time.time()
+        print(f"  Tempo A* per tentativo {attempt+1}: {end_time - start_time:.2f} secondi.")
+        d_print(f"  Tempo A* per tentativo {attempt+1}: {end_time - start_time:.2f} secondi.")
+
+        if plan_from_a_star:
+            print(f"  SUCCESSO nel tentativo {attempt+1}!")
+            d_print(f"  SUCCESSO nel tentativo {attempt+1}!")
+            final_plan_overall_case2 = plan_from_a_star
+            final_pokemon_obj_overall_case2 = goal_pokemon_from_a_star
+            break 
+        
+        print(f"  A* non ha trovato un piano nel tentativo {attempt+1}. Eseguo meta-analisi...")
+        d_print(f"  A* non ha trovato un piano nel tentativo {attempt+1}. Eseguo meta-analisi...")
+        if not promising_nodes:
+            print("  Nessun nodo promettente fornito da A* per la meta-analisi. Interrompo.")
+            d_print("  Nessun nodo promettente fornito da A* per la meta-analisi. Interrompo.")
+            break
+
+        meta_suggestion = meta_analyzer_v2(promising_nodes, target_pokemon_case2, accumulated_meta_suggestions_case2)
+        
+        if meta_suggestion:
+            is_redundant_suggestion = False
+            for prev_sugg in accumulated_meta_suggestions_case2:
+                if prev_sugg.nature == meta_suggestion.nature and prev_sugg.ivs == meta_suggestion.ivs and prev_sugg.species == meta_suggestion.species:
+                    is_redundant_suggestion = True
+                    break
+            if is_redundant_suggestion:
+                print(f"  Meta-Analisi ha suggerito un Pokémon ({repr(meta_suggestion)}) già considerato. Interrompo.")
+                d_print(f"  Meta-Analisi ha suggerito un Pokémon ({repr(meta_suggestion)}) già considerato. Interrompo.")
+                break
+            print(f"  Meta-Analisi suggerisce l'acquisto di: {repr(meta_suggestion)}")
+            d_print(f"  Meta-Analisi suggerisce l'acquisto di: {repr(meta_suggestion)}")
+            accumulated_meta_suggestions_case2.append(meta_suggestion)
+            accumulated_meta_purchases_cost_case2 += 1 
+        else:
+            print("  Meta-Analisi non ha nuovi suggerimenti. Interrompo.")
+            d_print("  Meta-Analisi non ha nuovi suggerimenti. Interrompo.")
+            break 
+    
+    if final_plan_overall_case2:
+        actual_purchases_in_plan = len([s for s in final_plan_overall_case2 if 'Acquisto' in s or 'MetaAcquisto' in s])
+        summary_msg_dragonite = f"\nPIANO FINALE TROVATO PER DRAGONITE!\nCosto Totale Effettivo (contando 'Acquisto' nel piano): {actual_purchases_in_plan} acquisti."
+        print(summary_msg_dragonite)
+        d_print(summary_msg_dragonite)
+        
+        print("--------------------------------------------------")
+        d_print("--------------------------------------------------")
+        for i, step in enumerate(final_plan_overall_case2):
+            if "OBIETTIVO RAGGIUNTO" not in step : 
+                 print(f"  Passo {i+1}: {step}")
+                 d_print(f"  Passo {i+1}: {step}")
+        print("--------------------------------------------------")
+        d_print("--------------------------------------------------")
+        
+        final_pokemon_msg_dragonite = f"Pokémon Finale Ottenuto: {repr(final_pokemon_obj_overall_case2)}"
+        print(final_pokemon_msg_dragonite)
+        d_print(final_pokemon_msg_dragonite)
+    else:
+        no_plan_msg_dragonite = "\nNESSUN PIANO TROVATO PER DRAGONITE ANCHE DOPO I TENTATIVI DI META-ANALISI."
+        print(no_plan_msg_dragonite)
+        d_print(no_plan_msg_dragonite)
 
 if __name__ == "__main__":
-    run_gyarados_test_with_meta_analysis()
+    # run_gyarados_test_with_meta_analysis() # Original test commented out
+    
+    run_test_case_1_gengar()
+    try:
+        # Ensure debug.txt exists before trying to copy, though clear_debug_log should create it
+        if DEBUG: # Only copy if debugging is on, otherwise debug.txt might not exist or be relevant
+             shutil.copy(DEBUG_FILE_NAME, "debug_case1.txt")
+             d_print(f"\n[System] Successfully copied {DEBUG_FILE_NAME} to debug_case1.txt after Gengar test.")
+    except FileNotFoundError:
+        print(f"[System] Error: {DEBUG_FILE_NAME} not found for Gengar, cannot copy to debug_case1.txt.")
+        d_print(f"[System] Error: {DEBUG_FILE_NAME} not found for Gengar, cannot copy to debug_case1.txt.")
+    except Exception as e:
+        print(f"[System] Error copying debug_case1.txt: {e}")
+        d_print(f"[System] Error copying debug_case1.txt: {e}")
+
+    run_test_case_2_dragonite()
+    try:
+        if DEBUG: # Only copy if debugging is on
+            shutil.copy(DEBUG_FILE_NAME, "debug_case2.txt")
+            # This d_print will go into the debug_case2.txt (the new debug.txt for Dragonite)
+            d_print(f"\n[System] Successfully copied {DEBUG_FILE_NAME} to debug_case2.txt after Dragonite test.")
+    except FileNotFoundError:
+        print(f"[System] Error: {DEBUG_FILE_NAME} not found for Dragonite, cannot copy to debug_case2.txt.")
+        d_print(f"[System] Error: {DEBUG_FILE_NAME} not found for Dragonite, cannot copy to debug_case2.txt.") # This will also go to Dragonite's debug
+    except Exception as e:
+        print(f"[System] Error copying debug_case2.txt: {e}")
+        d_print(f"[System] Error copying debug_case2.txt: {e}")

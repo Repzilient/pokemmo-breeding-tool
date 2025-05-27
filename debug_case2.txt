@@ -228,5 +228,3 @@ Meta-Suggerimento (IV su Specie Naturata): MetaAcq_Ditto_ATK_Adamant (Ditto, G:G
   Meta-Analisi suggerisce l'acquisto di: MetaAcq_Ditto_ATK_Adamant (Ditto, G:Genderless, N:Adamant, IVs:['ATK'], ID:3841340, Src:MetaAcquisto)
 
 NESSUN PIANO TROVATO PER DRAGONITE ANCHE DOPO I TENTATIVI DI META-ANALISI.
-
-[System] Successfully copied debug.txt to debug_case2.txt after Dragonite test.
