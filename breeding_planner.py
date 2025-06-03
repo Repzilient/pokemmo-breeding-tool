@@ -1049,7 +1049,7 @@ def calcola_pokemon_base_necessari_f2(
     return necessari_base
 
 # --- Logica Principale Fase 2 (Modificata per esportare piani candidati) ---
-def run_fase2(file_piani_json: str, file_pokemon_posseduti: str, file_debug_log: str, file_output_fase3: str):
+def run_fase2(file_piani_json: str, owned_pokemon_list: List[PokemonPossedutoF2], file_debug_log: str, file_output_fase3: str):
     debug_log_lines = []
     def log_debug(message):
         debug_log_lines.append(str(message))
@@ -1058,37 +1058,22 @@ def run_fase2(file_piani_json: str, file_pokemon_posseduti: str, file_debug_log:
     print("--- Fase 2: Valutazione Piani di Breeding ---")
     log_debug("--- Fase 2: Valutazione Piani di Breeding ---")
 
-    pokemon_posseduti_originali: List[PokemonPossedutoF2] = []
-    try:
-        with open(file_pokemon_posseduti, "r", encoding="utf-8") as f:
-            posseduti_data = json.load(f)
-            print(f"Caricamento pokemon posseduti da {file_pokemon_posseduti}...")
-            log_debug(f"Caricamento pokemon posseduti da {file_pokemon_posseduti}...")
-            for item in posseduti_data:
-                natura = item.get("natura", "")
-                if natura is None or natura.lower() == "null": natura = ""
-                p = PokemonPossedutoF2(
-                    id_utente=item.get("id_utente",""),
-                    ivs=sorted(list(set(item.get("ivs", [])))),
-                    natura=natura,
-                    specie=item.get("specie"), 
-                    sesso=item.get("sesso"),   
-                    egg_groups=item.get("egg_groups", [])
-                )
-                if p.id_utente: pokemon_posseduti_originali.append(p)
-        print(f"{len(pokemon_posseduti_originali)} pokemon posseduti caricati.")
-        log_debug(f"{len(pokemon_posseduti_originali)} pokemon posseduti caricati.")
+    # pokemon_posseduti_originali ora viene direttamente da owned_pokemon_list
+    pokemon_posseduti_originali: List[PokemonPossedutoF2] = list(owned_pokemon_list) 
+    print(f"{len(pokemon_posseduti_originali)} Pokémon posseduti ricevuti come parametro.")
+    log_debug(f"{len(pokemon_posseduti_originali)} Pokémon posseduti ricevuti come parametro.")
+    if pokemon_posseduti_originali:
         for p in pokemon_posseduti_originali:
-            iv_str = "/".join(p.ivs) if p.ivs else "Nessuna"
+            iv_str = "/".join(sorted(p.ivs)) if p.ivs else "Nessuna" # Assicura ordinamento per consistenza
             nat_str = p.natura if p.natura else "N/D"
-            print(f"- {p.id_utente} (IVs: {iv_str}, Natura: {nat_str})")
-            log_debug(f"- {p.id_utente} (IVs: {iv_str}, Natura: {nat_str})")
-    except FileNotFoundError:
-        print(f"Errore: Impossibile aprire il file dei pokemon posseduti: {file_pokemon_posseduti}", file=sys.stderr)
-        log_debug(f"Errore: Impossibile aprire il file dei pokemon posseduti: {file_pokemon_posseduti}")
-    except json.JSONDecodeError:
-        print(f"Errore: Formato JSON non valido in {file_pokemon_posseduti}", file=sys.stderr)
-        log_debug(f"Errore: Formato JSON non valido in {file_pokemon_posseduti}")
+            specie_str = f", Specie: {p.specie}" if p.specie else ""
+            sesso_str = f", Sesso: {p.sesso}" if p.sesso else ""
+            egg_groups_str = f", Gruppi Uova: {', '.join(p.egg_groups)}" if p.egg_groups else ""
+            print(f"- {p.id_utente} (IVs: {iv_str}, Natura: {nat_str}{specie_str}{sesso_str}{egg_groups_str})")
+            log_debug(f"- {p.id_utente} (IVs: {iv_str}, Natura: {nat_str}{specie_str}{sesso_str}{egg_groups_str})")
+    else:
+        print("Nessun Pokémon posseduto fornito.")
+        log_debug("Nessun Pokémon posseduto fornito.")
 
     piani_da_analizzare: List[PianoCompletoF2] = []
     natura_target_globale_letta_dal_json = ""
@@ -1319,12 +1304,12 @@ def run_fase2(file_piani_json: str, file_pokemon_posseduti: str, file_debug_log:
 
 # --- Logica Principale di Esecuzione (Aggiornata per passare il nome del file di output Fase 3) ---
 if __name__ == "__main__":
-    # --- Configurazione Fase 1 ---
+    # --- Configurazione Fase 1 (Stress Test Scenario 1) ---
     config_fase1 = {
-        "modalita_op_base": "4IV",
+        "modalita_op_base": "5IV",
         "con_natura_obiettivo": True,
-        "natura_obiettivo_spec": "Decisa",
-        "stats_target_config": ["SP.ATT", "DEF", "SP.DEF", "Velocità"] 
+        "natura_obiettivo_spec": "Decisa", # This is Adamant
+        "stats_target_config": ["PS", "ATT", "DEF", "SP.DEF", "Velocità"] 
     }
     
     print("--- Esecuzione Fase 1: Generazione Piani ---")
@@ -1338,24 +1323,24 @@ if __name__ == "__main__":
 
     # --- Configurazione Fase 2 ---
     file_piani_json_input = "piani_dati.json" 
-    file_pokemon_posseduti_input = "pokemon_posseduti.json" 
+    # file_pokemon_posseduti_input = "pokemon_posseduti.json" # Questo file non è più usato come input diretto
     file_debug_log_output = "fase2_debug_log.txt"
-    file_output_per_fase3 = "fase2_output_per_fase3.json" # NUOVO FILE DI OUTPUT
+    file_output_per_fase3 = "fase2_output_per_fase3.json"
 
     print("--- Esecuzione Fase 2: Valutazione Piani ---")
-    if not os.path.exists(file_pokemon_posseduti_input):
-        print(f"File {file_pokemon_posseduti_input} non trovato. Creazione di un file di esempio...")
-        dummy_posseduti = [
-            { "id_utente": "P1_M_Decisa_AS_V", "ivs": ["SP.ATT","Velocità"], "natura": "Decisa", "specie": "Pikachu", "sesso": "M", "egg_groups": ["Campo", "Folletto"]},
-            { "id_utente": "P2_M_Quieta_AS_V", "ivs": ["SP.ATT","Velocità"], "natura": "Quieta", "specie": "Raichu", "sesso": "M", "egg_groups": ["Campo", "Folletto"]},
-            { "id_utente": "P3_F_Quieta_DS_D", "ivs": ["SP.DEF","DEF"], "natura": "Quieta", "specie": "Pikachu", "sesso": "F", "egg_groups": ["Campo", "Folletto"]},
-            { "id_utente": "P4_F_Quieta_V", "ivs": ["Velocità"], "natura": "Quieta", "specie": "Ditto", "sesso": None, "egg_groups": ["Ditto"]}
-        ]
-        with open(file_pokemon_posseduti_input, 'w', encoding="utf-8") as f_dummy:
-            json.dump(dummy_posseduti, f_dummy, indent=2)
+    
+    # Creazione della lista di Pokémon posseduti campione come da istruzioni
+    sample_owned_pokemon = [
+        PokemonPossedutoF2(id_utente="Ditto1", ivs=["PS", "ATT"], natura="Decisa", specie="Ditto", sesso=None, egg_groups=["Ditto"]),
+        PokemonPossedutoF2(id_utente="Pika1", ivs=["SP.ATT", "Velocità"], natura="Modesta", specie="Pikachu", sesso="M", egg_groups=["Campo", "Folletto"])
+    ]
+    
+    # Non è più necessario creare/scrivere un file pokemon_posseduti.json fittizio
+    # i dati dei Pokémon posseduti vengono passati direttamente come lista.
 
     if os.path.exists(file_piani_json_input):
-         run_fase2(file_piani_json_input, file_pokemon_posseduti_input, file_debug_log_output, file_output_per_fase3)
+         # Chiamata a run_fase2 aggiornata per passare la lista sample_owned_pokemon
+         run_fase2(file_piani_json_input, sample_owned_pokemon, file_debug_log_output, file_output_per_fase3)
     else:
         print(f"File dei piani '{file_piani_json_input}' non trovato. Assicurarsi che la Fase 1 sia stata eseguita correttamente.")
     
