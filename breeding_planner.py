@@ -539,18 +539,18 @@ def run_fase1(
     elif modalita_operativa == "4IV+N":
         stats_per_modalita = stats_target_config if stats_target_config else ["SP.ATT", "DEF", "SP.DEF", "Velocità"]
         num_iv_target_per_colori = 4
-        num_iv_output_percorso_a = 0 
-        num_iv_output_percorso_b = 4 
+        num_iv_output_percorso_a = 4
+        num_iv_output_percorso_b = 3
     elif modalita_operativa == "3IV+N":
         stats_per_modalita = stats_target_config if stats_target_config else ["ATT", "DEF", "SP.DEF"]
         num_iv_target_per_colori = 3
-        num_iv_output_percorso_a = 0 
-        num_iv_output_percorso_b = 3
+        num_iv_output_percorso_a = 3
+        num_iv_output_percorso_b = 2
     elif modalita_operativa == "2IV+N":
         stats_per_modalita = stats_target_config if stats_target_config else ["ATT", "DEF"]
         num_iv_target_per_colori = 2
-        num_iv_output_percorso_a = 0
-        num_iv_output_percorso_b = 2
+        num_iv_output_percorso_a = 2
+        num_iv_output_percorso_b = 1
     elif modalita_operativa == "0IV+N": 
         stats_per_modalita = []
         num_iv_target_per_colori = 0
@@ -689,10 +689,16 @@ def run_fase1(
                     outfile_text_stream.write("    +\n")
                     outfile_text_stream.write(f"* Genitore B: {piano_corrente_json.percorso_B.risultato_percorso.nome_formattato if piano_corrente_json.percorso_B.valido else 'N/A'}\n")
                     outfile_text_stream.write(f"    -> Pokémon Target: {piano_corrente_json.pokemon_target_finale_piano.nome_formattato}\n")
-                elif con_natura_obiettivo: 
+                elif modalita_operativa in ["4IV+N", "3IV+N", "2IV+N"]:
+                    outfile_text_stream.write(f"--- Fine: L'Accoppiamento Finale del Piano {modalita_op_base}+{natura_obiettivo_spec} ---\n")
+                    outfile_text_stream.write(f"* Genitore A (IVs): {piano_corrente_json.percorso_A.risultato_percorso.nome_formattato if piano_corrente_json.percorso_A.valido else 'N/A'}\n")
+                    outfile_text_stream.write("    +\n")
+                    outfile_text_stream.write(f"* Genitore B (Natura): {piano_corrente_json.percorso_B.risultato_percorso.nome_formattato if piano_corrente_json.percorso_B.valido else 'N/A'}\n")
+                    outfile_text_stream.write(f"    -> Pokémon Target: {piano_corrente_json.pokemon_target_finale_piano.nome_formattato}\n")
+                elif con_natura_obiettivo: # Handles 1IV+N and other specific cases if any
                     outfile_text_stream.write(f"--- Risultato Finale del Piano {modalita_op_base}+{natura_obiettivo_spec} ---\n")
                     outfile_text_stream.write(f"* Pokémon Target: {piano_corrente_json.pokemon_target_finale_piano.nome_formattato}\n")
-                else: 
+                else: # Handles _noN modes
                     outfile_text_stream.write(f"--- Risultato Finale del Piano {modalita_op_base} ---\n")
                     outfile_text_stream.write(f"* Pokémon Target: {piano_corrente_json.pokemon_target_finale_piano.nome_formattato}\n")
                 outfile_text_stream.write("\n\n")
