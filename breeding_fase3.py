@@ -5,115 +5,126 @@ from typing import List, Dict, Optional, Any, Callable
 # --- Strutture Dati per la Fase 3 (Spostate da breeding_gui.py) ---
 @dataclass
 class PokemonBaseRichiestoF3:
-    """
-    Rappresenta un singolo tipo di Pokémon base teorico necessario per un piano,
-    con i dettagli dei costi per procurarselo.
-    """
-    descrizione: str  # Descrizione testuale (es. "Solo IV: ATT (Blu)")
-    stat_o_natura: str # La statistica IV specifica o la Natura
-    tipo: str          # "IV" o "Natura"
-    colore_ruolo_legenda: Optional[str] = None # Colore/ruolo dalla legenda (es. "Blu")
-    quantita_necessaria: int = 0
-    costo_femmina_target: Optional[float] = None
+    descrizione: str
+    stat_o_natura: str
+    tipo: str
+    colore_ruolo_legenda: Optional[str] = None
+    quantita_necessaria: int = 0 # Verrà impostato a 1 per istanza, o aggregato successivamente
+    costo_femmina_specie_target: Optional[float] = None
+    costo_maschio_specie_target: Optional[float] = None
+    costo_femmina_egg_group: Optional[float] = None
     costo_maschio_egg_group: Optional[float] = None
     costo_ditto: Optional[float] = None
-    scelta_migliore: Optional[str] = None # Es. "Femmina Target", "Maschio Egg Group", "Ditto"
+    scelta_migliore: Optional[str] = None
     costo_scelta_migliore: Optional[float] = None
-    id_univoco_base: str = "" # ID generato per l'abbinamento con i prezzi
+    id_univoco_base: str = "" # ID per abbinare ai prezzi GUI (es. IV_ATT_Blu, Natura_Decisa)
+    sesso_assegnato: Optional[str] = None # Sesso determinato dalla logica di Fase 3
 
     def __post_init__(self):
-        """
-        Genera un ID univoco per questo tipo di Pokémon base, utile per l'abbinamento
-        con i prezzi inseriti dall'utente.
-        """
-        if self.tipo == "IV":
-            self.id_univoco_base = f"IV_{self.stat_o_natura}" + (f"_{self.colore_ruolo_legenda}" if self.colore_ruolo_legenda else "")
-        elif self.tipo == "Natura":
-            self.id_univoco_base = f"Natura_{self.stat_o_natura}"
-        else:
-            # Fallback per descrizioni non standard, anche se idealmente non dovrebbe accadere
-            # con una corretta interpretazione delle descrizioni base.
-            self.id_univoco_base = self.descrizione.replace(" ", "_").replace(":", "").replace("(", "").replace(")", "")
+        # L'ID univoco ora dovrebbe essere calcolato in base alla descrizione/stat/colore del Pokémon base effettivo
+        # Questa logica potrebbe dover essere richiamata quando si crea l'istanza PokemonBaseRichiestoF3
+        # basandosi sui dati del pkmn_instance_dict
+        if not self.id_univoco_base: # Calcola solo se non già fornito
+            if self.tipo == "IV":
+                self.id_univoco_base = f"IV_{self.stat_o_natura}" + (f"_{self.colore_ruolo_legenda}" if self.colore_ruolo_legenda else "")
+            elif self.tipo == "Natura":
+                self.id_univoco_base = f"Natura_{self.stat_o_natura}"
+            else:
+                # Fallback, potrebbe essere necessario un modo più robusto se la descrizione non è standard
+                self.id_univoco_base = self.descrizione.replace(" ", "_").replace(":", "").replace("(", "").replace(")", "")
+
 
 @dataclass
 class PianoAnalizzatoF3:
-    """
-    Rappresenta un piano di breeding candidato dopo la Fase 2, arricchito con
-    i dettagli dei costi stimati per i Pokémon base necessari (Fase 3).
-    Permette l'ordinamento dei piani per trovare il migliore.
-    """
     id_piano_fase1: int
     legenda_usata: Dict[str, str]
     punteggio_fase2: float
     match_fase2: int
-    posseduti_usati_fase2: List[str] # Lista di ID utente dei pokemon posseduti usati
-    pokemon_target_finale: Dict[str, Any] # Dati del Pokémon target finale del piano
+    posseduti_usati_fase2: List[str]
+    pokemon_target_finale: Dict[str, Any]
     natura_target_globale: str
-    pokemon_base_necessari_calcolati: Dict[str, int] # Conteggio dei Pokémon base teorici {desc_base: quantita}
-    mappa_richiesto_a_posseduto: Dict[str, str] # Mappa {nome_formattato_richiesto: id_utente_posseduto}
-    
-    specie_target_piano: Optional[str] = None # Specie base del Pokémon target (per i costi)
+    pokemon_base_necessari_calcolati: Dict[str, int] # Può ancora essere utile per la GUI
+    mappa_richiesto_a_posseduto: Dict[str, str]
+
+    specie_target_piano: Optional[str] = None
     dettaglio_base_richiesti_con_costi: List[PokemonBaseRichiestoF3] = field(default_factory=list)
     costo_totale_stimato_base: float = 0.0
-    note_compatibilita: List[str] = field(default_factory=list) # Note aggiuntive (es. prezzi mancanti)
+    note_compatibilita: List[str] = field(default_factory=list)
 
-    # Dettagli opzionali dei percorsi, se necessari per la visualizzazione finale
     percorso_A_dettagli: Optional[Dict[str, Any]] = None
     percorso_B_dettagli: Optional[Dict[str, Any]] = None
 
-
     def __lt__(self, other: 'PianoAnalizzatoF3') -> bool:
-        """
-        Logica di ordinamento per i piani:
-        1. Punteggio Fase 2 (decrescente)
-        2. Numero di Match Fase 2 (decrescente)
-        3. Numero di Pokémon Posseduti Usati (decrescente - preferisce usare più posseduti se gli altri criteri sono pari)
-        4. Costo Totale Stimato Base (crescente - preferisce il più economico)
-        """
         if self.punteggio_fase2 != other.punteggio_fase2:
             return self.punteggio_fase2 > other.punteggio_fase2
         if self.match_fase2 != other.match_fase2:
             return self.match_fase2 > other.match_fase2
         if len(self.posseduti_usati_fase2) != len(other.posseduti_usati_fase2):
-            # Preferisce piani che usano PIÙ Pokémon posseduti (quindi meno da comprare)
-            # se punteggio e match sono uguali.
             return len(self.posseduti_usati_fase2) > len(other.posseduti_usati_fase2)
         return self.costo_totale_stimato_base < other.costo_totale_stimato_base
 
-# --- Funzioni Logiche per la Fase 3 ---
+# --- Funzioni Ausiliarie ---
 
-def _parse_desc_base_f3(desc_base: str) -> tuple[Optional[str], str, Optional[str]]:
-    """
-    Interpreta la descrizione di un Pokémon base teorico per estrarne tipo, statistica/natura e colore/ruolo.
-    Es: "Solo IV: ATT (Blu)" -> ("IV", "ATT", "Blu")
-        "Solo Natura: Decisa" -> ("Natura", "Decisa", None)
-    """
-    tipo = None
-    stat_o_natura = desc_base # Default
-    colore = None
-    try:
-        if "Solo Natura:" in desc_base:
-            tipo = "Natura"
-            stat_o_natura = desc_base.split(": ")[1].strip()
-        elif "Solo IV:" in desc_base:
-            tipo = "IV"
-            parts = desc_base.split(": ")[1].split("(")
-            stat_o_natura = parts[0].strip()
-            if len(parts) > 1:
-                colore = parts[1].replace(")", "").strip()
-        elif "Da Procurare" in desc_base: # Gestisce i casi di fallback
-            tipo = "Da Procurare"
-            # Tenta di estrarre una definizione più specifica se presente
-            if "(Definizione:" in desc_base:
-                 stat_o_natura = desc_base.split("(Definizione:")[1].split(")")[0].strip()
-            elif "(nome:" in desc_base: # Potrebbe essere un nome formattato
-                 stat_o_natura = desc_base.split("(nome:")[1].split(")")[0].strip()
-            else:
-                stat_o_natura = desc_base # Lascia la descrizione completa
-    except IndexError:
-        print(f"Avviso: Potenziale errore nel parsing della descrizione base (F3): {desc_base}")
-        stat_o_natura = desc_base # Fallback
-    return tipo, stat_o_natura, colore
+def _get_all_pokemon_instances(piano_obj: PianoAnalizzatoF3) -> List[Dict[str, Any]]:
+    """Estrae tutti i dizionari Pokémon unici dai percorsi del piano."""
+    all_instances_map: Dict[str, Dict[str, Any]] = {} # Usa la mappa per unicità basata sul nome
+
+    percorsi_dettagli = []
+    if piano_obj.percorso_A_dettagli and piano_obj.percorso_A_dettagli.get('valido'):
+        percorsi_dettagli.append(piano_obj.percorso_A_dettagli)
+    if piano_obj.percorso_B_dettagli and piano_obj.percorso_B_dettagli.get('valido'):
+        percorsi_dettagli.append(piano_obj.percorso_B_dettagli)
+
+    for percorso in percorsi_dettagli:
+        for livello in percorso.get('livelli', []):
+            for accoppiamento in livello.get('accoppiamenti', []):
+                for key in ['genitore1_richiesto', 'genitore2_richiesto', 'figlio_generato']:
+                    pkmn_dict = accoppiamento.get(key)
+                    if pkmn_dict and isinstance(pkmn_dict, dict):
+                        nome_formattato = pkmn_dict.get('nome_formattato_dal_piano')
+                        if nome_formattato and nome_formattato not in all_instances_map:
+                             all_instances_map[nome_formattato] = pkmn_dict
+
+    # Anche il target finale del piano è un'istanza
+    target_finale_dict = piano_obj.pokemon_target_finale
+    if target_finale_dict and isinstance(target_finale_dict, dict):
+        nome_formattato = target_finale_dict.get('nome_formattato_dal_piano')
+        if nome_formattato and nome_formattato not in all_instances_map:
+            all_instances_map[nome_formattato] = target_finale_dict
+
+    return list(all_instances_map.values())
+
+
+def _is_pokemon_ditto(pokemon_dict: Dict[str, Any]) -> bool:
+    if not pokemon_dict: return False
+    nome = pokemon_dict.get('nome_formattato_dal_piano', '')
+    return "ditto" in nome.lower()
+
+def _determine_id_base_prezzo_e_tipo(pkmn_instance_dict: Dict[str, Any], legenda: Dict[str,str]) -> tuple[Optional[str], Optional[str], Optional[str], Optional[str]]:
+    """Determina id_base_prezzo e tipo_base per un Pokémon istanza."""
+    ivs = pkmn_instance_dict.get('ivs', [])
+    natura = pkmn_instance_dict.get('natura', '')
+
+    is_base_iv = len(ivs) == 1 and not natura
+    is_base_natura = not ivs and natura
+
+    stat_o_natura_val = None
+    tipo_base_val = None
+    colore_ruolo_val = None
+    id_base_prezzo = None
+
+    if is_base_iv:
+        stat_o_natura_val = ivs[0]
+        tipo_base_val = "IV"
+        colore_ruolo_val = next((col for stat, col in legenda.items() if stat == stat_o_natura_val), None)
+        id_base_prezzo = f"IV_{stat_o_natura_val}" + (f"_{colore_ruolo_val}" if colore_ruolo_val else "")
+    elif is_base_natura:
+        stat_o_natura_val = natura
+        tipo_base_val = "Natura"
+        id_base_prezzo = f"Natura_{stat_o_natura_val}"
+
+    return id_base_prezzo, tipo_base_val, stat_o_natura_val, colore_ruolo_val
+
 
 def analizza_e_calcola_costi_piano_ottimale(
     piani_candidati_data: List[Dict[str, Any]],
@@ -122,23 +133,6 @@ def analizza_e_calcola_costi_piano_ottimale(
     pokemon_names_list_globale: List[str],
     fn_get_base_specie: Callable[[Optional[str]], Optional[str]]
 ) -> Optional[PianoAnalizzatoF3]:
-    """
-    Analizza i piani candidati dalla Fase 2, calcola i costi stimati per i Pokémon base
-    necessari utilizzando i prezzi forniti, e restituisce il piano considerato ottimale.
-
-    Args:
-        piani_candidati_data: Lista di dizionari, ognuno rappresentante un piano
-                                 candidato (output di fase2_output_per_fase3.json).
-        prezzi_base_raccolti_gui: Dizionario dei prezzi inseriti dall'utente nella GUI.
-                                    Formato: {id_univoco_base: {"femmina_target": costo, ...}}
-        specie_target_globale_gui: Nome della specie Pokémon target globale (dalla GUI).
-        pokemon_names_list_globale: Lista di tutti i nomi Pokémon validi.
-        fn_get_base_specie: Funzione per ottenere la specie base di un Pokémon.
-
-    Returns:
-        Un oggetto PianoAnalizzatoF3 rappresentante il piano ottimale, o None se nessun
-        piano valido può essere determinato.
-    """
     if not piani_candidati_data:
         return None
 
@@ -152,114 +146,192 @@ def analizza_e_calcola_costi_piano_ottimale(
                 punteggio_fase2=piano_data["punteggio_ottenuto"],
                 match_fase2=piano_data["pokemon_matchati_count"],
                 posseduti_usati_fase2=piano_data["id_pokemon_posseduti_usati_unici"],
-                pokemon_target_finale=piano_data["pokemon_target_finale_piano"],
+                pokemon_target_finale=piano_data["pokemon_target_finale_piano"], # Questo è un Dict
                 natura_target_globale=piano_data["natura_target_specifica_del_piano_globale"],
                 pokemon_base_necessari_calcolati=piano_data["pokemon_base_necessari_calcolati"],
                 mappa_richiesto_a_posseduto=piano_data.get("mappa_richiesto_a_posseduto", {}),
-                percorso_A_dettagli=piano_data.get("percorso_A_dettagli"),
-                percorso_B_dettagli=piano_data.get("percorso_B_dettagli")
+                percorso_A_dettagli=piano_data.get("percorso_A_dettagli"), # Questo è un Dict
+                percorso_B_dettagli=piano_data.get("percorso_B_dettagli")  # Questo è un Dict
             )
         except KeyError as e:
-            print(f"Errore: Chiave mancante nei dati del piano candidato durante la creazione di PianoAnalizzatoF3: {e}")
-            print(f"Dati del piano problematico: {piano_data}")
-            continue # Salta questo piano se i dati sono incompleti
+            print(f"Errore: Chiave mancante nei dati del piano candidato: {e}")
+            continue
 
-        # Determina la specie target per questo specifico piano (per i costi)
         specie_target_effettiva = specie_target_globale_gui
-        if not specie_target_effettiva: # Prova a dedurla dal piano se non inserita globalmente
-            nome_target_dal_piano = piano_obj.pokemon_target_finale.get("nome_formattato_dal_piano", 
-                                     piano_obj.pokemon_target_finale.get("nome_formattato", "Sconosciuta"))
-            
-            if "[" in nome_target_dal_piano:
-                specie_potenziale = nome_target_dal_piano.split("[")[0].strip()
-            else:
-                specie_potenziale = nome_target_dal_piano.strip()
-
-            colori_comuni_prefisso = ["Verde", "Blu", "Rosso", "Giallo", "Grigio", "Arancione", 
-                                      "Natura", "IV"] 
-            for colore_prefix in colori_comuni_prefisso:
-                if specie_potenziale.startswith(colore_prefix):
-                    test_specie = specie_potenziale[len(colore_prefix):]
-                    if test_specie in pokemon_names_list_globale or \
-                       any(test_specie.startswith(cp) for cp in colori_comuni_prefisso):
-                        specie_potenziale = test_specie
-
-            if specie_potenziale in pokemon_names_list_globale:
-                specie_target_effettiva = specie_potenziale
-            else: 
-                specie_target_effettiva = "Sconosciuta"
-        
+        if not specie_target_effettiva:
+            nome_target_dal_piano = piano_obj.pokemon_target_finale.get("nome_formattato_dal_piano", "Sconosciuta")
+            if "[" in nome_target_dal_piano: specie_potenziale = nome_target_dal_piano.split("[")[0].strip()
+            else: specie_potenziale = nome_target_dal_piano.strip()
+            colori_comuni_prefisso = ["Verde", "Blu", "Rosso", "Giallo", "Grigio", "Arancione", "Natura", "IV"]
+            for cp in colori_comuni_prefisso:
+                if specie_potenziale.startswith(cp):
+                    ts = specie_potenziale[len(cp):]
+                    if ts in pokemon_names_list_globale or any(ts.startswith(c2) for c2 in colori_comuni_prefisso):
+                        specie_potenziale = ts
+            if specie_potenziale in pokemon_names_list_globale: specie_target_effettiva = specie_potenziale
+            else: specie_target_effettiva = "Sconosciuta"
         piano_obj.specie_target_piano = fn_get_base_specie(specie_target_effettiva)
 
+        gender_map: Dict[str, str] = {}
+        percorsi_dettagli_validi = []
+        if piano_obj.percorso_A_dettagli and piano_obj.percorso_A_dettagli.get('valido'):
+            percorsi_dettagli_validi.append(piano_obj.percorso_A_dettagli)
+        if piano_obj.percorso_B_dettagli and piano_obj.percorso_B_dettagli.get('valido'):
+            percorsi_dettagli_validi.append(piano_obj.percorso_B_dettagli)
+
+        for percorso in percorsi_dettagli_validi:
+            for livello in percorso.get('livelli', []):
+                for accoppiamento in livello.get('accoppiamenti', []):
+                    g1_dict = accoppiamento.get('genitore1_richiesto', {})
+                    g2_dict = accoppiamento.get('genitore2_richiesto', {})
+                    figlio_dict = accoppiamento.get('figlio_generato', {})
+                    if not g1_dict or not g2_dict: continue
+
+                    g1_name = g1_dict.get('nome_formattato_dal_piano')
+                    g2_name = g2_dict.get('nome_formattato_dal_piano')
+                    figlio_name = figlio_dict.get('nome_formattato_dal_piano')
+
+                    g1_dict.setdefault('sesso_determinato', gender_map.get(g1_name))
+                    g2_dict.setdefault('sesso_determinato', gender_map.get(g2_name))
+
+                    is_g1_ditto = _is_pokemon_ditto(g1_dict)
+                    is_g2_ditto = _is_pokemon_ditto(g2_dict)
+
+                    is_final_target_child = (figlio_name and piano_obj.pokemon_target_finale and figlio_name == piano_obj.pokemon_target_finale.get('nome_formattato_dal_piano'))
+
+                    if is_final_target_child and piano_obj.specie_target_piano and piano_obj.specie_target_piano != "Sconosciuta":
+                        if is_g1_ditto:
+                            g1_dict['sesso_determinato'] = "Ditto"; gender_map[g1_name] = "Ditto"
+                            g2_dict['sesso_determinato'] = "F"; gender_map[g2_name] = "F"
+                        elif is_g2_ditto:
+                            g2_dict['sesso_determinato'] = "Ditto"; gender_map[g2_name] = "Ditto"
+                            g1_dict['sesso_determinato'] = "F"; gender_map[g1_name] = "F"
+                        else:
+                            g1_dict['sesso_determinato'] = "F"; gender_map[g1_name] = "F"
+                            g2_dict['sesso_determinato'] = "M"; gender_map[g2_name] = "M"
+                    else: # General assignment logic
+                        if g1_dict['sesso_determinato'] is None and g2_dict['sesso_determinato'] is None:
+                            if is_g1_ditto:
+                                g1_dict['sesso_determinato'] = "Ditto"; gender_map[g1_name] = "Ditto"
+                                g2_dict['sesso_determinato'] = "F"; gender_map[g2_name] = "F"
+                            elif is_g2_ditto:
+                                g2_dict['sesso_determinato'] = "Ditto"; gender_map[g2_name] = "Ditto"
+                                g1_dict['sesso_determinato'] = "F"; gender_map[g1_name] = "F"
+                            else:
+                                g1_dict['sesso_determinato'] = "F"; gender_map[g1_name] = "F"
+                                g2_dict['sesso_determinato'] = "M"; gender_map[g2_name] = "M"
+                        elif g1_dict['sesso_determinato'] is None:
+                            g1_dict['sesso_determinato'] = "Ditto" if is_g1_ditto else ("M" if g2_dict['sesso_determinato'] == "F" else "F")
+                            if g1_name: gender_map[g1_name] = g1_dict['sesso_determinato']
+                        elif g2_dict['sesso_determinato'] is None:
+                            g2_dict['sesso_determinato'] = "Ditto" if is_g2_ditto else ("M" if g1_dict['sesso_determinato'] == "F" else "F")
+                            if g2_name: gender_map[g2_name] = g2_dict['sesso_determinato']
+
+                    if not is_g1_ditto and not is_g2_ditto and g1_dict.get('sesso_determinato') == g2_dict.get('sesso_determinato'):
+                        # Conflict: make g2 the opposite gender
+                        g2_new_sesso = "M" if g1_dict['sesso_determinato'] == "F" else "F"
+                        g2_dict['sesso_determinato'] = g2_new_sesso
+                        if g2_name: gender_map[g2_name] = g2_new_sesso
 
         piano_obj.costo_totale_stimato_base = 0.0
-        piano_obj.dettaglio_base_richiesti_con_costi = []
-        piano_obj.note_compatibilita = []
+        piano_obj.dettaglio_base_richiesti_con_costi = [] # Re-initialize
+        piano_obj.note_compatibilita = [] # Re-initialize
 
-        for desc_base_teorico, quantita in piano_obj.pokemon_base_necessari_calcolati.items():
-            if quantita <= 0: 
+        all_pkmn_instances_in_plan = _get_all_pokemon_instances(piano_obj)
+        processed_for_costing = set()
+
+        for pkmn_instance in all_pkmn_instances_in_plan:
+            instance_name = pkmn_instance.get('nome_formattato_dal_piano')
+            if not instance_name or instance_name in processed_for_costing:
                 continue
 
-            tipo_base, stat_nat_base, colore_ruolo_base = _parse_desc_base_f3(desc_base_teorico)
-            
-            if tipo_base == "IV":
-                id_base_prezzo = f"IV_{stat_nat_base}" + (f"_{colore_ruolo_base}" if colore_ruolo_base else "")
-            elif tipo_base == "Natura":
-                id_base_prezzo = f"Natura_{stat_nat_base}"
-            else: 
-                id_base_prezzo = desc_base_teorico.replace(" ", "_").replace(":", "").replace("(", "").replace(")", "")
+            if pkmn_instance.get('soddisfatto_da_posseduto', False):
+                processed_for_costing.add(instance_name)
+                continue
 
+            id_base, tipo_b, stat_nat, colore_r = _determine_id_base_prezzo_e_tipo(pkmn_instance, piano_obj.legenda_usata)
 
-            prezzi_opzioni_per_base = prezzi_base_raccolti_gui.get(id_base_prezzo, {})
-            
-            dettaglio_pkmn_base = PokemonBaseRichiestoF3(
-                descrizione=desc_base_teorico, 
-                stat_o_natura=stat_nat_base, 
-                tipo=tipo_base or "Sconosciuto", 
-                colore_ruolo_legenda=colore_ruolo_base, 
-                quantita_necessaria=quantita,
-                id_univoco_base=id_base_prezzo 
+            if not id_base: # Not a base Pokémon that needs buying (e.g. an intermediate with 2+ IVs)
+                processed_for_costing.add(instance_name)
+                continue
+
+            sesso_assegnato_instance = pkmn_instance.get('sesso_determinato')
+            prezzi_opz = prezzi_base_raccolti_gui.get(id_base, {})
+            costo_scelta_instance = None
+            tipo_scelta_instance = "Non Prezzato"
+
+            # Specific price logic based on sesso_assegnato_instance
+            if sesso_assegnato_instance == "F":
+                costo_f_st = prezzi_opz.get("femmina_specie_target")
+                costo_f_eg = prezzi_opz.get("femmina_egg_group")
+                if costo_f_st is not None and (costo_f_eg is None or costo_f_st <= costo_f_eg) and piano_obj.specie_target_piano and piano_obj.specie_target_piano != "Sconosciuta": # Prioritize if target species matches
+                    costo_scelta_instance = costo_f_st
+                    tipo_scelta_instance = f"Femmina {piano_obj.specie_target_piano}"
+                elif costo_f_eg is not None:
+                    costo_scelta_instance = costo_f_eg
+                    tipo_scelta_instance = "Femmina Egg Group"
+            elif sesso_assegnato_instance == "M":
+                costo_m_st = prezzi_opz.get("maschio_specie_target")
+                costo_m_eg = prezzi_opz.get("maschio_egg_group")
+                if costo_m_st is not None and (costo_m_eg is None or costo_m_st <= costo_m_eg) and piano_obj.specie_target_piano and piano_obj.specie_target_piano != "Sconosciuta":
+                    costo_scelta_instance = costo_m_st
+                    tipo_scelta_instance = f"Maschio {piano_obj.specie_target_piano}"
+                elif costo_m_eg is not None:
+                    costo_scelta_instance = costo_m_eg
+                    tipo_scelta_instance = "Maschio Egg Group"
+            elif sesso_assegnato_instance == "Ditto":
+                costo_scelta_instance = prezzi_opz.get("ditto")
+                tipo_scelta_instance = "Ditto"
+
+            # Fallback if no gender-specific price found or sesso_assegnato_instance is None
+            if costo_scelta_instance is None:
+                opzioni_fallback = []
+                if prezzi_opz.get("femmina_specie_target") is not None: opzioni_fallback.append({"costo": prezzi_opz["femmina_specie_target"], "tipo": f"Femmina {piano_obj.specie_target_piano}"})
+                if prezzi_opz.get("maschio_specie_target") is not None: opzioni_fallback.append({"costo": prezzi_opz["maschio_specie_target"], "tipo": f"Maschio {piano_obj.specie_target_piano}"})
+                if prezzi_opz.get("femmina_egg_group") is not None: opzioni_fallback.append({"costo": prezzi_opz["femmina_egg_group"], "tipo": "Femmina Egg Group"})
+                if prezzi_opz.get("maschio_egg_group") is not None: opzioni_fallback.append({"costo": prezzi_opz["maschio_egg_group"], "tipo": "Maschio Egg Group"})
+                if prezzi_opz.get("ditto") is not None: opzioni_fallback.append({"costo": prezzi_opz["ditto"], "tipo": "Ditto"})
+
+                if opzioni_fallback:
+                    opzioni_fallback.sort(key=lambda x: x["costo"])
+                    costo_scelta_instance = opzioni_fallback[0]["costo"]
+                    tipo_scelta_instance = opzioni_fallback[0]["tipo"] + " (Fallback)"
+                elif not prezzi_opz: # No prices defined for this ID at all
+                    tipo_scelta_instance = "Non Prezzato"
+                    piano_obj.note_compatibilita.append(f"ATTENZIONE: Nessun prezzo definito per '{instance_name}' (ID: {id_base}, Sesso Richiesto: {sesso_assegnato_instance}).")
+                else: # Prices defined, but none matched and no fallback applicable (e.g. all were None)
+                    tipo_scelta_instance = "Nessuna Opzione Valida"
+                    piano_obj.note_compatibilita.append(f"INFO: Nessuna opzione di costo valida per '{instance_name}' (ID: {id_base}, Sesso Richiesto: {sesso_assegnato_instance}).")
+
+            if costo_scelta_instance is not None:
+                piano_obj.costo_totale_stimato_base += costo_scelta_instance
+
+            # Create PokemonBaseRichiestoF3 entry for this instance
+            dettaglio_richiesto = PokemonBaseRichiestoF3(
+                descrizione=instance_name, # Use the instance name as description
+                stat_o_natura=stat_nat,
+                tipo=tipo_b,
+                colore_ruolo_legenda=colore_r,
+                quantita_necessaria=1, # Each instance is one Pokémon to acquire
+                id_univoco_base=id_base,
+                sesso_assegnato=sesso_assegnato_instance,
+                costo_scelta_migliore=costo_scelta_instance,
+                scelta_migliore=tipo_scelta_instance,
+                # Store all available prices for this base type for reference
+                costo_femmina_specie_target=prezzi_opz.get("femmina_specie_target"),
+                costo_maschio_specie_target=prezzi_opz.get("maschio_specie_target"),
+                costo_femmina_egg_group=prezzi_opz.get("femmina_egg_group"),
+                costo_maschio_egg_group=prezzi_opz.get("maschio_egg_group"),
+                costo_ditto=prezzi_opz.get("ditto")
             )
+            piano_obj.dettaglio_base_richiesti_con_costi.append(dettaglio_richiesto)
+            processed_for_costing.add(instance_name)
 
-            if tipo_base == "Da Procurare": 
-                dettaglio_pkmn_base.scelta_migliore = "Da Procurare Manualmente"
-                dettaglio_pkmn_base.costo_scelta_migliore = 0 
-                piano_obj.note_compatibilita.append(f"'{desc_base_teorico}' deve essere procurato/analizzato manualmente.")
-            else: 
-                opzioni_costo_valide = []
-                costo_f = prezzi_opzioni_per_base.get("femmina_target")
-                if costo_f is not None:
-                    opzioni_costo_valide.append({"costo": costo_f, "tipo": f"Femmina {piano_obj.specie_target_piano}"})
-                    dettaglio_pkmn_base.costo_femmina_target = costo_f
-                
-                costo_m = prezzi_opzioni_per_base.get("maschio_egg")
-                if costo_m is not None:
-                    opzioni_costo_valide.append({"costo": costo_m, "tipo": "Maschio Egg Group"})
-                    dettaglio_pkmn_base.costo_maschio_egg_group = costo_m
-
-                costo_d = prezzi_opzioni_per_base.get("ditto")
-                if costo_d is not None:
-                    opzioni_costo_valide.append({"costo": costo_d, "tipo": "Ditto"})
-                    dettaglio_pkmn_base.costo_ditto = costo_d
-                
-                if opzioni_costo_valide:
-                    opzioni_costo_valide.sort(key=lambda x: x["costo"])
-                    dettaglio_pkmn_base.costo_scelta_migliore = opzioni_costo_valide[0]["costo"]
-                    dettaglio_pkmn_base.scelta_migliore = opzioni_costo_valide[0]["tipo"]
-                    # CORREZIONE: Controlla se costo_scelta_migliore è valido prima di moltiplicare
-                    if dettaglio_pkmn_base.costo_scelta_migliore is not None:
-                        piano_obj.costo_totale_stimato_base += dettaglio_pkmn_base.costo_scelta_migliore * quantita
-                else:
-                    dettaglio_pkmn_base.scelta_migliore = "Non Prezzato"
-                    piano_obj.note_compatibilita.append(f"ATTENZIONE: Nessun prezzo per '{desc_base_teorico}' (ID: {id_base_prezzo}). Costo non calcolato per questo componente.")
-            
-            piano_obj.dettaglio_base_richiesti_con_costi.append(dettaglio_pkmn_base)
-        
         piani_analizzati_f3.append(piano_obj)
 
     if not piani_analizzati_f3:
         return None
 
-    piani_analizzati_f3.sort() 
-    
+    piani_analizzati_f3.sort()
+
     return piani_analizzati_f3[0]
