@@ -442,8 +442,8 @@ class BreedingApp(tk.Tk):
                         if base.tipo != "Da Procurare":
                             st_nome = specie_target_eff_piano
                             opts = []
-                            if base.costo_femmina_target is not None:
-                                opts.append(f"F {st_nome}: {base.costo_femmina_target}")
+                            if base.costo_femmina_specie_target is not None:
+                                opts.append(f"F {st_nome}: {base.costo_femmina_specie_target}")
                             else: opts.append(f"F {st_nome}: N/P")
 
                             prezzi_per_id_base = self.prezzi_base_raccolti.get(base.id_univoco_base, {})
@@ -538,4 +538,3 @@ if __name__ == '__main__':
         print(traceback.format_exc())
         messagebox.showerror("Errore Fatale", f"Si è verificato un errore critico:\n{e}\n\nL'applicazione verrà chiusa. Controlla la console per i dettagli.")
 
-[end of breeding_gui.py]
