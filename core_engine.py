@@ -15,14 +15,45 @@ def _crea_piano_4iv_natura_strutturato(strategia_genitori_3iv: Tuple[Tuple[str, 
     target_finale = PokemonRichiesto(ruoli_iv=ruoli_4iv, ruolo_natura='V'); genitore_4iv_final = PokemonRichiesto(ruoli_iv=ruoli_4iv); genitore_3iv_n_final = PokemonRichiesto(ruoli_iv=ruoli_3iv_n, ruolo_natura='V')
     genitore_A_3iv = PokemonRichiesto(ruoli_iv=ruoli_genitore_A); genitore_B_3iv = PokemonRichiesto(ruoli_iv=ruoli_genitore_B)
     ruoli_2iv_n = tuple(sorted((ruoli_3iv_n[0], ruoli_3iv_n[1]))); genitore_2iv_n = PokemonRichiesto(ruoli_iv=ruoli_2iv_n, ruolo_natura='V')
-    ruoli_2iv_complemento = tuple(sorted((ruoli_3iv_n[0], ruoli_3iv_n[2]))); genitore_2iv_complemento = PokemonRichiesto(ruoli_iv=ruoli_2iv_complemento)
+
+    # Determina l'IV mancante per completare genitore_3iv_n_final da genitore_2iv_n
+    # Questo sarà ruoli_3iv_n[2] dato che ruoli_2iv_n sono ruoli_3iv_n[0] e ruoli_3iv_n[1]
+    missing_iv_for_3iv_n_final = ruoli_3iv_n[2]
+
+    # Seleziona il partner appropriato (genitore_A_3iv o genitore_B_3iv)
+    partner_for_3iv_n: PokemonRichiesto
+    if missing_iv_for_3iv_n_final in ruoli_genitore_A:
+        partner_for_3iv_n = genitore_A_3iv
+    else:
+        # Se non è in A, deve essere in B, dato che missing_iv_for_3iv_n_final fa parte di ruoli_4iv
+        partner_for_3iv_n = genitore_B_3iv
+
     gen_A_p1 = PokemonRichiesto(ruoli_iv=tuple(sorted((ruoli_genitore_A[0], ruoli_genitore_A[1])))); gen_A_p2 = PokemonRichiesto(ruoli_iv=tuple(sorted((ruoli_genitore_A[0], ruoli_genitore_A[2]))))
     gen_B_p1 = PokemonRichiesto(ruoli_iv=tuple(sorted((ruoli_genitore_B[0], ruoli_genitore_B[1])))); gen_B_p2 = PokemonRichiesto(ruoli_iv=tuple(sorted((ruoli_genitore_B[0], ruoli_genitore_B[2]))))
+    # gen_2iv_n_p1 è (IV1+Natura), gen_2iv_n_p2 è (IV1, IV2) per creare (IV1, IV2)+Natura
     gen_2iv_n_p1 = PokemonRichiesto(ruoli_iv=(ruoli_2iv_n[0],), ruolo_natura='V'); gen_2iv_n_p2 = PokemonRichiesto(ruoli_iv=ruoli_2iv_n)
+
     livello1_roles = ruoli_4iv
-    livello1 = Livello(1, [Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[0],)), PokemonRichiesto(ruoli_iv=(livello1_roles[1],)), PokemonRichiesto(ruoli_iv=(livello1_roles[0], livello1_roles[1]))), Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[0],)), PokemonRichiesto(ruoli_iv=(livello1_roles[2],)), PokemonRichiesto(ruoli_iv=(livello1_roles[0], livello1_roles[2]))), Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[0],)), PokemonRichiesto(ruoli_iv=(livello1_roles[3],)), PokemonRichiesto(ruoli_iv=(livello1_roles[0], livello1_roles[3]))), Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[1],)), PokemonRichiesto(ruoli_iv=(livello1_roles[2],)), PokemonRichiesto(ruoli_iv=(livello1_roles[1], livello1_roles[2]))), Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[1],)), PokemonRichiesto(ruoli_iv=(livello1_roles[3],)), PokemonRichiesto(ruoli_iv=(livello1_roles[1], livello1_roles[3]))), Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[2],)), PokemonRichiesto(ruoli_iv=(livello1_roles[3],)), PokemonRichiesto(ruoli_iv=(livello1_roles[2], livello1_roles[3]))), Accoppiamento(PokemonRichiesto(ruolo_natura='V'), PokemonRichiesto(ruoli_iv=(livello1_roles[0],)), PokemonRichiesto(ruoli_iv=(livello1_roles[0],), ruolo_natura='V')), Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[1],)), PokemonRichiesto(ruoli_iv=(livello1_roles[2],)), PokemonRichiesto(ruoli_iv=(livello1_roles[1], livello1_roles[2]))),])
-    livello2 = Livello(2, [Accoppiamento(gen_A_p1, gen_A_p2, genitore_A_3iv), Accoppiamento(gen_B_p1, gen_B_p2, genitore_B_3iv), Accoppiamento(gen_2iv_n_p1, gen_2iv_n_p2, genitore_2iv_n), Accoppiamento(livello1.accoppiamenti[0].figlio, livello1.accoppiamenti[3].figlio, PokemonRichiesto(ruoli_iv=tuple(sorted(set(livello1.accoppiamenti[0].figlio.ruoli_iv) | set(livello1.accoppiamenti[3].figlio.ruoli_iv)))))])
-    livello3 = Livello(3, [Accoppiamento(genitore_A_3iv, genitore_B_3iv, genitore_4iv_final), Accoppiamento(genitore_2iv_n, genitore_2iv_complemento, genitore_3iv_n_final)])
+    livello1 = Livello(1, [
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[0],)), PokemonRichiesto(ruoli_iv=(livello1_roles[1],)), PokemonRichiesto(ruoli_iv=(livello1_roles[0], livello1_roles[1]))),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[0],)), PokemonRichiesto(ruoli_iv=(livello1_roles[2],)), PokemonRichiesto(ruoli_iv=(livello1_roles[0], livello1_roles[2]))),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[0],)), PokemonRichiesto(ruoli_iv=(livello1_roles[3],)), PokemonRichiesto(ruoli_iv=(livello1_roles[0], livello1_roles[3]))),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[1],)), PokemonRichiesto(ruoli_iv=(livello1_roles[2],)), PokemonRichiesto(ruoli_iv=(livello1_roles[1], livello1_roles[2]))),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[1],)), PokemonRichiesto(ruoli_iv=(livello1_roles[3],)), PokemonRichiesto(ruoli_iv=(livello1_roles[1], livello1_roles[3]))),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[2],)), PokemonRichiesto(ruoli_iv=(livello1_roles[3],)), PokemonRichiesto(ruoli_iv=(livello1_roles[2], livello1_roles[3]))),
+        Accoppiamento(PokemonRichiesto(ruolo_natura='V'), PokemonRichiesto(ruoli_iv=(livello1_roles[0],)), PokemonRichiesto(ruoli_iv=(livello1_roles[0],), ruolo_natura='V')),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(livello1_roles[1],)), PokemonRichiesto(ruoli_iv=(livello1_roles[2],)), PokemonRichiesto(ruoli_iv=(livello1_roles[1], livello1_roles[2]))), # Duplicato? L'ultimo accoppiamento è identico al quarto.
+    ])
+    livello2 = Livello(2, [
+        Accoppiamento(gen_A_p1, gen_A_p2, genitore_A_3iv),
+        Accoppiamento(gen_B_p1, gen_B_p2, genitore_B_3iv),
+        Accoppiamento(gen_2iv_n_p1, gen_2iv_n_p2, genitore_2iv_n),
+        Accoppiamento(livello1.accoppiamenti[0].figlio, livello1.accoppiamenti[3].figlio, PokemonRichiesto(ruoli_iv=tuple(sorted(set(livello1.accoppiamenti[0].figlio.ruoli_iv) | set(livello1.accoppiamenti[3].figlio.ruoli_iv)))))
+    ])
+    livello3 = Livello(3, [
+        Accoppiamento(genitore_A_3iv, genitore_B_3iv, genitore_4iv_final),
+        Accoppiamento(genitore_2iv_n, partner_for_3iv_n, genitore_3iv_n_final)
+    ])
     livello4 = Livello(4, [Accoppiamento(genitore_4iv_final, genitore_3iv_n_final, target_finale)])
     return [livello1, livello2, livello3, livello4]
 
