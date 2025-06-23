@@ -1,0 +1,36 @@
+Totale piani analizzati: 4
+
+--------------------------------------------------------------------------------
+ID PIANO: 1
+Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Velocità', 'V': 'Jolly'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 2
+Legenda Ruoli -> Statistiche: {'B': 'Velocità', 'G': 'PS', 'V': 'Jolly'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 3
+Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Velocità', 'V': 'Jolly'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VG [1IV+N]                + B [1IV]                   -> VBG [2IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 4
+Legenda Ruoli -> Statistiche: {'B': 'Velocità', 'G': 'PS', 'V': 'Jolly'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VG [1IV+N]                + B [1IV]                   -> VBG [2IV+N]

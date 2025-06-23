@@ -1,0 +1,252 @@
+Totale piani analizzati: 18
+
+--------------------------------------------------------------------------------
+ID PIANO: 1
+Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Attacco', 'R': 'Difesa', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - B [1IV]                   + R [1IV]                   -> BR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + BR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 2
+Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Difesa', 'R': 'Attacco', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - B [1IV]                   + R [1IV]                   -> BR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + BR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 3
+Legenda Ruoli -> Statistiche: {'B': 'Attacco', 'G': 'PS', 'R': 'Difesa', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - B [1IV]                   + R [1IV]                   -> BR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + BR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 4
+Legenda Ruoli -> Statistiche: {'B': 'Attacco', 'G': 'Difesa', 'R': 'PS', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - B [1IV]                   + R [1IV]                   -> BR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + BR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 5
+Legenda Ruoli -> Statistiche: {'B': 'Difesa', 'G': 'PS', 'R': 'Attacco', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - B [1IV]                   + R [1IV]                   -> BR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + BR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 6
+Legenda Ruoli -> Statistiche: {'B': 'Difesa', 'G': 'Attacco', 'R': 'PS', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - B [1IV]                   + R [1IV]                   -> BR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + BR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 7
+Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Attacco', 'R': 'Difesa', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 8
+Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Difesa', 'R': 'Attacco', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 9
+Legenda Ruoli -> Statistiche: {'B': 'Attacco', 'G': 'PS', 'R': 'Difesa', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 10
+Legenda Ruoli -> Statistiche: {'B': 'Attacco', 'G': 'Difesa', 'R': 'PS', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 11
+Legenda Ruoli -> Statistiche: {'B': 'Difesa', 'G': 'PS', 'R': 'Attacco', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 12
+Legenda Ruoli -> Statistiche: {'B': 'Difesa', 'G': 'Attacco', 'R': 'PS', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBG [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 13
+Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Attacco', 'R': 'Difesa', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + R [1IV]                   -> VBR [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBR [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 14
+Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Difesa', 'R': 'Attacco', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + R [1IV]                   -> VBR [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBR [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 15
+Legenda Ruoli -> Statistiche: {'B': 'Attacco', 'G': 'PS', 'R': 'Difesa', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + R [1IV]                   -> VBR [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBR [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 16
+Legenda Ruoli -> Statistiche: {'B': 'Attacco', 'G': 'Difesa', 'R': 'PS', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + R [1IV]                   -> VBR [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBR [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 17
+Legenda Ruoli -> Statistiche: {'B': 'Difesa', 'G': 'PS', 'R': 'Attacco', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + R [1IV]                   -> VBR [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBR [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
+
+
+--------------------------------------------------------------------------------
+ID PIANO: 18
+Legenda Ruoli -> Statistiche: {'B': 'Difesa', 'G': 'Attacco', 'R': 'PS', 'V': 'Modest'}
+
+Struttura del Piano di Breeding:
+  --- Livello 1 ---
+    - VB [1IV+N]                + R [1IV]                   -> VBR [2IV+N]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+  --- Livello 2 ---
+    - VBR [2IV+N]               + GR [2IV]                  -> VBGR [3IV+N]
+  --- Livello 3 ---
+    - VBGR [3IV+N]              +  [0IV]                    -> VBGR [3IV+N]
