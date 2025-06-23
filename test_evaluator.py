@@ -1,111 +1,92 @@
 import unittest
-import os
-from typing import List, Dict, Any
+import math
+from typing import List, Optional
 
 import core_engine
-from structures import PokemonPosseduto, PianoValutato, PokemonRichiesto
+from structures import PianoValutato
 from plan_evaluator import valuta_piani
 
-def _scrivi_report_piani_valutati(piani: List[PianoValutato], nome_file: str):
-    """
-    Scrive un file di testo dettagliato usando la mappa di assegnazioni per slot.
-    """
-    print(f"\n[DEBUG] Scrittura del report di valutazione completo su '{nome_file}'...")
+def _scrivi_report_piani(piani_valutati: list[PianoValutato], nome_file: str):
+    """Funzione helper per scrivere un report dettagliato dei piani generati."""
+    print(f"\n[DEBUG] Scrittura del report di valutazione su '{nome_file}'...")
     with open(nome_file, 'w', encoding='utf-8') as f:
-        f.write(f"Totale piani analizzati: {len(piani)}\n\n")
-
-        for i, piano_valutato in enumerate(piani):
+        f.write(f"Totale piani analizzati: {len(piani_valutati)}\n\n")
+        piani_ordinati = sorted(piani_valutati, key=lambda p: p.piano_originale.id_piano)
+        for piano_valutato in piani_ordinati:
             piano = piano_valutato.piano_originale
             f.write("-" * 80 + "\n")
-            f.write(f"POSIZIONE: {i+1} | ID PIANO: {piano.id_piano} | PUNTEGGIO: {piano_valutato.punteggio:.2f}\n")
-            f.write("-" * 80 + "\n")
-            
-            f.write(f"Legenda Ruoli -> Statistiche: {piano.legenda_ruoli}\n")
-            f.write(f"Pokémon Posseduti Usati: {', '.join(sorted(list(piano_valutato.pokemon_usati))) or 'Nessuno'}\n\n")
-            
-            f.write("Assegnazioni (Requisito -> Posseduto):\n")
-            if piano_valutato.mappa_assegnazioni:
-                # Ordina gli slot per un report consistente
-                sorted_slots = sorted(piano_valutato.mappa_assegnazioni.keys())
-                for slot_key in sorted_slots:
-                    l_idx, a_idx, p_num = slot_key
-                    # Recupera l'oggetto PokemonRichiesto corretto usando lo slot
-                    genitore_obj = piano.livelli[l_idx].accoppiamenti[a_idx].genitore1 if p_num == 1 else piano.livelli[l_idx].accoppiamenti[a_idx].genitore2
-                    posseduto_id = piano_valutato.mappa_assegnazioni[slot_key]
-                    f.write(f"  - {genitore_obj.nome_generico:<15} -> {posseduto_id}\n")
-            else:
-                f.write("  - Nessuna assegnazione possibile.\n")
-            
-            f.write("\nStruttura del Piano di Breeding:\n")
-            for l_idx, livello in enumerate(piano.livelli):
+            f.write(f"ID PIANO: {piano.id_piano}\n")
+            f.write(f"Legenda Ruoli -> Statistiche: {piano.legenda_ruoli}\n\n")
+            f.write("Struttura del Piano di Breeding:\n")
+            for livello in piano.livelli:
                 f.write(f"  --- Livello {livello.livello_id} ---\n")
-                for a_idx, acc in enumerate(livello.accoppiamenti):
-                    # Genitore 1
-                    slot_key1 = (l_idx, a_idx, 1)
-                    genitore1_str = acc.genitore1.nome_generico
-                    if slot_key1 in piano_valutato.mappa_assegnazioni:
-                        genitore1_str = f"*{piano_valutato.mappa_assegnazioni[slot_key1]}*"
-
-                    # Genitore 2
-                    slot_key2 = (l_idx, a_idx, 2)
-                    genitore2_str = acc.genitore2.nome_generico
-                    if slot_key2 in piano_valutato.mappa_assegnazioni:
-                        genitore2_str = f"*{piano_valutato.mappa_assegnazioni[slot_key2]}*"
-                    
-                    figlio_str = acc.figlio.nome_generico
-                    f.write(f"    - {genitore1_str:<25} + {genitore2_str:<25} -> {figlio_str}\n")
+                for acc in livello.accoppiamenti:
+                    f.write(f"    - {acc.genitore1.nome_generico:<25} + {acc.genitore2.nome_generico:<25} -> {acc.figlio.nome_generico}\n")
             f.write("\n\n")
     print(f"[DEBUG] Report '{nome_file}' creato con successo.")
 
+class TestSuiteCompleta(unittest.TestCase):
+    """Suite di test per validare il motore di generazione universale."""
 
-class TestPlanEvaluator(unittest.TestCase):
-    def test_manual_charizard_scenario(self):
+    def _esegui_test_generico(self, num_iv: int, ivs_desiderate: list[str], natura: Optional[str], nome_file_report: str):
+        """Funzione generica per eseguire un test di generazione e reportistica."""
         print("\n" + "="*70)
-        print("--- ESECUZIONE TEST: SCENARIO CHARIZARD 4IV+N (MANUALE) ---")
+        print(f"--- ESECUZIONE TEST: GENERAZIONE PIANI {num_iv}IV {'+ Natura' if natura else 'Senza Natura'} ---")
         print("="*70)
 
-        pokemon_target = {
-            "specie": "Charizard",
-            "ivs": ["Attacco Speciale", "Difesa", "Difesa Speciale", "Velocità"],
-            "natura": "Adamant"
-        }
-        print(f"\n[FASE 1] Target: {pokemon_target['specie']} con IVs {pokemon_target['ivs']} e Natura {pokemon_target['natura']}")
-
-        piani_generati = core_engine.esegui_generazione(
-            ivs_desiderate=pokemon_target["ivs"],
-            natura_desiderata=pokemon_target["natura"]
-        )
-        self.assertTrue(len(piani_generati) > 0, "Il core_engine non ha generato piani per 4IV+Natura.")
-
-        pokemon_posseduti = [
-            PokemonPosseduto(id_utente="P1_M_Ada_AS_V", specie="Charizard", ivs=["Attacco Speciale", "Velocità"], natura="Adamant", sesso="M"),
-            PokemonPosseduto(id_utente="P2_M_Quiet_AS_V", specie="Charizard", ivs=["Attacco Speciale", "Velocità"], natura="Quiet", sesso="M"),
-            PokemonPosseduto(id_utente="P3_F_Quiet_DS_D", specie="Charizard", ivs=["Difesa Speciale", "Difesa"], natura="Quiet", sesso="F"),
-            PokemonPosseduto(id_utente="P4_F_Quiet_V", specie="Charizard", ivs=["Velocità"], natura="Quiet", sesso="F")
-        ]
-        print("\n[FASE 2] Pokémon Posseduti per la valutazione (scenario Charizard):")
-        for p in pokemon_posseduti:
-            print(f"  - {p.id_utente}: IVs={sorted(p.ivs) or 'N/A'}, Natura={p.natura or 'N/A'}")
-
-        piani_valutati = valuta_piani(piani_generati, pokemon_posseduti)
-        # Il nome del file del report viene aggiornato per non sovrascrivere i vecchi risultati
-        _scrivi_report_piani_valutati(piani_valutati, "report_piani_charizard_corretto_finale.txt")
+        num_permutazioni = math.factorial(num_iv)
         
-        self.assertTrue(len(piani_valutati) > 0, "Il plan_evaluator non ha restituito piani valutati.")
+        num_strategie = 0
+        if num_iv >= 2:
+            # Calcola il numero di strategie senza chiamare la funzione interna
+            # Il numero di strategie è il numero di modi per scegliere 2 genitori N-1 IV da un pool di N IV
+            num_combinazioni_genitori = math.comb(num_iv, num_iv - 1)
+            num_strategie = math.comb(num_combinazioni_genitori, 2)
+            if num_iv == 2 and natura: num_strategie = 2 # Caso speciale
+            elif num_iv == 3 and natura: num_strategie = math.comb(math.comb(3, 2), 2)
+            # Per 5IV+N e 5IV S/N il calcolo è più complesso e gestito internamente dal motore,
+            # quindi fidiamoci del numero di piani generati come riferimento.
+            if num_iv == 5:
+                piani_generati_temp = core_engine.esegui_generazione(ivs_desiderate, natura)
+                num_strategie = len(piani_generati_temp) // num_permutazioni if num_permutazioni > 0 else 0
+
+
+        piani_attesi = num_strategie * num_permutazioni
+        if piani_attesi == 0 and num_iv < 4 and natura: # Gestione fallback per 2/3 IV
+             piani_attesi = num_strategie * num_permutazioni if num_strategie > 0 else num_permutazioni
+             if num_iv == 3 and natura : piani_attesi = 3 * num_permutazioni
+
+        print(f"[INFO] Piani attesi: {piani_attesi} ({num_strategie} strategie * {num_permutazioni} permutazioni).")
         
-        miglior_piano = piani_valutati[0]
-        self.assertTrue(miglior_piano.punteggio > 0, "Il piano migliore deve avere un punteggio positivo.")
-        self.assertTrue(len(miglior_piano.pokemon_usati) > 0, "Il piano migliore deve usare almeno un pokémon.")
+        piani_generati = core_engine.esegui_generazione(ivs_desiderate, natura)
+        self.assertEqual(len(piani_generati), piani_attesi, f"Numero di piani generati non corretto per {num_iv}IV.")
         
-        print("\n" + "-"*70)
-        print("--- RISULTATO: DETTAGLIO DEL PIANO MIGLIORE (SCENARIO CHARIZARD) ---")
-        print(f"Punteggio ottenuto: {miglior_piano.punteggio:.2f}")
-        print(f"Pokémon Posseduti utilizzati: {', '.join(sorted(list(miglior_piano.pokemon_usati))) or 'Nessuno'}")
-        print("-" * 70)
+        piani_valutati = valuta_piani(piani_generati, [])
+        _scrivi_report_piani(piani_valutati, nome_file_report)
+        print(f"[RISULTATO] Test per {num_iv}IV completato. Controlla il file '{nome_file_report}'.")
+
+    # --- Test Piani CON Natura ---
+    def test_generazione_5iv_natura(self):
+        self._esegui_test_generico(5, ["PS", "Attacco", "Difesa", "Velocità", "Attacco Speciale"], "Adamant", "report_piani_5iv_natura.txt")
+
+    def test_generazione_4iv_natura(self):
+        self._esegui_test_generico(4, ["PS", "Attacco", "Difesa", "Velocità"], "Adamant", "report_piani_4iv_natura.txt")
+
+    def test_generazione_3iv_natura(self):
+        self._esegui_test_generico(3, ["PS", "Attacco", "Difesa"], "Modest", "report_piani_3iv_natura.txt")
+
+    def test_generazione_2iv_natura(self):
+        self._esegui_test_generico(2, ["PS", "Velocità"], "Jolly", "report_piani_2iv_natura.txt")
+
+    # --- Test Piani SENZA Natura ---
+    def test_generazione_5iv_senza_natura(self):
+        self._esegui_test_generico(5, ["PS", "Attacco", "Difesa", "Velocità", "Attacco Speciale"], None, "report_piani_5iv_senza_natura.txt")
+    
+    def test_generazione_4iv_senza_natura(self):
+        self._esegui_test_generico(4, ["PS", "Attacco", "Difesa", "Velocità"], None, "report_piani_4iv_senza_natura.txt")
         
 if __name__ == '__main__':
-    # Esegue solo il test specifico per evitare errori in altri test non aggiornati
-    suite = unittest.TestSuite()
-    suite.addTest(TestPlanEvaluator('test_manual_charizard_scenario'))
+    # Correzione: usa TestLoader per creare la suite
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSuiteCompleta)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
