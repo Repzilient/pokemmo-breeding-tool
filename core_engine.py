@@ -4,11 +4,12 @@ from typing import List, Dict, Optional, Tuple, Set
 
 from structures import PokemonRichiesto, Accoppiamento, Livello, PianoCompleto
 
-# Assume other _crea_piano... functions are present and correct from previous steps.
-# For brevity, only new/modified functions are detailed.
+# NOTE: Le funzioni _crea_piano_* sono state mantenute come fornite,
+# poiché l'errore risiedeva nella logica di generazione delle strategie
+# all'interno di `esegui_generazione`.
 
 def _crea_piano_4iv_natura_strutturato(strategia_genitori_3iv: Tuple[Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
-    # Existing function - assumed correct
+    """Crea la struttura di un piano per un Pokémon 4IV+Natura basata su una specifica strategia di genitori 3IV."""
     ruoli_genitore_A = tuple(sorted(strategia_genitori_3iv[0])); ruoli_genitore_B = tuple(sorted(strategia_genitori_3iv[1]))
     ruoli_4iv = tuple(sorted(list(set(ruoli_genitore_A) | set(ruoli_genitore_B)))); ruoli_3iv_n = tuple(sorted((ruoli_4iv[0], ruoli_4iv[1], ruoli_4iv[2])))
     target_finale = PokemonRichiesto(ruoli_iv=ruoli_4iv, ruolo_natura='V'); genitore_4iv_final = PokemonRichiesto(ruoli_iv=ruoli_4iv); genitore_3iv_n_final = PokemonRichiesto(ruoli_iv=ruoli_3iv_n, ruolo_natura='V')
@@ -26,7 +27,7 @@ def _crea_piano_4iv_natura_strutturato(strategia_genitori_3iv: Tuple[Tuple[str, 
     return [livello1, livello2, livello3, livello4]
 
 def _crea_piano_4iv_senza_natura_strutturato(strategia_genitori_3iv: Tuple[Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
-    # Existing function - assumed correct
+    """Crea la struttura di un piano per un Pokémon 4IV (senza natura) basata su una specifica strategia di genitori 3IV."""
     ruoli_genitore_A = tuple(sorted(strategia_genitori_3iv[0])); ruoli_genitore_B = tuple(sorted(strategia_genitori_3iv[1]))
     ruoli_4iv_target = tuple(sorted(list(set(ruoli_genitore_A) | set(ruoli_genitore_B)))); target_4iv = PokemonRichiesto(ruoli_iv=ruoli_4iv_target)
     if len(ruoli_4iv_target) != 4: raise ValueError(f"Strategia non produce 4IV: {ruoli_4iv_target}")
@@ -39,7 +40,7 @@ def _crea_piano_4iv_senza_natura_strutturato(strategia_genitori_3iv: Tuple[Tuple
     return [livello1, livello2, livello3]
 
 def _crea_piano_5iv_natura_strutturato(strategia_5iv_n: Tuple[Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
-    # Existing function - assumed correct
+    """Crea la struttura di un piano per un Pokémon 5IV+Natura."""
     all_5_iv_roles = tuple(sorted(strategia_5iv_n[0])); nature_branch_4_iv_roles = tuple(sorted(strategia_5iv_n[1]))
     if len(all_5_iv_roles)!=5 or len(nature_branch_4_iv_roles)!=4 or not set(nature_branch_4_iv_roles).issubset(set(all_5_iv_roles)): raise ValueError("Strategia 5IV+N non valida.")
     target_5iv_n = PokemonRichiesto(ruoli_iv=all_5_iv_roles, ruolo_natura='V'); gen_l4_p1_5iv = PokemonRichiesto(ruoli_iv=all_5_iv_roles); gen_l4_p2_4iv_n = PokemonRichiesto(ruoli_iv=nature_branch_4_iv_roles, ruolo_natura='V')
@@ -68,7 +69,7 @@ def _crea_piano_5iv_natura_strutturato(strategia_5iv_n: Tuple[Tuple[str, ...], T
     return [livello1, livello2, livello3, livello4, livello5]
 
 def _crea_piano_5iv_senza_natura_strutturato(strategia_genitori_4iv: Tuple[Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
-    # Existing function - assumed correct
+    """Crea la struttura di un piano per un Pokémon 5IV (senza natura) basata su una specifica strategia di genitori 4IV."""
     rA4iv=tuple(sorted(strategia_genitori_4iv[0])); rB4iv=tuple(sorted(strategia_genitori_4iv[1]))
     r5tgt=tuple(sorted(list(set(rA4iv)|set(rB4iv)))); target_5iv=PokemonRichiesto(ruoli_iv=r5tgt)
     if len(r5tgt) != 5: raise ValueError(f"Strategia genitori 4IV non produce un 5IV. Ruoli uniti: {r5tgt}")
@@ -89,7 +90,7 @@ def _crea_piano_5iv_senza_natura_strutturato(strategia_genitori_4iv: Tuple[Tuple
     return [livello1, livello2, livello3, livello4]
 
 def _crea_piano_3iv_natura_strutturato(strategia_3iv_n: Tuple[Tuple[str, ...], Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
-    # Existing function - assumed correct
+    """Crea la struttura di un piano per un Pokémon 3IV+Natura."""
     target_roles=tuple(sorted(strategia_3iv_n[0])); p1_2iv_n_roles=tuple(sorted(strategia_3iv_n[1])); p2_2iv_roles=tuple(sorted(strategia_3iv_n[2]))
     if len(target_roles) != 3 or len(p1_2iv_n_roles) != 2 or len(p2_2iv_roles) != 2: raise ValueError("Strategia 3IV+N non valida: dimensioni ruoli errate.")
     if not (set(p1_2iv_n_roles) | set(p2_2iv_roles)) == set(target_roles): raise ValueError("Strategia 3IV+N non valida: unione genitori non corrisponde al target.")
@@ -99,11 +100,11 @@ def _crea_piano_3iv_natura_strutturato(strategia_3iv_n: Tuple[Tuple[str, ...], T
     p2_c1_1iv=PokemonRichiesto(ruoli_iv=(p2_2iv_roles[0],)); p2_c2_1iv=PokemonRichiesto(ruoli_iv=(p2_2iv_roles[1],))
     livello1=Livello(1,[Accoppiamento(p1_1iv_n,p1_1iv,parent_2iv_n),Accoppiamento(p2_c1_1iv,p2_c2_1iv,parent_2iv)])
     livello2=Livello(2,[Accoppiamento(parent_2iv_n,parent_2iv,target_3iv_n)])
-    livello3_display=Livello(3,[Accoppiamento(target_3iv_n,PokemonRichiesto(),target_3iv_n)]) # Display convention
+    livello3_display=Livello(3,[Accoppiamento(target_3iv_n,PokemonRichiesto(),target_3iv_n)]) # Convenzione per la visualizzazione
     return [livello1,livello2,livello3_display]
 
 def _crea_piano_3iv_senza_natura_strutturato(strategia_3iv: Tuple[Tuple[str, ...], Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
-    # Existing function - assumed correct
+    """Crea la struttura di un piano per un Pokémon 3IV (senza natura)."""
     target_roles=tuple(sorted(strategia_3iv[0])); p1_2iv_roles=tuple(sorted(strategia_3iv[1])); p2_2iv_roles=tuple(sorted(strategia_3iv[2]))
     if len(target_roles) != 3 or len(p1_2iv_roles) != 2 or len(p2_2iv_roles) != 2: raise ValueError("Strategia 3IV non valida: dimensioni ruoli errate.")
     if not (set(p1_2iv_roles) | set(p2_2iv_roles)) == set(target_roles): raise ValueError("Strategia 3IV non valida: unione genitori non corrisponde al target.")
@@ -116,6 +117,7 @@ def _crea_piano_3iv_senza_natura_strutturato(strategia_3iv: Tuple[Tuple[str, ...
     return [livello1,livello2]
 
 def _crea_piano_2iv_natura_strutturato(strategia_2iv_n: Tuple[Tuple[str, ...], str]) -> List[Livello]:
+    """Crea la struttura di un piano per un Pokémon 2IV+Natura."""
     target_2_iv_roles = tuple(sorted(strategia_2iv_n[0]))
     role_for_1iv_n_parent = strategia_2iv_n[1]
 
@@ -130,7 +132,7 @@ def _crea_piano_2iv_natura_strutturato(strategia_2iv_n: Tuple[Tuple[str, ...], s
     parent_1iv_n = PokemonRichiesto(ruoli_iv=(role_for_1iv_n_parent,), ruolo_natura='V')
     parent_1iv = PokemonRichiesto(ruoli_iv=(other_role,))
 
-    # This is a single-level breeding process.
+    # Questo è un processo di breeding a livello singolo.
     livello1 = Livello(1, [
         Accoppiamento(parent_1iv_n, parent_1iv, target_2iv_n)
     ])
@@ -139,6 +141,10 @@ def _crea_piano_2iv_natura_strutturato(strategia_2iv_n: Tuple[Tuple[str, ...], s
 
 
 def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[str]) -> List[PianoCompleto]:
+    """
+    Funzione principale per generare tutti i possibili piani di breeding per un dato set di IV e natura.
+    Seleziona la strategia appropriata e genera piani permutando le statistiche reali.
+    """
     piani_generati: List[PianoCompleto] = []
     num_iv = len(ivs_desiderate)
     ha_natura = bool(natura_desiderata)
@@ -152,7 +158,7 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
     id_piano_counter = 0
     lista_piani_base_livelli: List[List[Livello]] = []
 
-    # Initialize strategy lists for checks later
+    # Inizializza le liste di strategie per verifiche successive
     strategie_4iv_natura: List[Tuple[Tuple[str, ...], Tuple[str, ...]]] = []
     strategie_4iv_senza_natura: List[Tuple[Tuple[str, ...], Tuple[str, ...]]] = []
     strategie_5iv_natura: List[Tuple[Tuple[str, ...], Tuple[str, ...]]] = []
@@ -219,7 +225,13 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
                         s_A = tuple(sorted(parent_A_roles_tuple))
                         s_B = tuple(sorted(parent_B_roles_tuple))
                         if s_A == s_B: continue
-                        strategy = tuple(sorted((s_A, s_B)))
+
+                        # --- CORREZIONE APPLICATA QUI ---
+                        # L'originale `tuple(sorted((s_A, s_B)))` confondeva Pylance.
+                        # Questa versione è più esplicita e garantisce un tuple di dimensione 2,
+                        # mantenendo l'ordinamento per l'univocità.
+                        strategy = (s_A, s_B) if s_A < s_B else (s_B, s_A)
+                        
                         if strategy not in added_strategies_set:
                             strategie_5iv_senza_natura.append(strategy)
                             added_strategies_set.add(strategy)
@@ -289,17 +301,9 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
                 except Exception as e: print(f"[ERRORE] Gen piano 2IV+N: {strategia_tuple}, {e}")
 
     else:
-        # This else handles cases not covered by specific num_iv/ha_natura combinations
-        # For example, num_iv < 2, or other unhandled num_iv values.
-        # Stubs for future specific types (like 2IV no nature) would be their own elif.
         print(f"[AVVISO] La generazione per {num_iv}IV, Natura: {ha_natura} non è supportata o implementata.")
 
     if not lista_piani_base_livelli:
-        # This condition is met if no strategies were found for a supported type,
-        # or if generation failed for all strategies of a supported type,
-        # or if the type was unsupported from the start.
-        # Specific messages for "no strategies found" or "not supported" are printed above.
-        # This is a general fallback if the list is empty for any reason for handled IV counts.
         if (num_iv in [2,3,4,5]):
              print(f"[AVVISO] Nessun piano base VALIDO generato per la richiesta: {num_iv}IV, Natura: {ha_natura}.")
         return []
@@ -322,8 +326,6 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
         nat_s = (('+ ' + natura_desiderata) if ha_natura and natura_desiderata
                  else (' senza natura' if not ha_natura else ''))
         print(f"[INFO] Generati {len(piani_generati)} piani completi per {num_iv}IVs{nat_s}.")
-    elif lista_piani_base_livelli: # Should ideally not be reached if piani_generati is empty and lista_piani_base_livelli is not.
+    elif lista_piani_base_livelli:
         print(f"[AVVISO] Strutture di piano base erano disponibili ma nessun piano finale è stato generato per {num_iv}IV, Natura: {ha_natura}.")
     return piani_generati
-
-```
