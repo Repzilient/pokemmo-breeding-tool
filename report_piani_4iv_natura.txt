@@ -8,12 +8,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -29,12 +34,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -50,12 +60,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -71,12 +86,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -92,12 +112,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -113,12 +138,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -134,12 +164,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -155,12 +190,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -176,12 +216,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -197,12 +242,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -218,12 +268,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -239,12 +294,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -260,12 +320,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -281,12 +346,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -302,12 +372,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -323,12 +398,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -344,12 +424,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -365,12 +450,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -386,12 +476,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -407,12 +502,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -428,12 +528,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -449,12 +554,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -470,12 +580,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -491,12 +606,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -512,12 +632,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -533,12 +658,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -554,12 +684,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -575,12 +710,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -596,12 +736,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -617,12 +762,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -638,12 +788,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -659,12 +814,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -680,12 +840,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -701,12 +866,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -722,12 +892,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -743,12 +918,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -764,12 +944,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -785,12 +970,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -806,12 +996,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -827,12 +1022,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -848,12 +1048,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -869,12 +1074,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -890,12 +1100,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -911,12 +1126,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -932,12 +1152,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -953,12 +1178,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -974,12 +1204,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -995,12 +1230,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1016,12 +1256,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1037,12 +1282,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1058,12 +1308,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1079,12 +1334,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1100,12 +1360,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1121,12 +1386,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1142,12 +1412,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1163,12 +1438,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1184,12 +1464,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1205,12 +1490,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1226,12 +1516,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1247,12 +1542,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1268,12 +1568,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1289,12 +1594,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1310,12 +1620,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1331,12 +1646,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1352,12 +1672,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1373,12 +1698,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1394,12 +1724,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1415,12 +1750,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1436,12 +1776,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1457,12 +1802,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1478,12 +1828,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1499,12 +1854,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1520,12 +1880,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1541,12 +1906,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1562,12 +1932,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1583,12 +1958,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1604,12 +1984,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1625,12 +2010,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1646,12 +2036,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1667,12 +2062,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1688,12 +2088,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1709,12 +2114,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1730,12 +2140,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1751,12 +2166,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1772,12 +2192,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1793,12 +2218,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1814,12 +2244,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1835,12 +2270,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1856,12 +2296,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1877,12 +2322,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1898,12 +2348,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1919,12 +2374,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1940,12 +2400,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1961,12 +2426,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -1982,12 +2452,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2003,12 +2478,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2024,12 +2504,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2045,12 +2530,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2066,12 +2556,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2087,12 +2582,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2108,12 +2608,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2129,12 +2634,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2150,12 +2660,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2171,12 +2686,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2192,12 +2712,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2213,12 +2738,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2234,12 +2764,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2255,12 +2790,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2276,12 +2816,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2297,12 +2842,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2318,12 +2868,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2339,12 +2894,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2360,12 +2920,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2381,12 +2946,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2402,12 +2972,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2423,12 +2998,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2444,12 +3024,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2465,12 +3050,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2486,12 +3076,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2507,12 +3102,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2528,12 +3128,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2549,12 +3154,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2570,12 +3180,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2591,12 +3206,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2612,12 +3232,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2633,12 +3258,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2654,12 +3284,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2675,12 +3310,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2696,12 +3336,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2717,12 +3362,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2738,12 +3388,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2759,12 +3414,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2780,12 +3440,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2801,12 +3466,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2822,12 +3492,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2843,12 +3518,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2864,12 +3544,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2885,12 +3570,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2906,12 +3596,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2927,12 +3622,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2948,12 +3648,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2969,12 +3674,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -2990,12 +3700,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
@@ -3011,12 +3726,17 @@ Struttura del Piano di Breeding:
   --- Livello 1 ---
     - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
     - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
     - G [1IV]                   + R [1IV]                   -> GR [2IV]
-    - R [1IV]                   + Y [1IV]                   -> RY [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + R [1IV]                   -> GR [2IV]
+    - G [1IV]                   + Y [1IV]                   -> GY [2IV]
   --- Livello 2 ---
     - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
     - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
-    - GR [2IV]                  + RY [2IV]                  -> GRY [3IV]
+    - BG [2IV]                  + GR [2IV]                  -> BGR [3IV]
+    - GR [2IV]                  + GY [2IV]                  -> GRY [3IV]
   --- Livello 3 ---
     - VBG [2IV+N]               + BGR [3IV]                 -> VBGR [3IV+N]
     - BGR [3IV]                 + GRY [3IV]                 -> BGRY [4IV]
