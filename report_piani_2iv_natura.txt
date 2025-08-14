@@ -6,7 +6,10 @@ Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Velocità', 'V': 'Jolly'}
 
 Struttura del Piano di Breeding:
   --- Livello 1 ---
-    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+  --- Livello 2 ---
+    - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
 
 
 --------------------------------------------------------------------------------
@@ -15,7 +18,10 @@ Legenda Ruoli -> Statistiche: {'B': 'Velocità', 'G': 'PS', 'V': 'Jolly'}
 
 Struttura del Piano di Breeding:
   --- Livello 1 ---
-    - VB [1IV+N]                + G [1IV]                   -> VBG [2IV+N]
+    - V [0IV+N]                 + B [1IV]                   -> VB [1IV+N]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+  --- Livello 2 ---
+    - VB [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
 
 
 --------------------------------------------------------------------------------
@@ -24,7 +30,10 @@ Legenda Ruoli -> Statistiche: {'B': 'PS', 'G': 'Velocità', 'V': 'Jolly'}
 
 Struttura del Piano di Breeding:
   --- Livello 1 ---
-    - VG [1IV+N]                + B [1IV]                   -> VBG [2IV+N]
+    - V [0IV+N]                 + G [1IV]                   -> VG [1IV+N]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+  --- Livello 2 ---
+    - VG [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
 
 
 --------------------------------------------------------------------------------
@@ -33,4 +42,7 @@ Legenda Ruoli -> Statistiche: {'B': 'Velocità', 'G': 'PS', 'V': 'Jolly'}
 
 Struttura del Piano di Breeding:
   --- Livello 1 ---
-    - VG [1IV+N]                + B [1IV]                   -> VBG [2IV+N]
+    - V [0IV+N]                 + G [1IV]                   -> VG [1IV+N]
+    - B [1IV]                   + G [1IV]                   -> BG [2IV]
+  --- Livello 2 ---
+    - VG [1IV+N]                + BG [2IV]                  -> VBG [2IV+N]
