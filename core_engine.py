@@ -83,73 +83,86 @@ def _crea_piano_4iv_senza_natura_strutturato(strategia_genitori_3iv: Tuple[Tuple
     return [livello1, livello2, livello3]
 
 def _crea_piano_5iv_natura_strutturato(strategia_5iv_n: Tuple[Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
-    """Crea la struttura di un piano per un Pokémon 5IV+Natura, seguendo il modello corretto a 5 livelli."""
-    # Ruoli Canonici: B,G,R,Y,O per IVs; V per Natura. La strategia viene ignorata.
-    # Mappatura da piani preeding.txt: B,G,R,I,O -> B,G,R,Y,O
+    """Crea la struttura di un piano per un Pokémon 5IV+Natura, seguendo un albero genealogico esplicito e senza riutilizzo."""
+    # Ruoli Canonici: B,G,R,Y,O per IVs; V per Natura. 'Y' sostituisce 'I' del piano utente.
 
-    # --- Definizione di tutti i Pokémon necessari nel piano ---
-    # Livello 0 (Base)
+    # --- Livello 0 (Base): Pokémon con 1IV o solo Natura ---
+    # Totali necessari calcolati dall'albero di dipendenze:
+    # V(1), B(2), G(11), R(10), Y(6), O(2)
+    # Derivazione:
+    # L2->L1 richiede: BG(1), BR(1), VG(1), GR(5), GY(4), RY(2), RO(2)
+    # Totale Base:
+    # B: BG(1) + BR(1) = 2
+    # G: BG(1) + VG(1) + GR(5) + GY(4) = 11
+    # R: BR(1) + GR(5) + RY(2) + RO(2) = 10
+    # Y: GY(4) + RY(2) = 6
+    # O: RO(2) = 2
+    # V: VG(1) = 1
+
     v_n = PokemonRichiesto(ruolo_natura='V')
-    b_1 = PokemonRichiesto(ruoli_iv=('B',))
-    g_1 = PokemonRichiesto(ruoli_iv=('G',))
-    r_1 = PokemonRichiesto(ruoli_iv=('R',))
-    y_1 = PokemonRichiesto(ruoli_iv=('Y',))
-    o_1 = PokemonRichiesto(ruoli_iv=('O',))
+    # Usiamo pop() quindi le liste sono invertite per comodità
+    g_1 = [PokemonRichiesto(ruoli_iv=('G',)) for _ in range(11)]
+    r_1 = [PokemonRichiesto(ruoli_iv=('R',)) for _ in range(10)]
+    y_1 = [PokemonRichiesto(ruoli_iv=('Y',)) for _ in range(6)]
+    o_1 = [PokemonRichiesto(ruoli_iv=('O',)) for _ in range(2)]
+    b_1 = [PokemonRichiesto(ruoli_iv=('B',)) for _ in range(2)]
 
-    # Livello 1 (Componenti)
+    # --- Livello 1: Creazione dei componenti 2IV e 1IV+N ---
+    vg_1n = PokemonRichiesto(ruoli_iv=('G',), ruolo_natura='V')
     bg_2 = PokemonRichiesto(ruoli_iv=('B', 'G'))
     br_2 = PokemonRichiesto(ruoli_iv=('B', 'R'))
-    gr_2 = PokemonRichiesto(ruoli_iv=('G', 'R'))
-    gy_2 = PokemonRichiesto(ruoli_iv=('G', 'Y'))
-    ry_2 = PokemonRichiesto(ruoli_iv=('R', 'Y'))
-    ro_2 = PokemonRichiesto(ruoli_iv=('R', 'O'))
-    vg_1n = PokemonRichiesto(ruoli_iv=('G',), ruolo_natura='V')
+    gr_2 = [PokemonRichiesto(ruoli_iv=('G', 'R')) for _ in range(5)]
+    gy_2 = [PokemonRichiesto(ruoli_iv=('G', 'Y')) for _ in range(4)]
+    ry_2 = [PokemonRichiesto(ruoli_iv=('R', 'Y')) for _ in range(2)]
+    ro_2 = [PokemonRichiesto(ruoli_iv=('R', 'O')) for _ in range(2)]
 
-    # Livello 2 (Intermedi)
+    livello1 = Livello(1, [
+        Accoppiamento(v_n, g_1.pop(), vg_1n),
+        Accoppiamento(b_1.pop(), g_1.pop(), bg_2),
+        Accoppiamento(b_1.pop(), r_1.pop(), br_2),
+    ] + [Accoppiamento(g_1.pop(), r_1.pop(), p) for p in gr_2]
+      + [Accoppiamento(g_1.pop(), y_1.pop(), p) for p in gy_2]
+      + [Accoppiamento(r_1.pop(), y_1.pop(), p) for p in ry_2]
+      + [Accoppiamento(r_1.pop(), o_1.pop(), p) for p in ro_2]
+    )
+
+    # --- Livello 2: Combinazione a 3IV e 2IV+N ---
     bgr_3 = PokemonRichiesto(ruoli_iv=('B', 'G', 'R'))
-    gry_3 = PokemonRichiesto(ruoli_iv=('G', 'R', 'Y'))
-    ryo_3 = PokemonRichiesto(ruoli_iv=('R', 'Y', 'O'))
+    gry_3 = [PokemonRichiesto(ruoli_iv=('G', 'R', 'Y')) for _ in range(4)]
+    ryo_3 = [PokemonRichiesto(ruoli_iv=('R', 'Y', 'O')) for _ in range(2)]
     vgr_2n = PokemonRichiesto(ruoli_iv=('G', 'R'), ruolo_natura='V')
 
-    # Livello 3 (Pre-finali)
+    livello2 = Livello(2, [
+        Accoppiamento(bg_2, br_2, bgr_3),
+        Accoppiamento(vg_1n, gr_2.pop(), vgr_2n),
+    ] + [Accoppiamento(gr_2.pop(), gy_2.pop(), p) for p in gry_3]
+      + [Accoppiamento(ry_2.pop(), ro_2.pop(), p) for p in ryo_3]
+    )
+
+    # --- Livello 3: Creazione dei Pokémon 4IV e 3IV+N ---
     bgry_4 = PokemonRichiesto(ruoli_iv=('B', 'G', 'R', 'Y'))
-    gryo_4 = PokemonRichiesto(ruoli_iv=('G', 'R', 'Y', 'O'))
+    gory_4 = [PokemonRichiesto(ruoli_iv=('G', 'O', 'R', 'Y')) for _ in range(2)]
     vgry_3n = PokemonRichiesto(ruoli_iv=('G', 'R', 'Y'), ruolo_natura='V')
 
-    # Livello 4 (Genitori Finali)
-    bgryo_5 = PokemonRichiesto(ruoli_iv=('B', 'G', 'R', 'Y', 'O'))         # Genitore A
-    vgryo_4n = PokemonRichiesto(ruoli_iv=('G', 'R', 'Y', 'O'), ruolo_natura='V') # Genitore B
-
-    # Livello 5 (Target)
-    vbgryo_5n = PokemonRichiesto(ruoli_iv=('B', 'G', 'R', 'Y', 'O'), ruolo_natura='V')
-
-    # --- Costruzione dei livelli del piano ---
-    livello1 = Livello(1, [
-        Accoppiamento(b_1, g_1, bg_2), Accoppiamento(b_1, r_1, br_2),
-        Accoppiamento(g_1, r_1, gr_2), Accoppiamento(g_1, y_1, gy_2),
-        Accoppiamento(r_1, y_1, ry_2), Accoppiamento(r_1, o_1, ro_2),
-        Accoppiamento(v_n, g_1, vg_1n)
-    ])
-
-    livello2 = Livello(2, [
-        Accoppiamento(bg_2, br_2, bgr_3), Accoppiamento(gr_2, gy_2, gry_3),
-        Accoppiamento(ry_2, ro_2, ryo_3), Accoppiamento(vg_1n, gr_2, vgr_2n)
-    ])
-
     livello3 = Livello(3, [
-        Accoppiamento(bgr_3, gry_3, bgry_4),
-        Accoppiamento(gry_3, ryo_3, gryo_4),
-        Accoppiamento(vgr_2n, gry_3, vgry_3n)
+        Accoppiamento(bgr_3, gry_3.pop(), bgry_4),
+        Accoppiamento(vgr_2n, gry_3.pop(), vgry_3n),
+        Accoppiamento(gry_3.pop(), ryo_3.pop(), gory_4[0]),
+        Accoppiamento(gry_3.pop(), ryo_3.pop(), gory_4[1]),
     ])
+
+    # --- Livello 4: Genitori Finali ---
+    bgory_5 = PokemonRichiesto(ruoli_iv=('B', 'G', 'R', 'Y', 'O'))
+    vgory_4n = PokemonRichiesto(ruoli_iv=('G', 'R', 'Y', 'O'), ruolo_natura='V')
 
     livello4 = Livello(4, [
-        Accoppiamento(bgry_4, gryo_4, bgryo_5),
-        Accoppiamento(vgry_3n, gryo_4, vgryo_4n)
+        Accoppiamento(bgry_4, gory_4[0], bgory_5),
+        Accoppiamento(vgry_3n, gory_4[1], vgory_4n)
     ])
 
-    livello5 = Livello(5, [
-        Accoppiamento(bgryo_5, vgryo_4n, vbgryo_5n)
-    ])
+    # --- Livello 5 (Target) ---
+    vbgory_5n = PokemonRichiesto(ruoli_iv=('B', 'G', 'R', 'Y', 'O'), ruolo_natura='V')
+    livello5 = Livello(5, [Accoppiamento(bgory_5, vgory_4n, vbgory_5n)])
 
     return [livello1, livello2, livello3, livello4, livello5]
 
