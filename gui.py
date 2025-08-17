@@ -440,38 +440,58 @@ class BreedingToolApp(tk.Tk):
 
     def _update_autocomplete(self, event):
         """
-        Filtra la lista di un Combobox in base al testo inserito.
-        Questo metodo viene collegato all'evento <KeyRelease>.
+        Filtra la lista di un Combobox, completa il testo e seleziona
+        la parte completata. Collegato all'evento <KeyRelease>.
         """
         widget = event.widget
 
-        # Ignora i tasti di navigazione per non interferire con la selezione
+        # Se l'utente preme BackSpace, vogliamo solo filtrare la lista, non autocompletare.
+        if event.keysym == "BackSpace":
+            # Usiamo after per assicurarci che il testo del widget sia già aggiornato
+            widget.after(10, self._filter_list, widget)
+            return
+
+        # Ignora altri tasti di navigazione
         if event.keysym in ("Up", "Down", "Left", "Right", "Return", "Escape", "Tab"):
             return
 
-        current_text = widget.get()
+        # Anche qui, usiamo 'after' per lavorare con il testo aggiornato dopo l'evento
+        widget.after(10, self._perform_autocomplete, widget)
 
-        # Salva la posizione del cursore per ripristinarla dopo l'aggiornamento
-        cursor_pos = widget.icursor()
-
-        if not current_text:
-            filtered_list = self.pokemon_names
+    def _filter_list(self, widget):
+        """Aggiorna solo la lista dei valori senza autocompletare il testo."""
+        typed_text = widget.get()
+        if typed_text:
+            filtered_list = [name for name in self.pokemon_names if name.lower().startswith(typed_text.lower())]
+            widget['values'] = filtered_list if filtered_list else self.pokemon_names
         else:
-            # Filtra la lista dei nomi (case-insensitive)
-            filtered_list = [name for name in self.pokemon_names if name.lower().startswith(current_text.lower())]
-
-        # L'aggiornamento di 'values' può cancellare il testo, quindi lo salviamo
-        # e lo ripristiniamo.
-        if filtered_list:
-            widget['values'] = filtered_list
-        else:
-            # Se non ci sono risultati, mostra la lista completa per evitare
-            # che l'utente rimanga bloccato.
             widget['values'] = self.pokemon_names
 
-        # Ripristina il testo e il cursore
-        widget.set(current_text)
-        widget.icursor(cursor_pos)
+    def _perform_autocomplete(self, widget):
+        """Esegue l'autocompletamento del testo e aggiorna la lista."""
+        typed_text = widget.get()
+
+        if not typed_text:
+            widget['values'] = self.pokemon_names
+            return
+
+        # Filtra la lista
+        filtered_list = [name for name in self.pokemon_names if name.lower().startswith(typed_text.lower())]
+
+        if filtered_list:
+            # C'è almeno una corrispondenza
+            completion = filtered_list[0]
+            widget['values'] = filtered_list
+
+            # Imposta il testo completato
+            widget.set(completion)
+
+            # Seleziona la parte di testo che è stata autocompletata
+            widget.icursor(len(typed_text))
+            widget.selection_range(len(typed_text), 'end')
+        else:
+            # Nessuna corrispondenza, resetta la lista
+            widget['values'] = self.pokemon_names
 
 
     def _reset_all(self):
