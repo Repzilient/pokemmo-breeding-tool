@@ -177,24 +177,80 @@ def _crea_piano_5iv_natura_strutturato(strategia_5iv_n: Tuple[Tuple[str, ...], T
     return [livello1, livello2, livello3, livello4, livello5]
 
 def _crea_piano_5iv_senza_natura_strutturato(strategia_genitori_4iv: Tuple[Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
-    """Crea la struttura di un piano per un Pokémon 5IV (senza natura) basata su una specifica strategia di genitori 4IV."""
-    rA4iv=tuple(sorted(strategia_genitori_4iv[0])); rB4iv=tuple(sorted(strategia_genitori_4iv[1]))
-    r5tgt=tuple(sorted(list(set(rA4iv)|set(rB4iv)))); target_5iv=PokemonRichiesto(ruoli_iv=r5tgt)
-    if len(r5tgt) != 5: raise ValueError(f"Strategia genitori 4IV non produce un 5IV. Ruoli uniti: {r5tgt}")
-    gen_A_4iv=PokemonRichiesto(ruoli_iv=rA4iv); gen_B_4iv=PokemonRichiesto(ruoli_iv=rB4iv)
-    rA4 = rA4iv; gen_A_p1_3iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rA4[0],rA4[1],rA4[2])))); gen_A_p2_3iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rA4[0],rA4[1],rA4[3]))))
-    rB4 = rB4iv; gen_B_p1_3iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rB4[0],rB4[1],rB4[2])))); gen_B_p2_3iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rB4[0],rB4[1],rB4[3]))))
-    rA_p1_3=gen_A_p1_3iv.ruoli_iv; gen_A_p1_c1_2iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rA_p1_3[0],rA_p1_3[1])))); gen_A_p1_c2_2iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rA_p1_3[0],rA_p1_3[2]))))
-    rA_p2_3=gen_A_p2_3iv.ruoli_iv; gen_A_p2_c1_2iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rA_p2_3[0],rA_p2_3[1])))); gen_A_p2_c2_2iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rA_p2_3[0],rA_p2_3[2]))))
-    rB_p1_3=gen_B_p1_3iv.ruoli_iv; gen_B_p1_c1_2iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rB_p1_3[0],rB_p1_3[1])))); gen_B_p1_c2_2iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rB_p1_3[0],rB_p1_3[2]))))
-    rB_p2_3=gen_B_p2_3iv.ruoli_iv; gen_B_p2_c1_2iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rB_p2_3[0],rB_p2_3[1])))); gen_B_p2_c2_2iv=PokemonRichiesto(ruoli_iv=tuple(sorted((rB_p2_3[0],rB_p2_3[2]))))
-    l1_children_2iv_set = {gen_A_p1_c1_2iv, gen_A_p1_c2_2iv, gen_A_p2_c1_2iv, gen_A_p2_c2_2iv, gen_B_p1_c1_2iv, gen_B_p1_c2_2iv, gen_B_p2_c1_2iv, gen_B_p2_c2_2iv}
-    livello1_accs = [];
-    for pok_2iv in l1_children_2iv_set: iv0,iv1=pok_2iv.ruoli_iv[0],pok_2iv.ruoli_iv[1]; livello1_accs.append(Accoppiamento(PokemonRichiesto(ruoli_iv=(iv0,)), PokemonRichiesto(ruoli_iv=(iv1,)), pok_2iv))
-    livello1=Livello(1, livello1_accs)
-    livello2=Livello(2, [Accoppiamento(gen_A_p1_c1_2iv, gen_A_p1_c2_2iv, gen_A_p1_3iv), Accoppiamento(gen_A_p2_c1_2iv, gen_A_p2_c2_2iv, gen_A_p2_3iv), Accoppiamento(gen_B_p1_c1_2iv, gen_B_p1_c2_2iv, gen_B_p1_3iv), Accoppiamento(gen_B_p2_c1_2iv, gen_B_p2_c2_2iv, gen_B_p2_3iv)])
-    livello3=Livello(3, [Accoppiamento(gen_A_p1_3iv, gen_A_p2_3iv, gen_A_4iv), Accoppiamento(gen_B_p1_3iv, gen_B_p2_3iv, gen_B_4iv)])
-    livello4=Livello(4, [Accoppiamento(gen_A_4iv, gen_B_4iv, target_5iv)])
+    """
+    Crea la struttura di un piano per un Pokémon 5IV (senza natura) basata su una
+    specifica strategia di genitori 4IV, garantendo che ogni Pokémon intermedio
+    sia un'istanza unica per evitare riutilizzi impliciti.
+    """
+    ruoli_genitore_A_4iv = tuple(sorted(strategia_genitori_4iv[0]))
+    ruoli_genitore_B_4iv = tuple(sorted(strategia_genitori_4iv[1]))
+
+    ruoli_target_5iv = tuple(sorted(list(set(ruoli_genitore_A_4iv) | set(ruoli_genitore_B_4iv))))
+    if len(ruoli_target_5iv) != 5:
+        raise ValueError(f"La strategia dei genitori 4IV non produce un 5IV. Ruoli uniti: {ruoli_target_5iv}")
+
+    # --- Livello 4 (Target) ---
+    target_5iv = PokemonRichiesto(ruoli_iv=ruoli_target_5iv)
+    genitore_A_4iv = PokemonRichiesto(ruoli_iv=ruoli_genitore_A_4iv)
+    genitore_B_4iv = PokemonRichiesto(ruoli_iv=ruoli_genitore_B_4iv)
+    livello4 = Livello(4, [Accoppiamento(genitore_A_4iv, genitore_B_4iv, target_5iv)])
+
+    # --- Livello 3 (Genitori 4IV) ---
+    # Decomposizione del genitore A
+    rA4 = ruoli_genitore_A_4iv
+    gen_A_p1_3iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rA4[0], rA4[1], rA4[2]))))
+    gen_A_p2_3iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rA4[0], rA4[1], rA4[3])))) # Potrebbe essere anche (rA4[0], rA4[2], rA4[3]), la logica originale usa questa combinazione
+    # Decomposizione del genitore B
+    rB4 = ruoli_genitore_B_4iv
+    gen_B_p1_3iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rB4[0], rB4[1], rB4[2]))))
+    gen_B_p2_3iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rB4[0], rB4[1], rB4[3]))))
+
+    livello3 = Livello(3, [
+        Accoppiamento(gen_A_p1_3iv, gen_A_p2_3iv, genitore_A_4iv),
+        Accoppiamento(gen_B_p1_3iv, gen_B_p2_3iv, genitore_B_4iv)
+    ])
+
+    # --- Livello 2 (Genitori 3IV) ---
+    # Decomposizione dei 4 genitori 3IV in 8 genitori 2IV.
+    # Ogni Pokémon qui è un'istanza distinta, anche se ha gli stessi IV.
+    rA_p1_3 = gen_A_p1_3iv.ruoli_iv
+    gen_A_p1_c1_2iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rA_p1_3[0], rA_p1_3[1]))))
+    gen_A_p1_c2_2iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rA_p1_3[0], rA_p1_3[2]))))
+
+    rA_p2_3 = gen_A_p2_3iv.ruoli_iv
+    gen_A_p2_c1_2iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rA_p2_3[0], rA_p2_3[1]))))
+    gen_A_p2_c2_2iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rA_p2_3[0], rA_p2_3[2]))))
+
+    rB_p1_3 = gen_B_p1_3iv.ruoli_iv
+    gen_B_p1_c1_2iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rB_p1_3[0], rB_p1_3[1]))))
+    gen_B_p1_c2_2iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rB_p1_3[0], rB_p1_3[2]))))
+
+    rB_p2_3 = gen_B_p2_3iv.ruoli_iv
+    gen_B_p2_c1_2iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rB_p2_3[0], rB_p2_3[1]))))
+    gen_B_p2_c2_2iv = PokemonRichiesto(ruoli_iv=tuple(sorted((rB_p2_3[0], rB_p2_3[2]))))
+
+    livello2 = Livello(2, [
+        Accoppiamento(gen_A_p1_c1_2iv, gen_A_p1_c2_2iv, gen_A_p1_3iv),
+        Accoppiamento(gen_A_p2_c1_2iv, gen_A_p2_c2_2iv, gen_A_p2_3iv),
+        Accoppiamento(gen_B_p1_c1_2iv, gen_B_p1_c2_2iv, gen_B_p1_3iv),
+        Accoppiamento(gen_B_p2_c1_2iv, gen_B_p2_c2_2iv, gen_B_p2_3iv)
+    ])
+
+    # --- Livello 1 (Genitori 2IV) ---
+    # Creazione degli 8 genitori 2IV a partire da genitori 1IV.
+    # Ogni accoppiamento è esplicito.
+    accoppiamenti_l1 = [
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(gen_A_p1_c1_2iv.ruoli_iv[0],)), PokemonRichiesto(ruoli_iv=(gen_A_p1_c1_2iv.ruoli_iv[1],)), gen_A_p1_c1_2iv),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(gen_A_p1_c2_2iv.ruoli_iv[0],)), PokemonRichiesto(ruoli_iv=(gen_A_p1_c2_2iv.ruoli_iv[1],)), gen_A_p1_c2_2iv),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(gen_A_p2_c1_2iv.ruoli_iv[0],)), PokemonRichiesto(ruoli_iv=(gen_A_p2_c1_2iv.ruoli_iv[1],)), gen_A_p2_c1_2iv),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(gen_A_p2_c2_2iv.ruoli_iv[0],)), PokemonRichiesto(ruoli_iv=(gen_A_p2_c2_2iv.ruoli_iv[1],)), gen_A_p2_c2_2iv),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(gen_B_p1_c1_2iv.ruoli_iv[0],)), PokemonRichiesto(ruoli_iv=(gen_B_p1_c1_2iv.ruoli_iv[1],)), gen_B_p1_c1_2iv),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(gen_B_p1_c2_2iv.ruoli_iv[0],)), PokemonRichiesto(ruoli_iv=(gen_B_p1_c2_2iv.ruoli_iv[1],)), gen_B_p1_c2_2iv),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(gen_B_p2_c1_2iv.ruoli_iv[0],)), PokemonRichiesto(ruoli_iv=(gen_B_p2_c1_2iv.ruoli_iv[1],)), gen_B_p2_c1_2iv),
+        Accoppiamento(PokemonRichiesto(ruoli_iv=(gen_B_p2_c2_2iv.ruoli_iv[0],)), PokemonRichiesto(ruoli_iv=(gen_B_p2_c2_2iv.ruoli_iv[1],)), gen_B_p2_c2_2iv),
+    ]
+    livello1 = Livello(1, accoppiamenti_l1)
+
     return [livello1, livello2, livello3, livello4]
 
 def _crea_piano_3iv_natura_strutturato(strategia_3iv_n: Tuple[Tuple[str, ...], Tuple[str, ...], Tuple[str, ...]]) -> List[Livello]:
