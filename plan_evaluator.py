@@ -77,11 +77,12 @@ class PlanEvaluator:
         posseduti_disponibili = list(self.pokemon_posseduti)
         
         potential_reqs = []
-        for l_idx, livello in enumerate(self.piano.livelli):
-            for a_idx, acc in enumerate(livello.accoppiamenti):
-                potential_reqs.append({'slot': (l_idx, a_idx, 1), 'req': acc.genitore1, 'id': id(acc.genitore1), 'level': l_idx})
-                potential_reqs.append({'slot': (l_idx, a_idx, 2), 'req': acc.genitore2, 'id': id(acc.genitore2), 'level': l_idx})
+        for livello in self.piano.livelli:
+            for acc in livello.accoppiamenti:
+                potential_reqs.append({'req': acc.genitore1, 'id': id(acc.genitore1), 'level': livello.livello_id})
+                potential_reqs.append({'req': acc.genitore2, 'id': id(acc.genitore2), 'level': livello.livello_id})
         
+        # Ordina i requisiti per livello (dal più alto al più basso) e complessità
         potential_reqs.sort(key=lambda item: (item['level'], len(item['req'].ruoli_iv), item['req'].ruolo_natura is not None), reverse=True)
 
         fulfilled_req_ids: Set[int] = set()
@@ -93,7 +94,6 @@ class PlanEvaluator:
 
             richiesto = item['req']
             
-            # Find all valid candidates and rank them
             candidati_validi = []
             for candidato in posseduti_disponibili:
                 if self._is_valid_candidate(richiesto, candidato):
@@ -103,19 +103,20 @@ class PlanEvaluator:
             if not candidati_validi:
                 continue
 
-            # Choose the best candidate (lowest rank)
             candidati_validi.sort(key=lambda x: x['rank'])
             best_candidate = candidati_validi[0]
             best_pokemon_assegnato = best_candidate['pokemon']
             
-            # Assign the best candidate
+            # --- MODIFICA CHIAVE ---
+            # Assegna il Pokémon usando l'ID univoco del requisito come chiave.
+            # Questo è il fix principale.
             score = self._calcola_punteggio_match(richiesto, best_pokemon_assegnato)
             piano_valutato.punteggio += score
             piano_valutato.pokemon_usati.add(best_pokemon_assegnato.id_utente)
-            piano_valutato.mappa_assegnazioni[item['slot']] = best_pokemon_assegnato.id_utente
+            piano_valutato.mappa_assegnazioni[req_id] = best_pokemon_assegnato.id_utente
             posseduti_disponibili.remove(best_pokemon_assegnato)
 
-            # Prune ancestors
+            # Pruning degli antenati: se copro un figlio, non devo più creare i suoi genitori
             q = [req_id]
             while q:
                 req_id_to_prune = q.pop(0)
