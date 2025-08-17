@@ -467,6 +467,9 @@ class BreedingToolApp(tk.Tk):
         else:
             widget['values'] = self.pokemon_names
 
+        # Mostra la lista aggiornata
+        widget.event_generate('<Down>')
+
     def _perform_autocomplete(self, widget):
         """Esegue l'autocompletamento del testo e aggiorna la lista."""
         typed_text = widget.get()
@@ -489,6 +492,9 @@ class BreedingToolApp(tk.Tk):
             # Seleziona la parte di testo che è stata autocompletata
             widget.icursor(len(typed_text))
             widget.selection_range(len(typed_text), 'end')
+
+            # Apre il menu a tendina per mostrare i suggerimenti
+            widget.event_generate('<Down>')
         else:
             # Nessuna corrispondenza, resetta la lista
             widget['values'] = self.pokemon_names
