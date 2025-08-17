@@ -93,6 +93,7 @@ class BreedingToolApp(tk.Tk):
         ttk.Label(target_frame, text="Specie:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
         target_combo = ttk.Combobox(target_frame, textvariable=self.target_species_var, values=self.pokemon_names)
         target_combo.grid(row=0, column=1, sticky="ew", padx=5, pady=2)
+        target_combo.bind('<KeyRelease>', self._update_autocomplete)
 
         # IVs
         ttk.Label(target_frame, text="IVs Desiderate:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
@@ -120,6 +121,7 @@ class BreedingToolApp(tk.Tk):
         ttk.Label(add_form, text="Specie:").grid(row=0, column=0, sticky="w")
         owned_combo = ttk.Combobox(add_form, textvariable=self.owned_species_var, values=self.pokemon_names)
         owned_combo.grid(row=0, column=1, columnspan=2, sticky="ew", pady=2)
+        owned_combo.bind('<KeyRelease>', self._update_autocomplete)
 
         ttk.Label(add_form, text="IVs:").grid(row=1, column=0, sticky="w")
         owned_iv_frame = ttk.Frame(add_form)
@@ -435,6 +437,42 @@ class BreedingToolApp(tk.Tk):
         self.results_text.config(state="normal")
         self.results_text.delete("1.0", tk.END)
         self.results_text.config(state="disabled")
+
+    def _update_autocomplete(self, event):
+        """
+        Filtra la lista di un Combobox in base al testo inserito.
+        Questo metodo viene collegato all'evento <KeyRelease>.
+        """
+        widget = event.widget
+
+        # Ignora i tasti di navigazione per non interferire con la selezione
+        if event.keysym in ("Up", "Down", "Left", "Right", "Return", "Escape", "Tab"):
+            return
+
+        current_text = widget.get()
+
+        # Salva la posizione del cursore per ripristinarla dopo l'aggiornamento
+        cursor_pos = widget.icursor()
+
+        if not current_text:
+            filtered_list = self.pokemon_names
+        else:
+            # Filtra la lista dei nomi (case-insensitive)
+            filtered_list = [name for name in self.pokemon_names if name.lower().startswith(current_text.lower())]
+
+        # L'aggiornamento di 'values' può cancellare il testo, quindi lo salviamo
+        # e lo ripristiniamo.
+        if filtered_list:
+            widget['values'] = filtered_list
+        else:
+            # Se non ci sono risultati, mostra la lista completa per evitare
+            # che l'utente rimanga bloccato.
+            widget['values'] = self.pokemon_names
+
+        # Ripristina il testo e il cursore
+        widget.set(current_text)
+        widget.icursor(cursor_pos)
+
 
     def _reset_all(self):
         """Resetta tutti gli input e i risultati."""
