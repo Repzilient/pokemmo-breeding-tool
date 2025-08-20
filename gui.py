@@ -469,6 +469,8 @@ class BreedingToolApp(tk.Tk):
 
         # Mostra la lista aggiornata
         widget.event_generate('<Down>')
+        # Forza il focus a tornare sul widget di input
+        widget.focus_set()
 
     def _perform_autocomplete(self, widget):
         """Esegue l'autocompletamento del testo e aggiorna la lista."""
@@ -495,6 +497,8 @@ class BreedingToolApp(tk.Tk):
 
             # Apre il menu a tendina per mostrare i suggerimenti
             widget.event_generate('<Down>')
+            # Forza il focus a tornare sul widget di input
+            widget.focus_set()
         else:
             # Nessuna corrispondenza, resetta la lista
             widget['values'] = self.pokemon_names
