@@ -8,6 +8,65 @@ from structures import PokemonPosseduto, PokemonRichiesto
 import core_engine
 import plan_evaluator
 
+
+# --- Classe AutocompleteCombobox ---
+# Basata sulla soluzione di Mitja Martini e Russell Adams, adattata da ttkwidgets.
+# Fonte: https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.html
+class AutocompleteCombobox(ttk.Combobox):
+    """
+    Un ttk.Combobox con funzionalità di autocompletamento.
+    Gestisce la selezione, il completamento del testo e la navigazione
+    in modo robusto.
+    """
+    def set_completion_list(self, completion_list):
+        """Imposta la lista di valori per l'autocompletamento."""
+        self._completion_list = sorted(completion_list, key=str.lower)
+        self._hits = []
+        self._hit_index = 0
+        self.position = 0
+        self.bind('<KeyRelease>', self.handle_keyrelease)
+        self['values'] = self._completion_list
+
+    def autocomplete(self, delta=0):
+        """
+        Esegue l'autocompletamento e scorre tra i suggerimenti.
+        delta: 0 per il primo suggerimento, 1 per il successivo, -1 per il precedente.
+        """
+        if delta:
+            self.delete(self.position, tk.END)
+        else:
+            self.position = len(self.get())
+
+        _hits = []
+        for element in self._completion_list:
+            if element.lower().startswith(self.get().lower()):
+                _hits.append(element)
+
+        if _hits != self._hits:
+            self._hit_index = 0
+            self._hits = _hits
+
+        if _hits:
+            self._hit_index = (self._hit_index + delta) % len(self._hits)
+            self.delete(0, tk.END)
+            self.insert(0, self._hits[self._hit_index])
+            self.select_range(self.position, tk.END)
+
+    def handle_keyrelease(self, event):
+        """Gestisce l'evento di rilascio di un tasto in modo intelligente."""
+
+        if event.keysym in ("Up", "Down"):
+            self.autocomplete(delta=1 if event.keysym == "Down" else -1)
+            return
+
+        if event.keysym == "BackSpace":
+            self.delete(self.index(tk.INSERT) -1, tk.END)
+            self.position = self.index(tk.END)
+
+        if len(event.keysym) == 1:
+            self.autocomplete()
+
+
 class BreedingToolApp(tk.Tk):
     """
     Interfaccia grafica per lo strumento di pianificazione del breeding di PokeMMO.
@@ -20,9 +79,9 @@ class BreedingToolApp(tk.Tk):
         # --- Caricamento Dati ---
         self.pokemon_names = []
         self.natures = [
-            "Nessuna", "Adamant", "Modest", "Jolly", "Timid", "Bold", "Calm", 
-            "Impish", "Careful", "Brave", "Quiet", "Rash", "Mild", "Hasty", 
-            "Serious", "Docile", "Hardy", "Bashful", "Quirky", "Lonely", 
+            "Nessuna", "Adamant", "Modest", "Jolly", "Timid", "Bold", "Calm",
+            "Impish", "Careful", "Brave", "Quiet", "Rash", "Mild", "Hasty",
+            "Serious", "Docile", "Hardy", "Bashful", "Quirky", "Lonely",
             "Naughty", "Gentle", "Lax", "Relaxed", "Sassy"
         ]
         self.stats = ["PS", "Attacco", "Difesa", "Attacco Speciale", "Difesa Speciale", "Velocità"]
@@ -76,7 +135,7 @@ class BreedingToolApp(tk.Tk):
 
         # --- Sezione Pokémon Posseduti ---
         self._create_owned_section(left_frame)
-        
+
         # --- Sezione Azioni ---
         self._create_actions_section(left_frame)
 
@@ -91,9 +150,9 @@ class BreedingToolApp(tk.Tk):
 
         # Specie
         ttk.Label(target_frame, text="Specie:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
-        target_combo = ttk.Combobox(target_frame, textvariable=self.target_species_var, values=self.pokemon_names)
+        target_combo = AutocompleteCombobox(target_frame, textvariable=self.target_species_var)
+        target_combo.set_completion_list(self.pokemon_names)
         target_combo.grid(row=0, column=1, sticky="ew", padx=5, pady=2)
-        target_combo.bind('<KeyRelease>', self._update_autocomplete)
 
         # IVs
         ttk.Label(target_frame, text="IVs Desiderate:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
@@ -119,9 +178,9 @@ class BreedingToolApp(tk.Tk):
         add_form.columnconfigure(1, weight=1)
 
         ttk.Label(add_form, text="Specie:").grid(row=0, column=0, sticky="w")
-        owned_combo = ttk.Combobox(add_form, textvariable=self.owned_species_var, values=self.pokemon_names)
+        owned_combo = AutocompleteCombobox(add_form, textvariable=self.owned_species_var)
+        owned_combo.set_completion_list(self.pokemon_names)
         owned_combo.grid(row=0, column=1, columnspan=2, sticky="ew", pady=2)
-        owned_combo.bind('<KeyRelease>', self._update_autocomplete)
 
         ttk.Label(add_form, text="IVs:").grid(row=1, column=0, sticky="w")
         owned_iv_frame = ttk.Frame(add_form)
@@ -149,7 +208,7 @@ class BreedingToolApp(tk.Tk):
         self.owned_pokemon_tree.column("Specie", width=100)
         self.owned_pokemon_tree.column("IVs", width=200)
         self.owned_pokemon_tree.column("Natura", width=100)
-        
+
         scrollbar = ttk.Scrollbar(list_frame, orient="vertical", command=self.owned_pokemon_tree.yview)
         self.owned_pokemon_tree.configure(yscrollcommand=scrollbar.set)
 
@@ -169,7 +228,7 @@ class BreedingToolApp(tk.Tk):
 
         ttk.Button(actions_frame, text="Genera e Valuta Piani", command=self._run_evaluation).grid(row=0, column=0, padx=5, sticky="ew")
         ttk.Button(actions_frame, text="Reset", command=self._reset_all).grid(row=0, column=1, padx=5, sticky="ew")
-        
+
     def _create_results_section(self, parent):
         """Crea la sezione dei risultati con le schede."""
         results_notebook = ttk.Notebook(parent)
@@ -215,7 +274,7 @@ class BreedingToolApp(tk.Tk):
         natura = self.owned_nature_var.get()
         if natura == "Nessuna":
             natura = None
-            
+
         pokemon_id = str(uuid.uuid4())
 
         new_pokemon = PokemonPosseduto(id_utente=pokemon_id, specie=specie, ivs=ivs, natura=natura)
@@ -241,14 +300,14 @@ class BreedingToolApp(tk.Tk):
             # L'item_id della treeview è l'id_utente che abbiamo impostato
             self.owned_pokemon_list = [p for p in self.owned_pokemon_list if p.id_utente != item_id]
             self.owned_pokemon_tree.delete(item_id)
-            
+
     def _run_evaluation(self):
         """Esegue la generazione e la valutazione dei piani."""
         target_ivs = [stat for stat, var in self.target_ivs_vars.items() if var.get()]
         target_nature = self.target_nature_var.get()
         if target_nature == "Nessuna":
             target_nature = None
-        
+
         if len(target_ivs) < 2:
             messagebox.showerror("Errore Target", "Seleziona almeno 2 IVs per il Pokémon target.")
             return
@@ -266,7 +325,7 @@ class BreedingToolApp(tk.Tk):
             messagebox.showerror("Errore Engine", f"Si è verificato un errore durante la generazione dei piani:\n{e}")
             self._clear_results()
             return
-            
+
         if not piani_generati:
             messagebox.showinfo("Nessun Piano", f"Nessun piano di breeding trovato per la configurazione richiesta ({len(target_ivs)}IV).")
             self._clear_results()
@@ -291,10 +350,10 @@ class BreedingToolApp(tk.Tk):
     def _display_text_plan(self, piano_valutato: plan_evaluator.PianoValutato):
         """Formatta e visualizza il piano testuale."""
         self.results_text.config(state="normal")
-        
+
         piano = piano_valutato.piano_originale
         legenda = piano.legenda_ruoli
-        
+
         output = []
         output.append(f"--- PIANO DI BREEDING OTTIMALE (Punteggio: {piano_valutato.punteggio:.2f}) ---\n")
         output.append("Legenda Statistiche:\n")
@@ -308,7 +367,7 @@ class BreedingToolApp(tk.Tk):
                 gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
                 gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
                 figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, {}, {}).replace('\n', ' ')
-                
+
                 output.append(f"  {gen1_str:<45} + {gen2_str:<45} -> {figlio_str}\n")
 
         self.results_text.insert("1.0", "".join(output))
@@ -317,7 +376,7 @@ class BreedingToolApp(tk.Tk):
     def _display_tree_plan(self, piano_valutato: plan_evaluator.PianoValutato):
         """Disegna l'albero genealogico del piano di breeding sul canvas."""
         self.update_idletasks()
-        
+
         piano = piano_valutato.piano_originale
         assegnazioni = piano_valutato.mappa_assegnazioni
         owned_pokemon_map = {p.id_utente: p for p in self.owned_pokemon_list}
@@ -329,15 +388,15 @@ class BreedingToolApp(tk.Tk):
                 child_to_parents_map[child_id] = (acc.genitore1, acc.genitore2)
 
         final_target = piano.livelli[-1].accoppiamenti[0].figlio
-        
+
         self.node_widths = {}
         self._calculate_node_widths(final_target, child_to_parents_map, assegnazioni)
-        
+
         total_width = self.node_widths.get(id(final_target), 120)
         start_x = total_width / 2 + 50 # Aggiunge un margine a sinistra
-        
+
         self._draw_node(final_target, start_x, 50, child_to_parents_map, assegnazioni, owned_pokemon_map, piano.legenda_ruoli)
-        
+
         bbox = self.results_canvas.bbox("all")
         if bbox:
             # La regione di scorrimento parte da 0 e si estende a tutta la larghezza calcolata
@@ -354,9 +413,9 @@ class BreedingToolApp(tk.Tk):
         else:
             iv_names = sorted([legenda.get(r, r) for r in node.ruoli_iv])
             natura_name = legenda.get(node.ruolo_natura)
-            
+
             iv_str = ", ".join(iv_names)
-            if len(iv_str) > 18: 
+            if len(iv_str) > 18:
                 parts = iv_str.split(", ")
                 mid = (len(parts) + 1) // 2
                 iv_str = ", ".join(parts[:mid]) + ",\n" + ", ".join(parts[mid:])
@@ -385,7 +444,7 @@ class BreedingToolApp(tk.Tk):
         genitore1, genitore2 = child_to_parents_map[node_id]
         width1 = self._calculate_node_widths(genitore1, child_to_parents_map, assegnazioni)
         width2 = self._calculate_node_widths(genitore2, child_to_parents_map, assegnazioni)
-        
+
         # La larghezza totale è la somma delle larghezze dei figli più lo spazio tra loro
         total_width = width1 + width2 + h_spacing
         self.node_widths[node_id] = total_width
@@ -397,9 +456,9 @@ class BreedingToolApp(tk.Tk):
         node_width, node_height = 120, 50
         v_spacing = 90
         h_spacing = 30 # Spazio orizzontale tra i nodi figli
-        
+
         is_owned = node_id in assegnazioni
-        
+
         # Disegna il riquadro e il testo
         fill_color = "#90EE90" if is_owned else "#ADD8E6"
         outline_color = "#006400" if is_owned else "#00008B"
@@ -410,12 +469,12 @@ class BreedingToolApp(tk.Tk):
         # Ricorsione per i genitori (ora disegnati sotto)
         if not is_owned and node_id in child_to_parents_map:
             genitore1, genitore2 = child_to_parents_map[node_id]
-            
+
             width1 = self.node_widths.get(id(genitore1), node_width)
             width2 = self.node_widths.get(id(genitore2), node_width)
-            
+
             new_y = y + v_spacing
-            
+
             # --- FIX: Logica di posizionamento robusta ---
             # Calcola il punto di partenza del primo figlio
             start_x1 = x - (width1 + width2 + h_spacing) / 2
@@ -438,72 +497,6 @@ class BreedingToolApp(tk.Tk):
         self.results_text.delete("1.0", tk.END)
         self.results_text.config(state="disabled")
 
-    def _update_autocomplete(self, event):
-        """
-        Filtra la lista di un Combobox, completa il testo e seleziona
-        la parte completata. Collegato all'evento <KeyRelease>.
-        """
-        widget = event.widget
-
-        # Se l'utente preme BackSpace, vogliamo solo filtrare la lista, non autocompletare.
-        if event.keysym == "BackSpace":
-            # Usiamo after per assicurarci che il testo del widget sia già aggiornato
-            widget.after(10, self._filter_list, widget)
-            return
-
-        # Ignora altri tasti di navigazione
-        if event.keysym in ("Up", "Down", "Left", "Right", "Return", "Escape", "Tab"):
-            return
-
-        # Anche qui, usiamo 'after' per lavorare con il testo aggiornato dopo l'evento
-        widget.after(10, self._perform_autocomplete, widget)
-
-    def _filter_list(self, widget):
-        """Aggiorna solo la lista dei valori senza autocompletare il testo."""
-        typed_text = widget.get()
-        if typed_text:
-            filtered_list = [name for name in self.pokemon_names if name.lower().startswith(typed_text.lower())]
-            widget['values'] = filtered_list if filtered_list else self.pokemon_names
-        else:
-            widget['values'] = self.pokemon_names
-
-        # Mostra la lista aggiornata
-        widget.event_generate('<Down>')
-        # Forza il focus a tornare sul widget di input
-        widget.focus_set()
-
-    def _perform_autocomplete(self, widget):
-        """Esegue l'autocompletamento del testo e aggiorna la lista."""
-        typed_text = widget.get()
-
-        if not typed_text:
-            widget['values'] = self.pokemon_names
-            return
-
-        # Filtra la lista
-        filtered_list = [name for name in self.pokemon_names if name.lower().startswith(typed_text.lower())]
-
-        if filtered_list:
-            # C'è almeno una corrispondenza
-            completion = filtered_list[0]
-            widget['values'] = filtered_list
-
-            # Imposta il testo completato
-            widget.set(completion)
-
-            # Seleziona la parte di testo che è stata autocompletata
-            widget.icursor(len(typed_text))
-            widget.selection_range(len(typed_text), 'end')
-
-            # Apre il menu a tendina per mostrare i suggerimenti
-            widget.event_generate('<Down>')
-            # Forza il focus a tornare sul widget di input
-            widget.focus_set()
-        else:
-            # Nessuna corrispondenza, resetta la lista
-            widget['values'] = self.pokemon_names
-
-
     def _reset_all(self):
         """Resetta tutti gli input e i risultati."""
         self.target_species_var.set("")
@@ -515,13 +508,13 @@ class BreedingToolApp(tk.Tk):
         for var in self.owned_ivs_vars.values():
             var.set(False)
         self.owned_nature_var.set("Nessuna")
-        
+
         for item in self.owned_pokemon_tree.get_children():
             self.owned_pokemon_tree.delete(item)
         self.owned_pokemon_list.clear()
 
         self._clear_results()
-        
+
         messagebox.showinfo("Reset", "Tutti i campi sono stati resettati.")
 
 
