@@ -63,6 +63,7 @@ class PianoValutato:
     """Contiene un piano generato e i risultati della sua valutazione."""
     piano_originale: PianoCompleto
     punteggio: float = 0.0
+    costo_totale: int = 0
     pokemon_usati: Set[str] = field(default_factory=set)
     # --- CORREZIONE CHIAVE ---
     # La mappa ora usa l'ID di memoria dell'oggetto PokemonRichiesto come chiave

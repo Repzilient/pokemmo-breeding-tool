@@ -7,6 +7,7 @@ import uuid
 from structures import PokemonPosseduto, PokemonRichiesto
 import core_engine
 import plan_evaluator
+from price_manager import PriceManager
 
 
 # --- Classe AutocompleteCombobox ---
@@ -78,6 +79,8 @@ class BreedingToolApp(tk.Tk):
 
         # --- Caricamento Dati ---
         self.pokemon_names = []
+        self.egg_groups_list = []
+        self.pokemon_data = {} # To map Name -> Egg Groups
         self.natures = [
             "Nessuna", "Adamant", "Modest", "Jolly", "Timid", "Bold", "Calm",
             "Impish", "Careful", "Brave", "Quiet", "Rash", "Mild", "Hasty",
@@ -86,6 +89,9 @@ class BreedingToolApp(tk.Tk):
         ]
         self.stats = ["PS", "Attacco", "Difesa", "Attacco Speciale", "Difesa Speciale", "Velocità"]
         self._load_pokemon_data()
+
+        # --- Price Manager ---
+        self.price_manager = PriceManager()
 
         # --- Variabili di stato ---
         self.owned_pokemon_list = []
@@ -96,6 +102,16 @@ class BreedingToolApp(tk.Tk):
         self.target_species_var = tk.StringVar()
         self.owned_species_var = tk.StringVar()
 
+        # --- Price Tab Variables ---
+        self.price_category_var = tk.StringVar(value="Specie")
+        self.price_name_var = tk.StringVar()
+        self.price_gender_var = tk.StringVar(value="M")
+
+        self.price_1iv_var = tk.IntVar(value=0)
+        self.price_nature_var = tk.IntVar(value=0)
+        self.price_1iv_nature_var = tk.IntVar(value=0)
+        self.price_base_var = tk.IntVar(value=0)
+
         # --- Creazione dell'interfaccia ---
         self._create_widgets()
 
@@ -104,7 +120,15 @@ class BreedingToolApp(tk.Tk):
         try:
             with open('pokemon_data.json', 'r', encoding='utf-8') as f:
                 data = json.load(f)
+                self.pokemon_data = data
                 self.pokemon_names = sorted(data.keys())
+
+                # Extract unique egg groups
+                groups = set()
+                for g_list in data.values():
+                    groups.update(g_list)
+                self.egg_groups_list = sorted(list(groups))
+
         except FileNotFoundError:
             messagebox.showerror("Errore", "File 'pokemon_data.json' non trovato. Assicurati che sia nella stessa cartella.")
             self.destroy()
@@ -114,11 +138,22 @@ class BreedingToolApp(tk.Tk):
 
     def _create_widgets(self):
         """Crea e organizza tutti i widget dell'interfaccia."""
-        main_frame = ttk.Frame(self, padding="10")
-        main_frame.grid(row=0, column=0, sticky="nsew")
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+        # Main Tab Control
+        tab_control = ttk.Notebook(self)
+        tab_control.pack(expand=1, fill="both")
 
+        # Tab 1: Planner
+        planner_tab = ttk.Frame(tab_control)
+        tab_control.add(planner_tab, text="Pianificatore")
+
+        # Tab 2: Prices
+        price_tab = ttk.Frame(tab_control)
+        tab_control.add(price_tab, text="Listino Prezzi")
+
+        self._create_planner_tab(planner_tab)
+        self._create_price_tab(price_tab)
+
+    def _create_planner_tab(self, main_frame):
         # --- Frame Sinistro: Input ---
         left_frame = ttk.Frame(main_frame, padding="10")
         left_frame.grid(row=0, column=0, sticky="ns", padx=(0, 10))
@@ -141,6 +176,106 @@ class BreedingToolApp(tk.Tk):
 
         # --- Sezione Risultati ---
         self._create_results_section(right_frame)
+
+    def _create_price_tab(self, parent):
+        # Container
+        container = ttk.Frame(parent, padding="20")
+        container.pack(fill="both", expand=True)
+
+        # --- Selection Frame ---
+        sel_frame = ttk.LabelFrame(container, text="Seleziona Categoria e Nome", padding="10")
+        sel_frame.pack(fill="x", pady=10)
+
+        # Category
+        ttk.Label(sel_frame, text="Categoria:").grid(row=0, column=0, sticky="w", padx=5)
+        cat_cb = ttk.Combobox(sel_frame, textvariable=self.price_category_var, values=["Specie", "EggGroup", "Ditto"], state="readonly")
+        cat_cb.grid(row=0, column=1, sticky="ew", padx=5)
+        cat_cb.bind("<<ComboboxSelected>>", self._on_price_category_change)
+
+        # Name
+        ttk.Label(sel_frame, text="Nome:").grid(row=0, column=2, sticky="w", padx=5)
+        self.price_name_combo = AutocompleteCombobox(sel_frame, textvariable=self.price_name_var)
+        self.price_name_combo.grid(row=0, column=3, sticky="ew", padx=5)
+        self._update_price_name_list()
+        self.price_name_combo.bind("<<ComboboxSelected>>", self._load_current_price)
+
+        # Gender
+        ttk.Label(sel_frame, text="Sesso:").grid(row=0, column=4, sticky="w", padx=5)
+        self.gender_cb = ttk.Combobox(sel_frame, textvariable=self.price_gender_var, values=["M", "F", "X"], state="readonly", width=5)
+        self.gender_cb.grid(row=0, column=5, sticky="ew", padx=5)
+        self.gender_cb.bind("<<ComboboxSelected>>", self._load_current_price)
+
+        # --- Prices Input Frame ---
+        input_frame = ttk.LabelFrame(container, text="Inserisci Prezzi ($)", padding="10")
+        input_frame.pack(fill="x", pady=10)
+
+        ttk.Label(input_frame, text="1 IV (31):").grid(row=0, column=0, sticky="e", padx=5, pady=5)
+        ttk.Entry(input_frame, textvariable=self.price_1iv_var).grid(row=0, column=1, sticky="w", padx=5)
+
+        ttk.Label(input_frame, text="Solo Natura:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
+        ttk.Entry(input_frame, textvariable=self.price_nature_var).grid(row=1, column=1, sticky="w", padx=5)
+
+        ttk.Label(input_frame, text="1 IV + Natura:").grid(row=2, column=0, sticky="e", padx=5, pady=5)
+        ttk.Entry(input_frame, textvariable=self.price_1iv_nature_var).grid(row=2, column=1, sticky="w", padx=5)
+
+        ttk.Label(input_frame, text="Base (Trash):").grid(row=3, column=0, sticky="e", padx=5, pady=5)
+        ttk.Entry(input_frame, textvariable=self.price_base_var).grid(row=3, column=1, sticky="w", padx=5)
+
+        # Save Button
+        ttk.Button(container, text="Salva Prezzi", command=self._save_current_price).pack(pady=20)
+
+        # Load Button (To refresh fields if typed manually)
+        ttk.Button(container, text="Carica Prezzi Esistenti", command=self._load_current_price).pack(pady=5)
+
+    def _on_price_category_change(self, event):
+        self._update_price_name_list()
+        self.price_name_var.set("")
+        if self.price_category_var.get() == "Ditto":
+            self.price_name_var.set("Ditto")
+            self.price_gender_var.set("X")
+            self.gender_cb.config(state="disabled")
+        else:
+            self.gender_cb.config(state="readonly")
+            self.price_gender_var.set("M") # Default
+
+    def _update_price_name_list(self):
+        cat = self.price_category_var.get()
+        if cat == "Specie":
+            self.price_name_combo.set_completion_list(self.pokemon_names)
+        elif cat == "EggGroup":
+            self.price_name_combo.set_completion_list(self.egg_groups_list)
+        elif cat == "Ditto":
+            self.price_name_combo.set_completion_list(["Ditto"])
+
+    def _load_current_price(self, event=None):
+        cat = self.price_category_var.get()
+        name = self.price_name_var.get()
+        gender = self.price_gender_var.get()
+
+        if not name: return
+
+        prices = self.price_manager.get_all_prices_for(cat, name, gender)
+
+        self.price_1iv_var.set(prices.get("1IV", 0))
+        self.price_nature_var.set(prices.get("Solo Natura", 0))
+        self.price_1iv_nature_var.set(prices.get("1IV + Natura", 0))
+        self.price_base_var.set(prices.get("Base", 0))
+
+    def _save_current_price(self):
+        cat = self.price_category_var.get()
+        name = self.price_name_var.get()
+        gender = self.price_gender_var.get()
+
+        if not name:
+             messagebox.showwarning("Errore", "Inserisci un nome valido.")
+             return
+
+        self.price_manager.set_price(cat, name, gender, "1IV", self.price_1iv_var.get())
+        self.price_manager.set_price(cat, name, gender, "Solo Natura", self.price_nature_var.get())
+        self.price_manager.set_price(cat, name, gender, "1IV + Natura", self.price_1iv_nature_var.get())
+        self.price_manager.set_price(cat, name, gender, "Base", self.price_base_var.get())
+
+        messagebox.showinfo("Successo", f"Prezzi salvati per {name} ({gender})")
 
     def _create_target_section(self, parent):
         """Crea la sezione per definire il Pokémon target."""
@@ -308,6 +443,11 @@ class BreedingToolApp(tk.Tk):
         if target_nature == "Nessuna":
             target_nature = None
 
+        target_species = self.target_species_var.get()
+        if not target_species or target_species not in self.pokemon_names:
+             messagebox.showerror("Errore Target", "Seleziona una specie valida per il Pokémon target.")
+             return
+
         if len(target_ivs) < 2:
             messagebox.showerror("Errore Target", "Seleziona almeno 2 IVs per il Pokémon target.")
             return
@@ -332,7 +472,14 @@ class BreedingToolApp(tk.Tk):
             return
 
         try:
-            piani_valutati = plan_evaluator.valuta_piani(piani_generati, self.owned_pokemon_list)
+            piani_valutati = plan_evaluator.valuta_piani(
+                piani_generati,
+                self.owned_pokemon_list,
+                self.price_manager,
+                target_species,
+                self.pokemon_data,
+                target_nature
+            )
         except Exception as e:
             messagebox.showerror("Errore Valutatore", f"Si è verificato un errore durante la valutazione dei piani:\n{e}")
             self._clear_results()
@@ -353,9 +500,16 @@ class BreedingToolApp(tk.Tk):
 
         piano = piano_valutato.piano_originale
         legenda = piano.legenda_ruoli
+        costo = piano_valutato.costo_totale
 
         output = []
         output.append(f"--- PIANO DI BREEDING OTTIMALE (Punteggio: {piano_valutato.punteggio:.2f}) ---\n")
+
+        cost_str = f"{costo:,}".replace(",", ".")
+        if costo >= 999999:
+             cost_str = "NON CALCOLABILE (Mancano prezzi)"
+
+        output.append(f"COSTO TOTALE STIMATO: ${cost_str}\n")
         output.append("Legenda Statistiche:\n")
         for ruolo, stat in legenda.items():
             output.append(f"  - {ruolo}: {stat}\n")
