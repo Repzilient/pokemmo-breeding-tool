@@ -364,9 +364,14 @@ class BreedingToolApp(tk.Tk):
         for livello in piano.livelli:
             output.append(f"\n--- Livello {livello.livello_id} ---\n")
             for acc in livello.accoppiamenti:
-                gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
-                gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
-                figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, {}, {}).replace('\n', ' ')
+                # Updated lookup to use SlotID
+                acc_id = id(acc)
+                gen1_slot_id = f"{acc_id}_1"
+                gen2_slot_id = f"{acc_id}_2"
+
+                gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}, gen1_slot_id).replace('\n', ' ')
+                gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}, gen2_slot_id).replace('\n', ' ')
+                figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, {}, {}, None).replace('\n', ' ')
 
                 output.append(f"  {gen1_str:<45} + {gen2_str:<45} -> {figlio_str}\n")
 
@@ -381,32 +386,70 @@ class BreedingToolApp(tk.Tk):
         assegnazioni = piano_valutato.mappa_assegnazioni
         owned_pokemon_map = {p.id_utente: p for p in self.owned_pokemon_list}
 
-        child_to_parents_map = {}
+        # child_to_parents_map needs to track which SLOT produced the parent?
+        # No, child_to_parents_map here maps child_id -> (genitore1, genitore2) OBJECTS.
+        # But we also need to pass the Coupling ID down the tree to generate Slot IDs for the parents.
+
+        # We need a map: id(child_obj) -> (acc_id, genitore1, genitore2)
+        child_to_coupling_map = {}
         for livello in piano.livelli:
             for acc in livello.accoppiamenti:
                 child_id = id(acc.figlio)
-                child_to_parents_map[child_id] = (acc.genitore1, acc.genitore2)
+                child_to_coupling_map[child_id] = acc
 
         final_target = piano.livelli[-1].accoppiamenti[0].figlio
 
         self.node_widths = {}
-        self._calculate_node_widths(final_target, child_to_parents_map, assegnazioni)
+        self._calculate_node_widths(final_target, child_to_coupling_map, assegnazioni) # Note: this uses simplistic width calc which might need update if we check assignments properly?
+        # Width calc uses 'is_owned' or 'not in child_to_parents_map'.
+        # is_owned check needs SlotID. But we are at Child level.
+        # The child is never "assigned" (it is produced). Assignments are on PARENTS.
+        # Wait, if I own the intermediate child, I assign it to the parent slot of the next level.
+        # But here we are drawing the tree of OBJECTS.
+
+        # The GUI draws the tree of *Objects*.
+        # An object might be assigned in one slot but not another (if reused).
+        # But typically intermediate objects are distinct.
+        # The assignments are on the INPUTS (parents).
+
+        # When drawing a node, we draw the Object.
+        # If this Object is a Parent in some coupling, did we assign a Pokemon to it?
+        # But a Node in the tree is just an Object.
+        # In the visual tree, a Node has parents.
+        # The Node itself is the "Child" of the connections below it.
+        # And it is the "Parent" of the connection above it.
+
+        # The assignments are relevant when the Node acts as a Parent.
+        # But the tree drawing is top-down (Target -> Parents).
+        # When we draw a Node, we want to know if *we have it*.
+        # If we have it, we display "Use your X".
+
+        # But we assign it to a specific SLOT.
+        # If 'acc' produces 'figlio'. 'figlio' is used in 'parent_acc' as 'genitoreX'.
+        # So we need to know the 'parent_acc' and 'side' where this node is used.
+        # But the recursive function `_draw_node` receives the `node`.
+        # It needs to know which SlotID this `node` corresponds to *in the context of its parent in the tree*.
+
+        # `_draw_node` is called by `_draw_node` (recursive).
+        # We can pass `slot_id` to `_draw_node`.
+
+        # Initial call: `final_target`. It is the root. No slot ID (it's the result).
 
         total_width = self.node_widths.get(id(final_target), 120)
-        start_x = total_width / 2 + 50 # Aggiunge un margine a sinistra
+        start_x = total_width / 2 + 50
 
-        self._draw_node(final_target, start_x, 50, child_to_parents_map, assegnazioni, owned_pokemon_map, piano.legenda_ruoli)
+        # We pass None as slot_id for the root.
+        self._draw_node(final_target, start_x, 50, child_to_coupling_map, assegnazioni, owned_pokemon_map, piano.legenda_ruoli, None)
 
         bbox = self.results_canvas.bbox("all")
         if bbox:
-            # La regione di scorrimento parte da 0 e si estende a tutta la larghezza calcolata
             self.results_canvas.config(scrollregion=(0, 0, total_width + 100, bbox[3] + 50))
 
-    def _get_node_text(self, node, legenda, assegnazioni, owned_map):
+    def _get_node_text(self, node, legenda, assegnazioni, owned_map, slot_id):
         """Crea il testo formattato per un nodo, traducendo i ruoli in nomi di statistiche."""
-        node_id = id(node)
-        if node_id in assegnazioni:
-            posseduto = owned_map[assegnazioni[node_id]]
+        # Check assignment using SlotID
+        if slot_id and slot_id in assegnazioni:
+            posseduto = owned_map[assegnazioni[slot_id]]
             iv_str = ", ".join(posseduto.ivs)
             natura_str = f"\n+ {posseduto.natura}" if posseduto.natura else ""
             return f"✔ Usa tuo {posseduto.specie}\n[{iv_str}]{natura_str}"
@@ -425,70 +468,89 @@ class BreedingToolApp(tk.Tk):
             else:
                 return f"{iv_str}\n[{len(iv_names)}IV]"
 
-    def _calculate_node_widths(self, node, child_to_parents_map, assegnazioni):
+    def _calculate_node_widths(self, node, child_to_coupling_map, assegnazioni):
         """Passata 1: Calcola ricorsivamente la larghezza necessaria per ogni sotto-albero."""
         node_id = id(node)
+        # Note: We can't easily check assignment here without context (slot_id).
+        # But width calculation mainly depends on whether we expand children or not.
+        # We assume we expand if it has parents (is produced by coupling).
+        # UNLESS we have it assigned?
+        # But we can be assigned to it in multiple places if reused.
+        # Assuming for width calc we just check if it has producers.
+
+        # If we want to collapse the tree when we own the pokemon, we need the slot_id context.
+        # But width calc is cached by node_id.
+        # If the same node is used in two places (one assigned, one not), it has different widths?
+        # Yes.
+        # So caching by node_id is WRONG if we support context-sensitive width.
+        # But for now let's just assume full expansion or update this later.
+
+        # Ideally, we traverse with context.
+        # But `_calculate_node_widths` needs to return width.
+        # Let's ignore "stop if owned" optimization for width for now, or just check if it has producers.
+
         node_width = 120
-        h_spacing = 30 # Spazio orizzontale tra i nodi figli
+        h_spacing = 30
 
-        is_owned = node_id in assegnazioni
-        # Se un nodo è posseduto o è una foglia (non ha genitori nel piano), la sua larghezza è fissa.
-        if is_owned or node_id not in child_to_parents_map:
-            self.node_widths[node_id] = node_width
-            return node_width
+        if node_id not in child_to_coupling_map:
+             self.node_widths[node_id] = node_width
+             return node_width
 
-        # Se il valore è già stato calcolato, restituiscilo
-        if node_id in self.node_widths:
-            return self.node_widths[node_id]
+        # If we have producers, we recurse.
+        acc = child_to_coupling_map[node_id]
+        genitore1 = acc.genitore1
+        genitore2 = acc.genitore2
 
-        genitore1, genitore2 = child_to_parents_map[node_id]
-        width1 = self._calculate_node_widths(genitore1, child_to_parents_map, assegnazioni)
-        width2 = self._calculate_node_widths(genitore2, child_to_parents_map, assegnazioni)
+        width1 = self._calculate_node_widths(genitore1, child_to_coupling_map, assegnazioni)
+        width2 = self._calculate_node_widths(genitore2, child_to_coupling_map, assegnazioni)
 
-        # La larghezza totale è la somma delle larghezze dei figli più lo spazio tra loro
         total_width = width1 + width2 + h_spacing
         self.node_widths[node_id] = total_width
         return total_width
 
-    def _draw_node(self, node, x, y, child_to_parents_map, assegnazioni, owned_map, legenda):
+    def _draw_node(self, node, x, y, child_to_coupling_map, assegnazioni, owned_map, legenda, slot_id):
         """Passata 2: Disegna ricorsivamente il nodo e i suoi figli."""
         node_id = id(node)
         node_width, node_height = 120, 50
         v_spacing = 90
-        h_spacing = 30 # Spazio orizzontale tra i nodi figli
+        h_spacing = 30
 
-        is_owned = node_id in assegnazioni
+        # Check if owned using the passed slot_id
+        is_owned = slot_id and slot_id in assegnazioni
 
         # Disegna il riquadro e il testo
         fill_color = "#90EE90" if is_owned else "#ADD8E6"
         outline_color = "#006400" if is_owned else "#00008B"
         self.results_canvas.create_rectangle(x - node_width/2, y - node_height/2, x + node_width/2, y + node_height/2, fill=fill_color, outline=outline_color, width=2)
-        text = self._get_node_text(node, legenda, assegnazioni, owned_map)
+        text = self._get_node_text(node, legenda, assegnazioni, owned_map, slot_id)
         self.results_canvas.create_text(x, y, text=text, font=("Arial", 8, "bold" if is_owned else "normal"), justify=tk.CENTER)
 
         # Ricorsione per i genitori (ora disegnati sotto)
-        if not is_owned and node_id in child_to_parents_map:
-            genitore1, genitore2 = child_to_parents_map[node_id]
+        # Stop recursion if we own the pokemon at this slot
+        if not is_owned and node_id in child_to_coupling_map:
+            acc = child_to_coupling_map[node_id]
+            genitore1 = acc.genitore1
+            genitore2 = acc.genitore2
+            acc_id = id(acc)
+
+            # Generate slot IDs for the parents
+            slot_id_1 = f"{acc_id}_1"
+            slot_id_2 = f"{acc_id}_2"
 
             width1 = self.node_widths.get(id(genitore1), node_width)
             width2 = self.node_widths.get(id(genitore2), node_width)
 
             new_y = y + v_spacing
 
-            # --- FIX: Logica di posizionamento robusta ---
-            # Calcola il punto di partenza del primo figlio
             start_x1 = x - (width1 + width2 + h_spacing) / 2
-            # Il centro del primo figlio è il suo punto di partenza + metà della sua larghezza
             x1 = start_x1 + width1 / 2
-            # Il centro del secondo figlio è la fine del primo + lo spazio + metà della sua larghezza
             x2 = start_x1 + width1 + h_spacing + width2 / 2
 
-            # Linee di collegamento
             self.results_canvas.create_line(x, y + node_height/2, x1, new_y - node_height/2, width=1.5)
             self.results_canvas.create_line(x, y + node_height/2, x2, new_y - node_height/2, width=1.5)
 
-            self._draw_node(genitore1, x1, new_y, child_to_parents_map, assegnazioni, owned_map, legenda)
-            self._draw_node(genitore2, x2, new_y, child_to_parents_map, assegnazioni, owned_map, legenda)
+            self._draw_node(genitore1, x1, new_y, child_to_coupling_map, assegnazioni, owned_map, legenda, slot_id_1)
+            self._draw_node(genitore2, x2, new_y, child_to_coupling_map, assegnazioni, owned_map, legenda, slot_id_2)
 
     def _clear_results(self):
         """Pulisce il canvas e l'area di testo dei risultati."""
