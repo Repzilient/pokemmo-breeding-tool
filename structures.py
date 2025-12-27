@@ -63,8 +63,11 @@ class PianoValutato:
     """Contiene un piano generato e i risultati della sua valutazione."""
     piano_originale: PianoCompleto
     punteggio: float = 0.0
+    costo_totale: int = 0
     pokemon_usati: Set[str] = field(default_factory=set)
     # --- CORREZIONE CHIAVE ---
     # La mappa ora usa l'ID di memoria dell'oggetto PokemonRichiesto come chiave
     # per garantire l'univocità di ogni "slot" genitore nel piano.
     mappa_assegnazioni: Dict[int, str] = field(default_factory=dict)
+    # Mappa delle decisioni di acquisto: {id_nodo: "Descrizione acquisto"}
+    mappa_acquisti: Dict[int, str] = field(default_factory=dict)

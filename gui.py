@@ -2,24 +2,18 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import json
 import uuid
+from typing import Set, List
 
 # Importa le classi e le funzioni necessarie dai file del progetto
-from structures import PokemonPosseduto, PokemonRichiesto
+from structures import PokemonPosseduto, PokemonRichiesto, PianoValutato
 import core_engine
 import plan_evaluator
+from price_manager import PriceManager
 
 
 # --- Classe AutocompleteCombobox ---
-# Basata sulla soluzione di Mitja Martini e Russell Adams, adattata da ttkwidgets.
-# Fonte: https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.html
 class AutocompleteCombobox(ttk.Combobox):
-    """
-    Un ttk.Combobox con funzionalità di autocompletamento.
-    Gestisce la selezione, il completamento del testo e la navigazione
-    in modo robusto.
-    """
     def set_completion_list(self, completion_list):
-        """Imposta la lista di valori per l'autocompletamento."""
         self._completion_list = sorted(completion_list, key=str.lower)
         self._hits = []
         self._hit_index = 0
@@ -28,10 +22,6 @@ class AutocompleteCombobox(ttk.Combobox):
         self['values'] = self._completion_list
 
     def autocomplete(self, delta=0):
-        """
-        Esegue l'autocompletamento e scorre tra i suggerimenti.
-        delta: 0 per il primo suggerimento, 1 per il successivo, -1 per il precedente.
-        """
         if delta:
             self.delete(self.position, tk.END)
         else:
@@ -53,18 +43,135 @@ class AutocompleteCombobox(ttk.Combobox):
             self.select_range(self.position, tk.END)
 
     def handle_keyrelease(self, event):
-        """Gestisce l'evento di rilascio di un tasto in modo intelligente."""
-
         if event.keysym in ("Up", "Down"):
             self.autocomplete(delta=1 if event.keysym == "Down" else -1)
             return
-
         if event.keysym == "BackSpace":
             self.delete(self.index(tk.INSERT) -1, tk.END)
             self.position = self.index(tk.END)
-
         if len(event.keysym) == 1:
             self.autocomplete()
+
+
+class PriceInputDialog(tk.Toplevel):
+    """
+    Dialog window for entering prices for specific required stats.
+    """
+    def __init__(self, parent, required_stats: Set[str], price_manager: PriceManager, on_confirm):
+        super().__init__(parent)
+        self.title("Inserimento Prezzi di Mercato")
+        self.geometry("900x600")
+        self.price_manager = price_manager
+        self.on_confirm = on_confirm
+        self.required_stats = sorted(list(required_stats))
+        self.inputs = {}
+
+        self._create_widgets()
+
+    def _create_widgets(self):
+        container = ttk.Frame(self, padding="10")
+        container.pack(fill="both", expand=True)
+
+        ttk.Label(container, text="Inserisci i prezzi per gli ingredienti mancanti ($)", font=("Arial", 12, "bold")).pack(pady=10)
+
+        # Scrollable Frame for inputs
+        canvas = tk.Canvas(container)
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # Headers
+        headers = ["Statistica / Natura", "Specie (M)", "Specie (F)", "EggGroup (M)", "EggGroup (F)", "Ditto"]
+        for col, text in enumerate(headers):
+            ttk.Label(scrollable_frame, text=text, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=5, pady=5)
+
+        # Rows
+        for i, stat in enumerate(self.required_stats):
+            row = i + 1
+            ttk.Label(scrollable_frame, text=stat).grid(row=row, column=0, padx=5, pady=5, sticky="w")
+
+            self.inputs[stat] = {}
+
+            # Specie M
+            sm = ttk.Entry(scrollable_frame, width=10)
+            sm.grid(row=row, column=1, padx=2)
+            self.inputs[stat]["Specie_M"] = sm
+
+            # Specie F
+            sf = ttk.Entry(scrollable_frame, width=10)
+            sf.grid(row=row, column=2, padx=2)
+            self.inputs[stat]["Specie_F"] = sf
+
+            # EggGroup M
+            em = ttk.Entry(scrollable_frame, width=10)
+            em.grid(row=row, column=3, padx=2)
+            self.inputs[stat]["EggGroup_M"] = em
+
+            # EggGroup F
+            ef = ttk.Entry(scrollable_frame, width=10)
+            ef.grid(row=row, column=4, padx=2)
+            self.inputs[stat]["EggGroup_F"] = ef
+
+            # Ditto
+            d = ttk.Entry(scrollable_frame, width=10)
+            d.grid(row=row, column=5, padx=2)
+            self.inputs[stat]["Ditto"] = d
+
+        # Button Frame
+        btn_frame = ttk.Frame(container)
+        btn_frame.pack(pady=20)
+
+        # Confirm Button
+        ttk.Button(btn_frame, text="Calcola Costi e Valuta", command=self._confirm).pack(side="left", padx=10)
+
+        # Skip Prices Button
+        ttk.Button(btn_frame, text="Non aggiungere prezzi", command=self._skip_prices).pack(side="left", padx=10)
+
+    def _confirm(self):
+        self.price_manager.clear()
+
+        for stat, entries in self.inputs.items():
+            try:
+                # Helper to parse int or default to infinity
+                def get_val(entry):
+                    val = entry.get().strip()
+                    if not val: return 999999999
+                    return int(val)
+
+                self.price_manager.set_price(stat, "Specie", "M", get_val(entries["Specie_M"]))
+                self.price_manager.set_price(stat, "Specie", "F", get_val(entries["Specie_F"]))
+                self.price_manager.set_price(stat, "EggGroup", "M", get_val(entries["EggGroup_M"]))
+                self.price_manager.set_price(stat, "EggGroup", "F", get_val(entries["EggGroup_F"]))
+                self.price_manager.set_price(stat, "Ditto", "X", get_val(entries["Ditto"]))
+
+            except ValueError:
+                messagebox.showerror("Errore", f"Inserisci valori numerici validi per {stat}")
+                return
+
+        self.on_confirm()
+        self.destroy()
+
+    def _skip_prices(self):
+        """Sets all prices to 0 and confirms."""
+        self.price_manager.clear()
+        for stat in self.required_stats:
+            self.price_manager.set_price(stat, "Specie", "M", 0)
+            self.price_manager.set_price(stat, "Specie", "F", 0)
+            self.price_manager.set_price(stat, "EggGroup", "M", 0)
+            self.price_manager.set_price(stat, "EggGroup", "F", 0)
+            self.price_manager.set_price(stat, "Ditto", "X", 0)
+
+        self.on_confirm()
+        self.destroy()
 
 
 class BreedingToolApp(tk.Tk):
@@ -78,6 +185,7 @@ class BreedingToolApp(tk.Tk):
 
         # --- Caricamento Dati ---
         self.pokemon_names = []
+        self.pokemon_data = {}
         self.natures = [
             "Nessuna", "Adamant", "Modest", "Jolly", "Timid", "Bold", "Calm",
             "Impish", "Careful", "Brave", "Quiet", "Rash", "Mild", "Hasty",
@@ -86,6 +194,8 @@ class BreedingToolApp(tk.Tk):
         ]
         self.stats = ["PS", "Attacco", "Difesa", "Attacco Speciale", "Difesa Speciale", "Velocità"]
         self._load_pokemon_data()
+
+        self.price_manager = PriceManager()
 
         # --- Variabili di stato ---
         self.owned_pokemon_list = []
@@ -96,83 +206,70 @@ class BreedingToolApp(tk.Tk):
         self.target_species_var = tk.StringVar()
         self.owned_species_var = tk.StringVar()
 
+        # Stored generated plans for phase 2
+        self.generated_plans_cache = []
+
         # --- Creazione dell'interfaccia ---
         self._create_widgets()
 
     def _load_pokemon_data(self):
-        """Carica i nomi dei Pokémon dal file JSON."""
         try:
             with open('pokemon_data.json', 'r', encoding='utf-8') as f:
                 data = json.load(f)
+                self.pokemon_data = data
                 self.pokemon_names = sorted(data.keys())
         except FileNotFoundError:
-            messagebox.showerror("Errore", "File 'pokemon_data.json' non trovato. Assicurati che sia nella stessa cartella.")
+            messagebox.showerror("Errore", "File 'pokemon_data.json' non trovato.")
             self.destroy()
         except json.JSONDecodeError:
             messagebox.showerror("Errore", "Il file 'pokemon_data.json' non è formattato correttamente.")
             self.destroy()
 
     def _create_widgets(self):
-        """Crea e organizza tutti i widget dell'interfaccia."""
         main_frame = ttk.Frame(self, padding="10")
         main_frame.grid(row=0, column=0, sticky="nsew")
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        # --- Frame Sinistro: Input ---
         left_frame = ttk.Frame(main_frame, padding="10")
         left_frame.grid(row=0, column=0, sticky="ns", padx=(0, 10))
         main_frame.columnconfigure(0, weight=1)
 
-        # --- Frame Destro: Risultati ---
         right_frame = ttk.Frame(main_frame, padding="10")
         right_frame.grid(row=0, column=1, sticky="nsew")
         main_frame.columnconfigure(1, weight=3)
         main_frame.rowconfigure(0, weight=1)
 
-        # --- Sezione Pokémon Target ---
         self._create_target_section(left_frame)
-
-        # --- Sezione Pokémon Posseduti ---
         self._create_owned_section(left_frame)
-
-        # --- Sezione Azioni ---
         self._create_actions_section(left_frame)
-
-        # --- Sezione Risultati ---
         self._create_results_section(right_frame)
 
     def _create_target_section(self, parent):
-        """Crea la sezione per definire il Pokémon target."""
         target_frame = ttk.LabelFrame(parent, text="Pokémon Target", padding="10")
         target_frame.grid(row=0, column=0, sticky="ew", pady=5)
         target_frame.columnconfigure(1, weight=1)
 
-        # Specie
         ttk.Label(target_frame, text="Specie:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
         target_combo = AutocompleteCombobox(target_frame, textvariable=self.target_species_var)
         target_combo.set_completion_list(self.pokemon_names)
         target_combo.grid(row=0, column=1, sticky="ew", padx=5, pady=2)
 
-        # IVs
         ttk.Label(target_frame, text="IVs Desiderate:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
         iv_frame = ttk.Frame(target_frame)
         iv_frame.grid(row=1, column=1, sticky="ew")
         for i, stat in enumerate(self.stats):
             ttk.Checkbutton(iv_frame, text=stat, variable=self.target_ivs_vars[stat]).grid(row=i//3, column=i%3, sticky="w", padx=5)
 
-        # Natura
         ttk.Label(target_frame, text="Natura:").grid(row=2, column=0, sticky="w", padx=5, pady=2)
         nature_combo = ttk.Combobox(target_frame, textvariable=self.target_nature_var, values=self.natures, state="readonly")
         nature_combo.grid(row=2, column=1, sticky="ew", padx=5, pady=2)
 
     def _create_owned_section(self, parent):
-        """Crea la sezione per aggiungere e visualizzare i Pokémon posseduti."""
         owned_frame = ttk.LabelFrame(parent, text="Pokémon Posseduti", padding="10")
         owned_frame.grid(row=1, column=0, sticky="ew", pady=5)
         owned_frame.columnconfigure(0, weight=1)
 
-        # --- Form di Aggiunta ---
         add_form = ttk.Frame(owned_frame)
         add_form.grid(row=0, column=0, sticky="ew")
         add_form.columnconfigure(1, weight=1)
@@ -194,7 +291,6 @@ class BreedingToolApp(tk.Tk):
 
         ttk.Button(add_form, text="Aggiungi Pokémon", command=self._add_owned_pokemon).grid(row=3, column=1, sticky="e", pady=10)
 
-        # --- Lista Pokémon Posseduti ---
         list_frame = ttk.Frame(owned_frame)
         list_frame.grid(row=1, column=0, sticky="nsew", pady=10)
         owned_frame.rowconfigure(1, weight=1)
@@ -204,7 +300,7 @@ class BreedingToolApp(tk.Tk):
         self.owned_pokemon_tree.heading("Specie", text="Specie")
         self.owned_pokemon_tree.heading("IVs", text="IVs")
         self.owned_pokemon_tree.heading("Natura", text="Natura")
-        self.owned_pokemon_tree.column("ID", width=0, stretch=tk.NO) # Nasconde la colonna ID
+        self.owned_pokemon_tree.column("ID", width=0, stretch=tk.NO)
         self.owned_pokemon_tree.column("Specie", width=100)
         self.owned_pokemon_tree.column("IVs", width=200)
         self.owned_pokemon_tree.column("Natura", width=100)
@@ -220,23 +316,20 @@ class BreedingToolApp(tk.Tk):
         ttk.Button(owned_frame, text="Rimuovi Selezionato", command=self._remove_owned_pokemon).grid(row=2, column=0, sticky="e", pady=5)
 
     def _create_actions_section(self, parent):
-        """Crea i bottoni per le azioni principali."""
         actions_frame = ttk.Frame(parent, padding="10")
         actions_frame.grid(row=2, column=0, sticky="ew")
         actions_frame.columnconfigure(0, weight=1)
         actions_frame.columnconfigure(1, weight=1)
 
-        ttk.Button(actions_frame, text="Genera e Valuta Piani", command=self._run_evaluation).grid(row=0, column=0, padx=5, sticky="ew")
+        ttk.Button(actions_frame, text="Genera e Valuta Piani", command=self._run_evaluation_phase_1).grid(row=0, column=0, padx=5, sticky="ew")
         ttk.Button(actions_frame, text="Reset", command=self._reset_all).grid(row=0, column=1, padx=5, sticky="ew")
 
     def _create_results_section(self, parent):
-        """Crea la sezione dei risultati con le schede."""
         results_notebook = ttk.Notebook(parent)
         results_notebook.grid(row=0, column=0, sticky="nsew")
         parent.rowconfigure(0, weight=1)
         parent.columnconfigure(0, weight=1)
 
-        # --- Scheda Albero Genealogico ---
         tree_frame = ttk.Frame(results_notebook, padding="5")
         results_notebook.add(tree_frame, text="Albero Genealogico")
         tree_frame.rowconfigure(0, weight=1)
@@ -250,7 +343,6 @@ class BreedingToolApp(tk.Tk):
         h_scroll.grid(row=1, column=0, sticky="ew")
         v_scroll.grid(row=0, column=1, sticky="ns")
 
-        # --- Scheda Piano Testuale ---
         text_frame = ttk.Frame(results_notebook, padding="5")
         results_notebook.add(text_frame, text="Piano Testuale")
         text_frame.rowconfigure(0, weight=1)
@@ -262,9 +354,7 @@ class BreedingToolApp(tk.Tk):
         self.results_text.grid(row=0, column=0, sticky="nsew")
         text_scroll.grid(row=0, column=1, sticky="ns")
 
-
     def _add_owned_pokemon(self):
-        """Aggiunge un Pokémon alla lista dei posseduti."""
         specie = self.owned_species_var.get()
         if not specie or specie not in self.pokemon_names:
             messagebox.showwarning("Input Invalido", "Seleziona una specie valida per il Pokémon.")
@@ -276,7 +366,6 @@ class BreedingToolApp(tk.Tk):
             natura = None
 
         pokemon_id = str(uuid.uuid4())
-
         new_pokemon = PokemonPosseduto(id_utente=pokemon_id, specie=specie, ivs=ivs, natura=natura)
         self.owned_pokemon_list.append(new_pokemon)
 
@@ -290,33 +379,31 @@ class BreedingToolApp(tk.Tk):
         self.owned_nature_var.set("Nessuna")
 
     def _remove_owned_pokemon(self):
-        """Rimuove il Pokémon selezionato dalla lista."""
         selected_items = self.owned_pokemon_tree.selection()
         if not selected_items:
             messagebox.showwarning("Nessuna Selezione", "Seleziona un Pokémon dalla lista per rimuoverlo.")
             return
-
         for item_id in selected_items:
-            # L'item_id della treeview è l'id_utente che abbiamo impostato
             self.owned_pokemon_list = [p for p in self.owned_pokemon_list if p.id_utente != item_id]
             self.owned_pokemon_tree.delete(item_id)
 
-    def _run_evaluation(self):
-        """Esegue la generazione e la valutazione dei piani."""
+    def _run_evaluation_phase_1(self):
+        """Generates plans and selects candidates, then opens price dialog."""
         target_ivs = [stat for stat, var in self.target_ivs_vars.items() if var.get()]
         target_nature = self.target_nature_var.get()
         if target_nature == "Nessuna":
             target_nature = None
 
+        target_species = self.target_species_var.get()
+        if not target_species or target_species not in self.pokemon_names:
+             messagebox.showerror("Errore Target", "Seleziona una specie valida per il Pokémon target.")
+             return
         if len(target_ivs) < 2:
             messagebox.showerror("Errore Target", "Seleziona almeno 2 IVs per il Pokémon target.")
             return
 
         self._clear_results()
         self.results_canvas.create_text(300, 100, text=f"Generazione piani per {len(target_ivs)}IV in corso...", font=("Arial", 12))
-        self.results_text.config(state="normal")
-        self.results_text.insert("1.0", f"Generazione piani per {len(target_ivs)}IV in corso...")
-        self.results_text.config(state="disabled")
         self.update_idletasks()
 
         try:
@@ -327,35 +414,120 @@ class BreedingToolApp(tk.Tk):
             return
 
         if not piani_generati:
-            messagebox.showinfo("Nessun Piano", f"Nessun piano di breeding trovato per la configurazione richiesta ({len(target_ivs)}IV).")
+            messagebox.showinfo("Nessun Piano", f"Nessun piano trovato.")
             self._clear_results()
             return
 
+        # Initial Evaluation (Score Only)
         try:
             piani_valutati = plan_evaluator.valuta_piani(piani_generati, self.owned_pokemon_list)
         except Exception as e:
-            messagebox.showerror("Errore Valutatore", f"Si è verificato un errore durante la valutazione dei piani:\n{e}")
+            messagebox.showerror("Errore Valutatore", f"Si è verificato un errore:\n{e}")
             self._clear_results()
             return
 
-        best_plan = piani_valutati[0]
-        self._display_plan(best_plan)
+        # Keep Top candidates (e.g. Top 20)
+        self.generated_plans_cache = piani_valutati[:20]
 
-    def _display_plan(self, piano_valutato: plan_evaluator.PianoValutato):
-        """Chiama le funzioni per visualizzare il piano in entrambe le schede."""
+        # Analyze Ingredients for Price Dialog
+        required_stats = set()
+
+        # Helper to traverse plan and find holes
+        def find_holes(plan_val):
+            holes = set()
+            piano = plan_val.piano_originale
+            mappa = plan_val.mappa_assegnazioni
+
+            # Map nodes
+            node_map = {}
+            child_to_parents = {}
+            for l in piano.livelli:
+                for acc in l.accoppiamenti:
+                    node_map[id(acc.genitore1)] = acc.genitore1
+                    node_map[id(acc.genitore2)] = acc.genitore2
+                    node_map[id(acc.figlio)] = acc.figlio
+                    child_to_parents[id(acc.figlio)] = (id(acc.genitore1), id(acc.genitore2))
+
+            def traverse(node_id):
+                if node_id in mappa:
+                    return # Owned
+
+                # Check if leaf
+                if node_id not in child_to_parents:
+                    # Is a hole
+                    node = node_map[node_id]
+                    # Get stats
+                    for r in node.ruoli_iv:
+                        stat = piano.legenda_ruoli.get(r)
+                        if stat: holes.add(stat)
+                    if node.ruolo_natura:
+                        n = piano.legenda_ruoli.get(node.ruolo_natura)
+                        if n: holes.add("Natura")
+                else:
+                    p1, p2 = child_to_parents[node_id]
+                    traverse(p1)
+                    traverse(p2)
+
+            # Start from root
+            final_node = piano.livelli[-1].accoppiamenti[0].figlio
+            traverse(id(final_node))
+            return holes
+
+        for p in self.generated_plans_cache:
+            required_stats.update(find_holes(p))
+
+        if not required_stats:
+            # No holes! All owned. Just show result.
+            self._display_plan(self.generated_plans_cache[0])
+            return
+
+        # Open Dialog
+        PriceInputDialog(self, required_stats, self.price_manager, self._run_evaluation_phase_2)
+
+    def _run_evaluation_phase_2(self):
+        """Calculates costs using entered prices and shows best result."""
+        target_species = self.target_species_var.get()
+        target_nature = self.target_nature_var.get()
+        if target_nature == "Nessuna": target_nature = None
+
+        # Re-evaluate cost for cached plans
+        for p_val in self.generated_plans_cache:
+            ev = plan_evaluator.PlanEvaluator(
+                p_val.piano_originale,
+                self.owned_pokemon_list,
+                self.price_manager,
+                target_species,
+                self.pokemon_data,
+                target_nature
+            )
+            ev._build_tree_maps()
+            ev.update_cost(p_val)
+
+        # Sort: Primary Cost (Asc), Secondary Score (Desc)
+        self.generated_plans_cache.sort(key=lambda p: p.punteggio, reverse=True) # Ensure score priority
+        self.generated_plans_cache.sort(key=lambda p: p.costo_totale) # Then sort by cost (Cheapest first)
+
+        best = self.generated_plans_cache[0]
+        self._display_plan(best)
+
+    def _display_plan(self, piano_valutato: PianoValutato):
         self._clear_results()
         self._display_tree_plan(piano_valutato)
         self._display_text_plan(piano_valutato)
 
-    def _display_text_plan(self, piano_valutato: plan_evaluator.PianoValutato):
-        """Formatta e visualizza il piano testuale."""
+    def _display_text_plan(self, piano_valutato: PianoValutato):
         self.results_text.config(state="normal")
-
         piano = piano_valutato.piano_originale
         legenda = piano.legenda_ruoli
+        costo = piano_valutato.costo_totale
 
         output = []
         output.append(f"--- PIANO DI BREEDING OTTIMALE (Punteggio: {piano_valutato.punteggio:.2f}) ---\n")
+
+        cost_str = f"{costo:,}".replace(",", ".")
+        if costo >= 999999: cost_str = "NON CALCOLABILE"
+
+        output.append(f"COSTO TOTALE STIMATO: ${cost_str}\n")
         output.append("Legenda Statistiche:\n")
         for ruolo, stat in legenda.items():
             output.append(f"  - {ruolo}: {stat}\n")
@@ -364,19 +536,17 @@ class BreedingToolApp(tk.Tk):
         for livello in piano.livelli:
             output.append(f"\n--- Livello {livello.livello_id} ---\n")
             for acc in livello.accoppiamenti:
-                gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
-                gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
-                figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, {}, {}).replace('\n', ' ')
+                gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
+                gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
+                figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, piano_valutato, {}).replace('\n', ' ')
 
                 output.append(f"  {gen1_str:<45} + {gen2_str:<45} -> {figlio_str}\n")
 
         self.results_text.insert("1.0", "".join(output))
         self.results_text.config(state="disabled")
 
-    def _display_tree_plan(self, piano_valutato: plan_evaluator.PianoValutato):
-        """Disegna l'albero genealogico del piano di breeding sul canvas."""
+    def _display_tree_plan(self, piano_valutato: PianoValutato):
         self.update_idletasks()
-
         piano = piano_valutato.piano_originale
         assegnazioni = piano_valutato.mappa_assegnazioni
         owned_pokemon_map = {p.id_utente: p for p in self.owned_pokemon_list}
@@ -388,135 +558,117 @@ class BreedingToolApp(tk.Tk):
                 child_to_parents_map[child_id] = (acc.genitore1, acc.genitore2)
 
         final_target = piano.livelli[-1].accoppiamenti[0].figlio
-
         self.node_widths = {}
         self._calculate_node_widths(final_target, child_to_parents_map, assegnazioni)
 
         total_width = self.node_widths.get(id(final_target), 120)
-        start_x = total_width / 2 + 50 # Aggiunge un margine a sinistra
+        start_x = total_width / 2 + 50
 
-        self._draw_node(final_target, start_x, 50, child_to_parents_map, assegnazioni, owned_pokemon_map, piano.legenda_ruoli)
+        self._draw_node(final_target, start_x, 50, child_to_parents_map, piano_valutato, owned_pokemon_map, piano.legenda_ruoli)
 
         bbox = self.results_canvas.bbox("all")
         if bbox:
-            # La regione di scorrimento parte da 0 e si estende a tutta la larghezza calcolata
             self.results_canvas.config(scrollregion=(0, 0, total_width + 100, bbox[3] + 50))
 
-    def _get_node_text(self, node, legenda, assegnazioni, owned_map):
-        """Crea il testo formattato per un nodo, traducendo i ruoli in nomi di statistiche."""
+    def _get_node_text(self, node, legenda, piano_valutato, owned_map):
         node_id = id(node)
-        if node_id in assegnazioni:
-            posseduto = owned_map[assegnazioni[node_id]]
+
+        # Check Owned
+        if node_id in piano_valutato.mappa_assegnazioni:
+            posseduto = owned_map[piano_valutato.mappa_assegnazioni[node_id]]
             iv_str = ", ".join(posseduto.ivs)
             natura_str = f"\n+ {posseduto.natura}" if posseduto.natura else ""
             return f"✔ Usa tuo {posseduto.specie}\n[{iv_str}]{natura_str}"
+
+        # Check Purchased
+        if node_id in piano_valutato.mappa_acquisti:
+            return f"🛒 {piano_valutato.mappa_acquisti[node_id]}"
+
+        # Standard Description
+        iv_names = sorted([legenda.get(r, r) for r in node.ruoli_iv])
+        natura_name = legenda.get(node.ruolo_natura)
+        iv_str = ", ".join(iv_names)
+        if len(iv_str) > 18:
+            parts = iv_str.split(", ")
+            mid = (len(parts) + 1) // 2
+            iv_str = ", ".join(parts[:mid]) + ",\n" + ", ".join(parts[mid:])
+        if natura_name:
+            return f"{iv_str}\n+ {natura_name}"
         else:
-            iv_names = sorted([legenda.get(r, r) for r in node.ruoli_iv])
-            natura_name = legenda.get(node.ruolo_natura)
-
-            iv_str = ", ".join(iv_names)
-            if len(iv_str) > 18:
-                parts = iv_str.split(", ")
-                mid = (len(parts) + 1) // 2
-                iv_str = ", ".join(parts[:mid]) + ",\n" + ", ".join(parts[mid:])
-
-            if natura_name:
-                return f"{iv_str}\n+ {natura_name}"
-            else:
-                return f"{iv_str}\n[{len(iv_names)}IV]"
+            return f"{iv_str}\n[{len(iv_names)}IV]"
 
     def _calculate_node_widths(self, node, child_to_parents_map, assegnazioni):
-        """Passata 1: Calcola ricorsivamente la larghezza necessaria per ogni sotto-albero."""
         node_id = id(node)
         node_width = 120
-        h_spacing = 30 # Spazio orizzontale tra i nodi figli
-
+        h_spacing = 30
         is_owned = node_id in assegnazioni
-        # Se un nodo è posseduto o è una foglia (non ha genitori nel piano), la sua larghezza è fissa.
         if is_owned or node_id not in child_to_parents_map:
             self.node_widths[node_id] = node_width
             return node_width
-
-        # Se il valore è già stato calcolato, restituiscilo
         if node_id in self.node_widths:
             return self.node_widths[node_id]
-
         genitore1, genitore2 = child_to_parents_map[node_id]
         width1 = self._calculate_node_widths(genitore1, child_to_parents_map, assegnazioni)
         width2 = self._calculate_node_widths(genitore2, child_to_parents_map, assegnazioni)
-
-        # La larghezza totale è la somma delle larghezze dei figli più lo spazio tra loro
         total_width = width1 + width2 + h_spacing
         self.node_widths[node_id] = total_width
         return total_width
 
-    def _draw_node(self, node, x, y, child_to_parents_map, assegnazioni, owned_map, legenda):
-        """Passata 2: Disegna ricorsivamente il nodo e i suoi figli."""
+    def _draw_node(self, node, x, y, child_to_parents_map, piano_valutato, owned_map, legenda):
         node_id = id(node)
         node_width, node_height = 120, 50
         v_spacing = 90
-        h_spacing = 30 # Spazio orizzontale tra i nodi figli
+        h_spacing = 30
+        is_owned = node_id in piano_valutato.mappa_assegnazioni
+        is_bought = node_id in piano_valutato.mappa_acquisti
 
-        is_owned = node_id in assegnazioni
+        fill_color = "#ADD8E6"
+        outline_color = "#00008B"
 
-        # Disegna il riquadro e il testo
-        fill_color = "#90EE90" if is_owned else "#ADD8E6"
-        outline_color = "#006400" if is_owned else "#00008B"
+        if is_owned:
+            fill_color = "#90EE90"
+            outline_color = "#006400"
+        elif is_bought:
+            fill_color = "#FFD700" # Gold for bought
+            outline_color = "#B8860B"
+
         self.results_canvas.create_rectangle(x - node_width/2, y - node_height/2, x + node_width/2, y + node_height/2, fill=fill_color, outline=outline_color, width=2)
-        text = self._get_node_text(node, legenda, assegnazioni, owned_map)
+        text = self._get_node_text(node, legenda, piano_valutato, owned_map)
         self.results_canvas.create_text(x, y, text=text, font=("Arial", 8, "bold" if is_owned else "normal"), justify=tk.CENTER)
 
-        # Ricorsione per i genitori (ora disegnati sotto)
         if not is_owned and node_id in child_to_parents_map:
             genitore1, genitore2 = child_to_parents_map[node_id]
-
             width1 = self.node_widths.get(id(genitore1), node_width)
             width2 = self.node_widths.get(id(genitore2), node_width)
-
             new_y = y + v_spacing
-
-            # --- FIX: Logica di posizionamento robusta ---
-            # Calcola il punto di partenza del primo figlio
             start_x1 = x - (width1 + width2 + h_spacing) / 2
-            # Il centro del primo figlio è il suo punto di partenza + metà della sua larghezza
             x1 = start_x1 + width1 / 2
-            # Il centro del secondo figlio è la fine del primo + lo spazio + metà della sua larghezza
             x2 = start_x1 + width1 + h_spacing + width2 / 2
-
-            # Linee di collegamento
             self.results_canvas.create_line(x, y + node_height/2, x1, new_y - node_height/2, width=1.5)
             self.results_canvas.create_line(x, y + node_height/2, x2, new_y - node_height/2, width=1.5)
-
-            self._draw_node(genitore1, x1, new_y, child_to_parents_map, assegnazioni, owned_map, legenda)
-            self._draw_node(genitore2, x2, new_y, child_to_parents_map, assegnazioni, owned_map, legenda)
+            self._draw_node(genitore1, x1, new_y, child_to_parents_map, piano_valutato, owned_map, legenda)
+            self._draw_node(genitore2, x2, new_y, child_to_parents_map, piano_valutato, owned_map, legenda)
 
     def _clear_results(self):
-        """Pulisce il canvas e l'area di testo dei risultati."""
         self.results_canvas.delete("all")
         self.results_text.config(state="normal")
         self.results_text.delete("1.0", tk.END)
         self.results_text.config(state="disabled")
 
     def _reset_all(self):
-        """Resetta tutti gli input e i risultati."""
         self.target_species_var.set("")
         for var in self.target_ivs_vars.values():
             var.set(False)
         self.target_nature_var.set("Nessuna")
-
         self.owned_species_var.set("")
         for var in self.owned_ivs_vars.values():
             var.set(False)
         self.owned_nature_var.set("Nessuna")
-
         for item in self.owned_pokemon_tree.get_children():
             self.owned_pokemon_tree.delete(item)
         self.owned_pokemon_list.clear()
-
         self._clear_results()
-
         messagebox.showinfo("Reset", "Tutti i campi sono stati resettati.")
-
 
 if __name__ == '__main__':
     app = BreedingToolApp()

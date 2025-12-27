@@ -3,31 +3,34 @@ import itertools
 from typing import List, Dict, Optional, Any, Tuple, Set
 
 from structures import PianoCompleto, PokemonRichiesto, PokemonPosseduto, PianoValutato
+from price_manager import PriceManager
 
 class PlanEvaluator:
     """
     A comprehensive and robust class to evaluate breeding plans.
-    This version correctly merges the full-tree analysis with the user-defined
-    "most efficient match" rule.
     """
 
-    def __init__(self, piano: PianoCompleto, pokemon_posseduti: List[PokemonPosseduto]):
+    def __init__(self, piano: PianoCompleto, pokemon_posseduti: List[PokemonPosseduto], price_manager: Optional[PriceManager] = None, target_species: str = "Ditto", pokemon_data: Dict = {}, target_nature: Optional[str] = None):
         self.piano = piano
         self.pokemon_posseduti = pokemon_posseduti
         self.legenda = piano.legenda_ruoli
+        self.price_manager = price_manager
+        self.target_species = target_species
+        self.pokemon_data = pokemon_data
+        self.target_nature = target_nature
         self._child_to_parents_map: Dict[int, List[int]] = {}
+        self._node_map: Dict[int, PokemonRichiesto] = {}
 
     def _build_tree_maps(self):
         """Creates a map to find the parents of any child node in the tree."""
         for livello in self.piano.livelli:
             for acc in livello.accoppiamenti:
                 self._child_to_parents_map[id(acc.figlio)] = [id(acc.genitore1), id(acc.genitore2)]
+                self._node_map[id(acc.genitore1)] = acc.genitore1
+                self._node_map[id(acc.genitore2)] = acc.genitore2
+                self._node_map[id(acc.figlio)] = acc.figlio
 
     def _is_valid_candidate(self, richiesto: PokemonRichiesto, posseduto: PokemonPosseduto) -> bool:
-        """
-        Checks if an owned Pokémon is a valid candidate for a requirement.
-        It must have AT LEAST the required IVs and the exact Nature if specified.
-        """
         ivs_reali_richieste = {self.legenda.get(r) for r in richiesto.ruoli_iv if r in self.legenda}
         if not ivs_reali_richieste.issubset(set(posseduto.ivs)):
             return False
@@ -35,54 +38,140 @@ class PlanEvaluator:
         natura_reale_richiesta = self.legenda.get(richiesto.ruolo_natura) if richiesto.ruolo_natura in self.legenda else None
         if natura_reale_richiesta is not None and posseduto.natura != natura_reale_richiesta:
             return False
-            
+
         return True
 
     def _rank_candidate(self, richiesto: PokemonRichiesto, posseduto: PokemonPosseduto) -> Tuple[int, int]:
-        """
-        Ranks a candidate's efficiency. Lower is better.
-        The primary ranking criterion is the number of "wasted" IVs.
-        """
         ivs_reali_richieste = {self.legenda.get(r) for r in richiesto.ruoli_iv if r in self.legenda}
         iv_waste = len(posseduto.ivs) - len(ivs_reali_richieste)
-        
+
         natura_reale_richiesta = self.legenda.get(richiesto.ruolo_natura) if richiesto.ruolo_natura in self.legenda else None
         nature_waste = 1 if natura_reale_richiesta is None and posseduto.natura is not None else 0
-        
+
         return (iv_waste, nature_waste)
 
     def _calcola_punteggio_match(self, richiesto: PokemonRichiesto, posseduto: PokemonPosseduto) -> float:
-        """Calculates the score for a confirmed assignment, rewarding efficiency."""
         punteggio = 10.0
         punteggio += len(richiesto.ruoli_iv) * 5.0
-        
+
         natura_reale_richiesta = self.legenda.get(richiesto.ruolo_natura) if richiesto.ruolo_natura in self.legenda else None
         if natura_reale_richiesta is not None and posseduto.natura == natura_reale_richiesta:
             punteggio += 15.0
 
         iv_waste, _ = self._rank_candidate(richiesto, posseduto)
         if iv_waste == 0:
-            punteggio += 5.0  # Higher bonus for perfect IV efficiency
+            punteggio += 5.0
         else:
-            punteggio -= iv_waste * 2.0 # Higher penalty for wasting IVs
+            punteggio -= iv_waste * 2.0
 
         return punteggio
 
+    def calculate_cost_recursive(self, node_id: int, piano_valutato: PianoValutato, is_species_mandatory: bool) -> Tuple[int, Dict[int, str]]:
+        """
+        Calculates the cost to obtain the Pokemon at node_id.
+        Returns (Cost, Decisions_Map).
+        is_species_mandatory: If True, this Pokemon MUST be the target species (Female).
+        """
+        # 1. Check if Owned
+        if node_id in piano_valutato.mappa_assegnazioni:
+            return 0, {}
+
+        node = self._node_map.get(node_id)
+        if not node:
+             return 999999, {}
+
+        # 2. Determine Requirements
+        iv_roles = node.ruoli_iv
+        nature_role = node.ruolo_natura
+
+        required_stats = [self.legenda.get(r) for r in iv_roles if r in self.legenda]
+        required_nature = self.legenda.get(nature_role) if nature_role in self.legenda else None
+
+        # 3. Base Case: Leaf Node or Hole
+        if node_id not in self._child_to_parents_map:
+            if self.price_manager is None:
+                return 999999, {}
+
+            primary_stat_key = None
+            if required_stats:
+                primary_stat_key = required_stats[0]
+            elif required_nature:
+                primary_stat_key = "Natura"
+            else:
+                primary_stat_key = "Base"
+
+            cost = 999999999
+            decision_desc = "Sconosciuto"
+
+            egg_groups = self.pokemon_data.get(self.target_species, [])
+            # Usa il primo gruppo uova se disponibile, altrimenti "Mostro"
+            group_name = egg_groups[0] if egg_groups else "EggGroup"
+
+            if is_species_mandatory:
+                # Must be Female Species
+                c = self.price_manager.get_price(primary_stat_key, "Specie", "F")
+                if c < cost:
+                    cost = c
+                    decision_desc = f"Comprare {self.target_species} ♀\n({primary_stat_key}) - ${c}"
+            else:
+                # Can be Male Specie, Male EggGroup, or Ditto
+                options = []
+
+                c_specie_m = self.price_manager.get_price(primary_stat_key, "Specie", "M")
+                options.append((c_specie_m, f"Comprare {self.target_species} ♂\n({primary_stat_key}) - ${c_specie_m}"))
+
+                c_group_m = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")
+                options.append((c_group_m, f"Comprare {group_name} ♂\n({primary_stat_key}) - ${c_group_m}"))
+
+                c_ditto = self.price_manager.get_price(primary_stat_key, "Ditto", "X")
+                options.append((c_ditto, f"Comprare Ditto\n({primary_stat_key}) - ${c_ditto}"))
+
+                # Find min
+                options.sort(key=lambda x: x[0])
+                cost, decision_desc = options[0]
+
+            return cost, {node_id: decision_desc}
+
+        # 4. Recursive Step: Breeding
+        parents = self._child_to_parents_map[node_id]
+        p1_id, p2_id = parents[0], parents[1]
+
+        fee = 20000
+        if required_nature is not None:
+             fee = 15000
+
+        # Case A: P1=Female(Species), P2=Male(Compatible)
+        cost_A1, decisions_A1 = self.calculate_cost_recursive(p1_id, piano_valutato, True)
+        cost_A2, decisions_A2 = self.calculate_cost_recursive(p2_id, piano_valutato, False)
+        total_A = cost_A1 + cost_A2
+
+        # Case B: P2=Female(Species), P1=Male(Compatible)
+        cost_B1, decisions_B1 = self.calculate_cost_recursive(p2_id, piano_valutato, True)
+        cost_B2, decisions_B2 = self.calculate_cost_recursive(p1_id, piano_valutato, False)
+        total_B = cost_B1 + cost_B2
+
+        if total_A <= total_B:
+            # Merge decisions
+            decisions = {**decisions_A1, **decisions_A2}
+            return fee + total_A, decisions
+        else:
+            decisions = {**decisions_B1, **decisions_B2}
+            return fee + total_B, decisions
+
     def evaluate(self) -> PianoValutato:
         """
-        Executes the full evaluation to find the best set of efficient assignments.
+        Executes the full evaluation (assignments only).
         """
         self._build_tree_maps()
         piano_valutato = PianoValutato(piano_originale=self.piano)
         posseduti_disponibili = list(self.pokemon_posseduti)
-        
+
         potential_reqs = []
         for livello in self.piano.livelli:
             for acc in livello.accoppiamenti:
                 potential_reqs.append({'req': acc.genitore1, 'id': id(acc.genitore1), 'level': livello.livello_id})
                 potential_reqs.append({'req': acc.genitore2, 'id': id(acc.genitore2), 'level': livello.livello_id})
-        
-        # Ordina i requisiti per livello (dal più alto al più basso) e complessità
+
         potential_reqs.sort(key=lambda item: (item['level'], len(item['req'].ruoli_iv), item['req'].ruolo_natura is not None), reverse=True)
 
         fulfilled_req_ids: Set[int] = set()
@@ -93,30 +182,26 @@ class PlanEvaluator:
                 continue
 
             richiesto = item['req']
-            
+
             candidati_validi = []
             for candidato in posseduti_disponibili:
                 if self._is_valid_candidate(richiesto, candidato):
                     rank = self._rank_candidate(richiesto, candidato)
                     candidati_validi.append({'pokemon': candidato, 'rank': rank})
-            
+
             if not candidati_validi:
                 continue
 
             candidati_validi.sort(key=lambda x: x['rank'])
             best_candidate = candidati_validi[0]
             best_pokemon_assegnato = best_candidate['pokemon']
-            
-            # --- MODIFICA CHIAVE ---
-            # Assegna il Pokémon usando l'ID univoco del requisito come chiave.
-            # Questo è il fix principale.
+
             score = self._calcola_punteggio_match(richiesto, best_pokemon_assegnato)
             piano_valutato.punteggio += score
             piano_valutato.pokemon_usati.add(best_pokemon_assegnato.id_utente)
             piano_valutato.mappa_assegnazioni[req_id] = best_pokemon_assegnato.id_utente
             posseduti_disponibili.remove(best_pokemon_assegnato)
 
-            # Pruning degli antenati: se copro un figlio, non devo più creare i suoi genitori
             q = [req_id]
             while q:
                 req_id_to_prune = q.pop(0)
@@ -124,19 +209,29 @@ class PlanEvaluator:
                     fulfilled_req_ids.add(req_id_to_prune)
                     if req_id_to_prune in self._child_to_parents_map:
                         q.extend(self._child_to_parents_map[req_id_to_prune])
-        
+
         return piano_valutato
+
+    def update_cost(self, piano_valutato: PianoValutato):
+        """
+        Runs the cost calculation on an already evaluated plan.
+        """
+        if self.price_manager and self.piano.livelli:
+             final_node = self.piano.livelli[-1].accoppiamenti[0].figlio
+             cost, decisions = self.calculate_cost_recursive(id(final_node), piano_valutato, True)
+             piano_valutato.costo_totale = cost
+             piano_valutato.mappa_acquisti = decisions
 
 
 def valuta_piani(piani_generati: List[PianoCompleto], pokemon_posseduti: List[PokemonPosseduto]) -> List[PianoValutato]:
     """
-    Main function to orchestrate the evaluation of all plans.
+    Initial evaluation based only on Owned Pokemon score.
     """
     piani_valutati = []
     for piano in piani_generati:
         evaluator = PlanEvaluator(piano, list(pokemon_posseduti))
         piano_valutato = evaluator.evaluate()
         piani_valutati.append(piano_valutato)
-        
+
     piani_valutati.sort(key=lambda p: p.punteggio, reverse=True)
     return piani_valutati
