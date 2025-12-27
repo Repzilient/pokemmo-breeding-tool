@@ -1,6 +1,7 @@
 import copy
 import itertools
 from typing import List, Dict, Optional, Any, Tuple, Set
+from collections import defaultdict
 
 from structures import PianoCompleto, PokemonRichiesto, PokemonPosseduto, PianoValutato
 from price_manager import PriceManager
@@ -21,8 +22,44 @@ class PlanEvaluator:
         self._child_to_parents_map: Dict[int, List[int]] = {}
         self._node_map: Dict[int, PokemonRichiesto] = {}
 
+    def _ensure_unique_nodes(self):
+        """
+        Traverses the plan and ensures that every leaf (base parent) is a unique object instance.
+        This prevents conflicting decision logic when a single requirement object is reused
+        across multiple branches of the breeding tree.
+
+        CRITICAL: Only clones external leaves if they are SHARED (ref_count > 1).
+        This ensures idempotency: if the plan is already a Tree (unique leaves), IDs are preserved.
+        """
+        generated_ids = set()
+        ref_counts = defaultdict(int)
+
+        # 1. Identify generated nodes and count references
+        for livello in self.piano.livelli:
+            for acc in livello.accoppiamenti:
+                generated_ids.add(id(acc.figlio))
+                ref_counts[id(acc.genitore1)] += 1
+                ref_counts[id(acc.genitore2)] += 1
+
+        # 2. Uniquify shared external leaves
+        for livello in self.piano.livelli:
+            for acc in livello.accoppiamenti:
+                # Handle Genitore 1
+                if id(acc.genitore1) not in generated_ids:
+                    # External Leaf. Only clone if shared.
+                    if ref_counts[id(acc.genitore1)] > 1:
+                        acc.genitore1 = copy.copy(acc.genitore1)
+
+                # Handle Genitore 2
+                if id(acc.genitore2) not in generated_ids:
+                    if ref_counts[id(acc.genitore2)] > 1:
+                        acc.genitore2 = copy.copy(acc.genitore2)
+
     def _build_tree_maps(self):
         """Creates a map to find the parents of any child node in the tree."""
+        # Fix: Ensure nodes are unique before mapping
+        self._ensure_unique_nodes()
+
         for livello in self.piano.livelli:
             for acc in livello.accoppiamenti:
                 self._child_to_parents_map[id(acc.figlio)] = [id(acc.genitore1), id(acc.genitore2)]
@@ -78,7 +115,7 @@ class PlanEvaluator:
 
         node = self._node_map.get(node_id)
         if not node:
-             return 999999, {}
+             return 999999999, {}
 
         # 2. Determine Requirements
         iv_roles = node.ruoli_iv
@@ -90,7 +127,7 @@ class PlanEvaluator:
         # 3. Base Case: Leaf Node or Hole
         if node_id not in self._child_to_parents_map:
             if self.price_manager is None:
-                return 999999, {}
+                return 999999999, {}
 
             primary_stat_key = None
             if required_stats:
