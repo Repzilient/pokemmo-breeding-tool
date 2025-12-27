@@ -126,8 +126,15 @@ class PriceInputDialog(tk.Toplevel):
             d.grid(row=row, column=5, padx=2)
             self.inputs[stat]["Ditto"] = d
 
+        # Button Frame
+        btn_frame = ttk.Frame(container)
+        btn_frame.pack(pady=20)
+
         # Confirm Button
-        ttk.Button(container, text="Calcola Costi e Valuta", command=self._confirm).pack(pady=20)
+        ttk.Button(btn_frame, text="Calcola Costi e Valuta", command=self._confirm).pack(side="left", padx=10)
+
+        # Skip Prices Button
+        ttk.Button(btn_frame, text="Non aggiungere prezzi", command=self._skip_prices).pack(side="left", padx=10)
 
     def _confirm(self):
         self.price_manager.clear()
@@ -149,6 +156,19 @@ class PriceInputDialog(tk.Toplevel):
             except ValueError:
                 messagebox.showerror("Errore", f"Inserisci valori numerici validi per {stat}")
                 return
+
+        self.on_confirm()
+        self.destroy()
+
+    def _skip_prices(self):
+        """Sets all prices to 0 and confirms."""
+        self.price_manager.clear()
+        for stat in self.required_stats:
+            self.price_manager.set_price(stat, "Specie", "M", 0)
+            self.price_manager.set_price(stat, "Specie", "F", 0)
+            self.price_manager.set_price(stat, "EggGroup", "M", 0)
+            self.price_manager.set_price(stat, "EggGroup", "F", 0)
+            self.price_manager.set_price(stat, "Ditto", "X", 0)
 
         self.on_confirm()
         self.destroy()
@@ -472,10 +492,6 @@ class BreedingToolApp(tk.Tk):
 
         # Re-evaluate cost for cached plans
         for p_val in self.generated_plans_cache:
-            # Re-instantiate evaluator just to access helper methods or use static helper if refactored
-            # Actually we just need to run the cost update logic
-
-            # We construct a temporary evaluator to use its methods
             ev = plan_evaluator.PlanEvaluator(
                 p_val.piano_originale,
                 self.owned_pokemon_list,
@@ -484,12 +500,10 @@ class BreedingToolApp(tk.Tk):
                 self.pokemon_data,
                 target_nature
             )
-            # Inject the maps (they are needed for cost calc)
             ev._build_tree_maps()
             ev.update_cost(p_val)
 
         # Sort: Primary Cost (Asc), Secondary Score (Desc)
-        # Note: Previous sort was Score Desc. Python sort is stable.
         self.generated_plans_cache.sort(key=lambda p: p.punteggio, reverse=True) # Ensure score priority
         self.generated_plans_cache.sort(key=lambda p: p.costo_totale) # Then sort by cost (Cheapest first)
 
@@ -522,9 +536,9 @@ class BreedingToolApp(tk.Tk):
         for livello in piano.livelli:
             output.append(f"\n--- Livello {livello.livello_id} ---\n")
             for acc in livello.accoppiamenti:
-                gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
-                gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato.mappa_assegnazioni, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
-                figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, {}, {}).replace('\n', ' ')
+                gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
+                gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
+                figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, piano_valutato, {}).replace('\n', ' ')
 
                 output.append(f"  {gen1_str:<45} + {gen2_str:<45} -> {figlio_str}\n")
 
@@ -550,31 +564,38 @@ class BreedingToolApp(tk.Tk):
         total_width = self.node_widths.get(id(final_target), 120)
         start_x = total_width / 2 + 50
 
-        self._draw_node(final_target, start_x, 50, child_to_parents_map, assegnazioni, owned_pokemon_map, piano.legenda_ruoli)
+        self._draw_node(final_target, start_x, 50, child_to_parents_map, piano_valutato, owned_pokemon_map, piano.legenda_ruoli)
 
         bbox = self.results_canvas.bbox("all")
         if bbox:
             self.results_canvas.config(scrollregion=(0, 0, total_width + 100, bbox[3] + 50))
 
-    def _get_node_text(self, node, legenda, assegnazioni, owned_map):
+    def _get_node_text(self, node, legenda, piano_valutato, owned_map):
         node_id = id(node)
-        if node_id in assegnazioni:
-            posseduto = owned_map[assegnazioni[node_id]]
+
+        # Check Owned
+        if node_id in piano_valutato.mappa_assegnazioni:
+            posseduto = owned_map[piano_valutato.mappa_assegnazioni[node_id]]
             iv_str = ", ".join(posseduto.ivs)
             natura_str = f"\n+ {posseduto.natura}" if posseduto.natura else ""
             return f"✔ Usa tuo {posseduto.specie}\n[{iv_str}]{natura_str}"
+
+        # Check Purchased
+        if node_id in piano_valutato.mappa_acquisti:
+            return f"🛒 {piano_valutato.mappa_acquisti[node_id]}"
+
+        # Standard Description
+        iv_names = sorted([legenda.get(r, r) for r in node.ruoli_iv])
+        natura_name = legenda.get(node.ruolo_natura)
+        iv_str = ", ".join(iv_names)
+        if len(iv_str) > 18:
+            parts = iv_str.split(", ")
+            mid = (len(parts) + 1) // 2
+            iv_str = ", ".join(parts[:mid]) + ",\n" + ", ".join(parts[mid:])
+        if natura_name:
+            return f"{iv_str}\n+ {natura_name}"
         else:
-            iv_names = sorted([legenda.get(r, r) for r in node.ruoli_iv])
-            natura_name = legenda.get(node.ruolo_natura)
-            iv_str = ", ".join(iv_names)
-            if len(iv_str) > 18:
-                parts = iv_str.split(", ")
-                mid = (len(parts) + 1) // 2
-                iv_str = ", ".join(parts[:mid]) + ",\n" + ", ".join(parts[mid:])
-            if natura_name:
-                return f"{iv_str}\n+ {natura_name}"
-            else:
-                return f"{iv_str}\n[{len(iv_names)}IV]"
+            return f"{iv_str}\n[{len(iv_names)}IV]"
 
     def _calculate_node_widths(self, node, child_to_parents_map, assegnazioni):
         node_id = id(node)
@@ -593,17 +614,28 @@ class BreedingToolApp(tk.Tk):
         self.node_widths[node_id] = total_width
         return total_width
 
-    def _draw_node(self, node, x, y, child_to_parents_map, assegnazioni, owned_map, legenda):
+    def _draw_node(self, node, x, y, child_to_parents_map, piano_valutato, owned_map, legenda):
         node_id = id(node)
         node_width, node_height = 120, 50
         v_spacing = 90
         h_spacing = 30
-        is_owned = node_id in assegnazioni
-        fill_color = "#90EE90" if is_owned else "#ADD8E6"
-        outline_color = "#006400" if is_owned else "#00008B"
+        is_owned = node_id in piano_valutato.mappa_assegnazioni
+        is_bought = node_id in piano_valutato.mappa_acquisti
+
+        fill_color = "#ADD8E6"
+        outline_color = "#00008B"
+
+        if is_owned:
+            fill_color = "#90EE90"
+            outline_color = "#006400"
+        elif is_bought:
+            fill_color = "#FFD700" # Gold for bought
+            outline_color = "#B8860B"
+
         self.results_canvas.create_rectangle(x - node_width/2, y - node_height/2, x + node_width/2, y + node_height/2, fill=fill_color, outline=outline_color, width=2)
-        text = self._get_node_text(node, legenda, assegnazioni, owned_map)
+        text = self._get_node_text(node, legenda, piano_valutato, owned_map)
         self.results_canvas.create_text(x, y, text=text, font=("Arial", 8, "bold" if is_owned else "normal"), justify=tk.CENTER)
+
         if not is_owned and node_id in child_to_parents_map:
             genitore1, genitore2 = child_to_parents_map[node_id]
             width1 = self.node_widths.get(id(genitore1), node_width)
@@ -614,8 +646,8 @@ class BreedingToolApp(tk.Tk):
             x2 = start_x1 + width1 + h_spacing + width2 / 2
             self.results_canvas.create_line(x, y + node_height/2, x1, new_y - node_height/2, width=1.5)
             self.results_canvas.create_line(x, y + node_height/2, x2, new_y - node_height/2, width=1.5)
-            self._draw_node(genitore1, x1, new_y, child_to_parents_map, assegnazioni, owned_map, legenda)
-            self._draw_node(genitore2, x2, new_y, child_to_parents_map, assegnazioni, owned_map, legenda)
+            self._draw_node(genitore1, x1, new_y, child_to_parents_map, piano_valutato, owned_map, legenda)
+            self._draw_node(genitore2, x2, new_y, child_to_parents_map, piano_valutato, owned_map, legenda)
 
     def _clear_results(self):
         self.results_canvas.delete("all")
