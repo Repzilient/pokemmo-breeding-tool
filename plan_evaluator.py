@@ -21,8 +21,37 @@ class PlanEvaluator:
         self._child_to_parents_map: Dict[int, List[int]] = {}
         self._node_map: Dict[int, PokemonRichiesto] = {}
 
+    def _ensure_unique_nodes(self):
+        """
+        Traverses the plan and ensures that every leaf (base parent) is a unique object instance.
+        This prevents conflicting decision logic when a single requirement object is reused
+        across multiple branches of the breeding tree.
+        Only modifies 'external' leaves (not produced by the plan itself).
+        """
+        generated_ids = set()
+
+        # 1. Identify all nodes produced by the plan (children)
+        for livello in self.piano.livelli:
+            for acc in livello.accoppiamenti:
+                generated_ids.add(id(acc.figlio))
+
+        # 2. Uniquify external leaves only
+        for livello in self.piano.livelli:
+            for acc in livello.accoppiamenti:
+                # Handle Genitore 1
+                if id(acc.genitore1) not in generated_ids:
+                    # It's an external leaf. Always clone it to ensure uniqueness in this slot.
+                    acc.genitore1 = copy.copy(acc.genitore1)
+
+                # Handle Genitore 2
+                if id(acc.genitore2) not in generated_ids:
+                    acc.genitore2 = copy.copy(acc.genitore2)
+
     def _build_tree_maps(self):
         """Creates a map to find the parents of any child node in the tree."""
+        # Fix: Ensure nodes are unique before mapping
+        self._ensure_unique_nodes()
+
         for livello in self.piano.livelli:
             for acc in livello.accoppiamenti:
                 self._child_to_parents_map[id(acc.figlio)] = [id(acc.genitore1), id(acc.genitore2)]
