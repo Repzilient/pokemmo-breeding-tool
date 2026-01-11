@@ -5,6 +5,7 @@ import uuid
 from typing import Set, List
 
 # Importa le classi e le funzioni necessarie dai file del progetto
+# Aggiornamento: Gestione automatica sesso e ottimizzazione costi
 from structures import PokemonPosseduto, PokemonRichiesto, PianoValutato
 import core_engine
 import plan_evaluator
