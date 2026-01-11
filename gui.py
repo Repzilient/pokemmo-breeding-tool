@@ -567,11 +567,23 @@ class BreedingToolApp(tk.Tk):
 
     def _display_plan(self, piano_valutato: PianoValutato):
         self._clear_results()
-        self._display_tree_plan(piano_valutato)
-        self._display_text_plan(piano_valutato)
+        try:
+            self._display_tree_plan(piano_valutato)
+        except Exception as e:
+            print(f"Errore visualizzazione albero: {e}")
+
+        try:
+            self._display_text_plan(piano_valutato)
+        except Exception as e:
+            print(f"Errore visualizzazione testo: {e}")
+            self.results_text.config(state="normal")
+            self.results_text.insert("1.0", f"Errore durante la generazione del report testuale:\n{e}")
+            self.results_text.config(state="disabled")
 
     def _display_text_plan(self, piano_valutato: PianoValutato):
         self.results_text.config(state="normal")
+        self.results_text.delete("1.0", tk.END) # Safety clear
+
         piano = piano_valutato.piano_originale
         legenda = piano.legenda_ruoli
         costo = piano_valutato.costo_totale
@@ -580,7 +592,7 @@ class BreedingToolApp(tk.Tk):
         output.append(f"--- PIANO DI BREEDING OTTIMALE (Punteggio: {piano_valutato.punteggio:.2f}) ---\n")
 
         cost_str = f"{costo:,}".replace(",", ".")
-        if costo >= 999999: cost_str = "NON CALCOLABILE"
+        if costo >= 999999990: cost_str = "NON CALCOLABILE (O > 999M)"
 
         output.append(f"COSTO TOTALE STIMATO: ${cost_str}\n")
         output.append("Legenda Statistiche:\n")
@@ -588,11 +600,13 @@ class BreedingToolApp(tk.Tk):
             output.append(f"  - {ruolo}: {stat}\n")
         output.append("\n" + "="*60 + "\n")
 
+        owned_map = {p.id_utente: p for p in self.owned_pokemon_list}
+
         for livello in piano.livelli:
             output.append(f"\n--- Livello {livello.livello_id} ---\n")
             for acc in livello.accoppiamenti:
-                gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
-                gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato, {p.id_utente: p for p in self.owned_pokemon_list}).replace('\n', ' ')
+                gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato, owned_map).replace('\n', ' ')
+                gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato, owned_map).replace('\n', ' ')
                 figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, piano_valutato, {}).replace('\n', ' ')
 
                 output.append(f"  {gen1_str:<45} + {gen2_str:<45} -> {figlio_str}\n")
@@ -630,10 +644,14 @@ class BreedingToolApp(tk.Tk):
 
         # Check Owned
         if node_id in piano_valutato.mappa_assegnazioni:
-            posseduto = owned_map[piano_valutato.mappa_assegnazioni[node_id]]
-            iv_str = ", ".join(posseduto.ivs)
-            natura_str = f"\n+ {posseduto.natura}" if posseduto.natura else ""
-            return f"✔ Usa tuo {posseduto.specie}\n[{iv_str}]{natura_str}"
+            user_id = piano_valutato.mappa_assegnazioni[node_id]
+            posseduto = owned_map.get(user_id)
+            if posseduto:
+                iv_str = ", ".join(posseduto.ivs)
+                natura_str = f"\n+ {posseduto.natura}" if posseduto.natura else ""
+                return f"✔ Usa tuo {posseduto.specie}\n[{iv_str}]{natura_str}"
+            else:
+                return f"✔ Usa tuo Pokemon (ID Non Trovato)"
 
         # Check Purchased
         if node_id in piano_valutato.mappa_acquisti:
