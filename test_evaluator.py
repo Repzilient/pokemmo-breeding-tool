@@ -146,7 +146,7 @@ class TestSuiteCompleta(unittest.TestCase):
         # Verifica logica di base (scelte economiche ovvie)
         self.assertTrue(found_ditto_ps, "Dovrebbe aver scelto Ditto per PS ($2000)")
         self.assertTrue(found_group_atk, "Dovrebbe aver scelto Drago/EggGroup per Attacco ($3000)")
-        self.assertTrue(found_nature_ditto, "Dovrebbe aver scelto Ditto per Natura ($1000)")
+        self.assertTrue(found_nature_ditto, "Dovrebbe aver scelto Ditto per Natura (poiché $1000 + Base < $50000 Specie F)")
 
         # La scelta della Difesa è condizionata dalla topologia del piano (maschio vs femmina),
         # quindi non asseriamo rigidamente su quella per evitare falsi negativi dovuti al caso.

@@ -145,11 +145,41 @@ class PlanEvaluator:
             group_name = egg_groups[0] if egg_groups else "EggGroup"
 
             if is_species_mandatory:
-                # Must be Female Species
-                c = self.price_manager.get_price(primary_stat_key, "Specie", "F")
-                if c < cost:
-                    cost = c
-                    decision_desc = f"Comprare {self.target_species} ♀\n({primary_stat_key}) - ${c}"
+                # Option A: Buy Female Species (Standard)
+                cost_A = self.price_manager.get_price(primary_stat_key, "Specie", "F")
+
+                # Option B: Buy Male Species + Ditto (Ditto Trick)
+                # This works because Male Species + Ditto = Species Egg
+                # Usually we need the stat on one of them.
+                # If we buy Species Male with Stat, Ditto can be trash.
+                # If we buy Ditto with Stat, Species Male can be trash.
+                # Let's assume best case: Cheapest combination.
+
+                # Case B1: Species M (Stat) + Ditto (Trash)
+                c_specie_m_stat = self.price_manager.get_price(primary_stat_key, "Specie", "M")
+                c_ditto_base = self.price_manager.get_price("Base", "Ditto", "X")
+                cost_B1 = c_specie_m_stat + c_ditto_base
+
+                # Case B2: Species M (Trash) + Ditto (Stat)
+                c_specie_m_base = self.price_manager.get_price("Base", "Specie", "M")
+                c_ditto_stat = self.price_manager.get_price(primary_stat_key, "Ditto", "X")
+                cost_B2 = c_specie_m_base + c_ditto_stat
+
+                if cost_B1 < cost_B2:
+                    cost_B = cost_B1
+                    desc_B = f"Comprare {self.target_species} ♂ ({primary_stat_key}) + Ditto (Base) - ${cost_B}"
+                else:
+                    cost_B = cost_B2
+                    desc_B = f"Comprare Ditto ({primary_stat_key}) + {self.target_species} ♂ (Base) - ${cost_B}"
+
+                # Compare A vs B
+                if cost_A <= cost_B:
+                    cost = cost_A
+                    decision_desc = f"Comprare {self.target_species} ♀\n({primary_stat_key}) - ${cost_A}"
+                else:
+                    cost = cost_B
+                    decision_desc = desc_B
+
             else:
                 # Can be Male Specie, Male EggGroup, or Ditto
                 options = []
