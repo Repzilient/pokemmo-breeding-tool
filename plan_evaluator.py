@@ -5,13 +5,14 @@ from collections import defaultdict
 
 from structures import PianoCompleto, PokemonRichiesto, PokemonPosseduto, PianoValutato
 from price_manager import PriceManager
+from gender_helper import GenderHelper
 
 class PlanEvaluator:
     """
     A comprehensive and robust class to evaluate breeding plans.
     """
 
-    def __init__(self, piano: PianoCompleto, pokemon_posseduti: List[PokemonPosseduto], price_manager: Optional[PriceManager] = None, target_species: str = "Ditto", pokemon_data: Dict = {}, target_nature: Optional[str] = None):
+    def __init__(self, piano: PianoCompleto, pokemon_posseduti: List[PokemonPosseduto], price_manager: Optional[PriceManager] = None, target_species: str = "Ditto", pokemon_data: Dict = {}, target_nature: Optional[str] = None, gender_helper: Optional[GenderHelper] = None):
         self.piano = piano
         self.pokemon_posseduti = pokemon_posseduti
         self.legenda = piano.legenda_ruoli
@@ -19,6 +20,7 @@ class PlanEvaluator:
         self.target_species = target_species
         self.pokemon_data = pokemon_data
         self.target_nature = target_nature
+        self.gender_helper = gender_helper
         self._child_to_parents_map: Dict[int, List[int]] = {}
         self._node_map: Dict[int, PokemonRichiesto] = {}
 
@@ -67,7 +69,7 @@ class PlanEvaluator:
                 self._node_map[id(acc.genitore2)] = acc.genitore2
                 self._node_map[id(acc.figlio)] = acc.figlio
 
-    def _is_valid_candidate(self, richiesto: PokemonRichiesto, posseduto: PokemonPosseduto) -> bool:
+    def _is_valid_candidate(self, richiesto: PokemonRichiesto, posseduto: PokemonPosseduto, required_gender: Optional[str] = None) -> bool:
         ivs_reali_richieste = {self.legenda.get(r) for r in richiesto.ruoli_iv if r in self.legenda}
         if not ivs_reali_richieste.issubset(set(posseduto.ivs)):
             return False
@@ -75,6 +77,14 @@ class PlanEvaluator:
         natura_reale_richiesta = self.legenda.get(richiesto.ruolo_natura) if richiesto.ruolo_natura in self.legenda else None
         if natura_reale_richiesta is not None and posseduto.natura != natura_reale_richiesta:
             return False
+
+        # Gender Check
+        if required_gender and posseduto.sesso:
+             # Standard roles: Genitore 1 (Mother) -> Needs F; Genitore 2 (Father) -> Needs M.
+             if required_gender == "F":
+                 if posseduto.sesso not in ["F", "Genderless"]: return False
+             elif required_gender == "M":
+                 if posseduto.sesso not in ["M", "Genderless"]: return False
 
         return True
 
@@ -142,24 +152,54 @@ class PlanEvaluator:
 
             egg_groups = self.pokemon_data.get(self.target_species, [])
             # Usa il primo gruppo uova se disponibile, altrimenti "Mostro"
-            group_name = egg_groups[0] if egg_groups else "EggGroup"
+            group_name = egg_groups[0] if egg_groups else "Mostro"
 
             if is_species_mandatory:
-                # Must be Female Species
-                c = self.price_manager.get_price(primary_stat_key, "Specie", "F")
-                if c < cost:
-                    cost = c
-                    decision_desc = f"Comprare {self.target_species} ♀\n({primary_stat_key}) - ${c}"
+                # Must be Female Species (or target species Genderless/MaleOnly)
+                target_type = "Unknown"
+                if self.gender_helper:
+                    target_type = self.gender_helper.get_gender_ratio_type(self.target_species)
+
+                req_gender_buy = "F"
+                if "solo maschio" in target_type: req_gender_buy = "M"
+                if "genderless" in target_type or "N/A" in target_type: req_gender_buy = "X"
+
+                # If we need Female, buy Female.
+                if req_gender_buy == "F":
+                    c = self.price_manager.get_price(primary_stat_key, "Specie", "F")
+                    if c < cost:
+                        cost = c
+                        decision_desc = f"Comprare {self.target_species} ♀\n({primary_stat_key}) - ${c}"
+                elif req_gender_buy == "M":
+                    c = self.price_manager.get_price(primary_stat_key, "Specie", "M")
+                    if c < cost:
+                        cost = c
+                        decision_desc = f"Comprare {self.target_species} ♂\n({primary_stat_key}) - ${c}"
+                else: # Genderless
+                    c = self.price_manager.get_price(primary_stat_key, "Specie", "M")
+                    if c < cost:
+                        cost = c
+                        decision_desc = f"Comprare {self.target_species}\n({primary_stat_key}) - ${c}"
+
             else:
-                # Can be Male Specie, Male EggGroup, or Ditto
+                # Can be Male Helper.
                 options = []
 
+                # Option 1: Target Species Male
                 c_specie_m = self.price_manager.get_price(primary_stat_key, "Specie", "M")
                 options.append((c_specie_m, f"Comprare {self.target_species} ♂\n({primary_stat_key}) - ${c_specie_m}"))
 
+                # Option 2: Egg Group Male (Optimized)
                 c_group_m = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")
-                options.append((c_group_m, f"Comprare {group_name} ♂\n({primary_stat_key}) - ${c_group_m}"))
 
+                # Find optimized species
+                optimal_species_name = group_name
+                if self.gender_helper:
+                    optimal_species_name = self.gender_helper.get_optimal_species_for_egg_group(group_name, "M")
+
+                options.append((c_group_m, f"Comprare {optimal_species_name} ♂\n(EggGroup {group_name}) - ${c_group_m}"))
+
+                # Option 3: Ditto
                 c_ditto = self.price_manager.get_price(primary_stat_key, "Ditto", "X")
                 options.append((c_ditto, f"Comprare Ditto\n({primary_stat_key}) - ${c_ditto}"))
 
@@ -173,27 +213,53 @@ class PlanEvaluator:
         parents = self._child_to_parents_map[node_id]
         p1_id, p2_id = parents[0], parents[1]
 
-        fee = 20000
+        base_fee = 20000
         if required_nature is not None:
-             fee = 15000
+             base_fee = 15000
 
-        # Case A: P1=Female(Species), P2=Male(Compatible)
-        cost_A1, decisions_A1 = self.calculate_cost_recursive(p1_id, piano_valutato, True)
-        cost_A2, decisions_A2 = self.calculate_cost_recursive(p2_id, piano_valutato, False)
-        total_A = cost_A1 + cost_A2
+        egg_groups = self.pokemon_data.get(self.target_species, [])
+        group_name = egg_groups[0] if egg_groups else "Mostro"
 
-        # Case B: P2=Female(Species), P1=Male(Compatible)
+        # Resolve Species for this Node to calculate Gender Fee correctly
+        node_species = self.target_species
+        if not is_species_mandatory and self.gender_helper:
+            # If helper line, use Optimal Species
+            node_species = self.gender_helper.get_optimal_species_for_egg_group(group_name, "M")
+
+        # Calculate Gender Selection Fee for THIS node
+        required_gender_child = "F" if is_species_mandatory else "M"
+
+        # Check if Target is Genderless/MaleOnly (Edge Case)
+        target_type = "Unknown"
+        if self.gender_helper:
+            target_type = self.gender_helper.get_gender_ratio_type(node_species)
+
+        if "genderless" in target_type: required_gender_child = "X"
+        elif "solo maschio" in target_type: required_gender_child = "M"
+        elif "solo femmina" in target_type: required_gender_child = "F"
+
+        gender_fee = 0
+        if self.gender_helper:
+            gender_fee = self.gender_helper.get_gender_selection_cost(node_species, required_gender_child)
+
+        # Recursive Calls
+        # Case A: P1=Female(Line), P2=Male(Filler)
+        cost_A1, decisions_A1 = self.calculate_cost_recursive(p1_id, piano_valutato, True) # Mother (Species)
+        cost_A2, decisions_A2 = self.calculate_cost_recursive(p2_id, piano_valutato, False) # Father (Helper)
+
+        total_A = cost_A1 + cost_A2 + gender_fee
+
+        # Same for B
         cost_B1, decisions_B1 = self.calculate_cost_recursive(p2_id, piano_valutato, True)
         cost_B2, decisions_B2 = self.calculate_cost_recursive(p1_id, piano_valutato, False)
-        total_B = cost_B1 + cost_B2
+        total_B = cost_B1 + cost_B2 + gender_fee
 
         if total_A <= total_B:
-            # Merge decisions
             decisions = {**decisions_A1, **decisions_A2}
-            return fee + total_A, decisions
+            return base_fee + total_A, decisions
         else:
             decisions = {**decisions_B1, **decisions_B2}
-            return fee + total_B, decisions
+            return base_fee + total_B, decisions
 
     def evaluate(self) -> PianoValutato:
         """
@@ -206,8 +272,9 @@ class PlanEvaluator:
         potential_reqs = []
         for livello in self.piano.livelli:
             for acc in livello.accoppiamenti:
-                potential_reqs.append({'req': acc.genitore1, 'id': id(acc.genitore1), 'level': livello.livello_id})
-                potential_reqs.append({'req': acc.genitore2, 'id': id(acc.genitore2), 'level': livello.livello_id})
+                # Genitore 1 is typically Mother (F). Genitore 2 is Father (M).
+                potential_reqs.append({'req': acc.genitore1, 'id': id(acc.genitore1), 'level': livello.livello_id, 'gender': 'F'})
+                potential_reqs.append({'req': acc.genitore2, 'id': id(acc.genitore2), 'level': livello.livello_id, 'gender': 'M'})
 
         potential_reqs.sort(key=lambda item: (item['level'], len(item['req'].ruoli_iv), item['req'].ruolo_natura is not None), reverse=True)
 
@@ -219,10 +286,11 @@ class PlanEvaluator:
                 continue
 
             richiesto = item['req']
+            req_gender = item['gender']
 
             candidati_validi = []
             for candidato in posseduti_disponibili:
-                if self._is_valid_candidate(richiesto, candidato):
+                if self._is_valid_candidate(richiesto, candidato, req_gender):
                     rank = self._rank_candidate(richiesto, candidato)
                     candidati_validi.append({'pokemon': candidato, 'rank': rank})
 

@@ -9,6 +9,7 @@ from structures import PokemonPosseduto, PokemonRichiesto, PianoValutato
 import core_engine
 import plan_evaluator
 from price_manager import PriceManager
+from gender_helper import GenderHelper
 
 
 # --- Classe AutocompleteCombobox ---
@@ -196,6 +197,7 @@ class BreedingToolApp(tk.Tk):
         self._load_pokemon_data()
 
         self.price_manager = PriceManager()
+        self.gender_helper = GenderHelper()
 
         # --- Variabili di stato ---
         self.owned_pokemon_list = []
@@ -205,6 +207,7 @@ class BreedingToolApp(tk.Tk):
         self.owned_nature_var = tk.StringVar(value=self.natures[0])
         self.target_species_var = tk.StringVar()
         self.owned_species_var = tk.StringVar()
+        self.owned_gender_var = tk.StringVar(value="M")
 
         # Stored generated plans for phase 2
         self.generated_plans_cache = []
@@ -275,13 +278,20 @@ class BreedingToolApp(tk.Tk):
         add_form.columnconfigure(1, weight=1)
 
         ttk.Label(add_form, text="Specie:").grid(row=0, column=0, sticky="w")
-        owned_combo = AutocompleteCombobox(add_form, textvariable=self.owned_species_var)
-        owned_combo.set_completion_list(self.pokemon_names)
-        owned_combo.grid(row=0, column=1, columnspan=2, sticky="ew", pady=2)
+        self.owned_combo = AutocompleteCombobox(add_form, textvariable=self.owned_species_var)
+        self.owned_combo.set_completion_list(self.pokemon_names)
+        self.owned_combo.grid(row=0, column=1, columnspan=2, sticky="ew", pady=2)
+        # Bind event for gender update
+        self.owned_combo.bind("<<ComboboxSelected>>", self._on_owned_species_selected)
+        self.owned_combo.bind("<FocusOut>", self._on_owned_species_selected)
+
+        ttk.Label(add_form, text="Sesso:").grid(row=0, column=3, sticky="w", padx=(10, 5))
+        self.gender_combo = ttk.Combobox(add_form, textvariable=self.owned_gender_var, values=["M", "F", "Genderless"], state="readonly", width=10)
+        self.gender_combo.grid(row=0, column=4, sticky="ew", pady=2)
 
         ttk.Label(add_form, text="IVs:").grid(row=1, column=0, sticky="w")
         owned_iv_frame = ttk.Frame(add_form)
-        owned_iv_frame.grid(row=1, column=1, columnspan=2, sticky="ew")
+        owned_iv_frame.grid(row=1, column=1, columnspan=4, sticky="ew")
         for i, stat in enumerate(self.stats):
             ttk.Checkbutton(owned_iv_frame, text=stat, variable=self.owned_ivs_vars[stat]).grid(row=i//3, column=i%3, sticky="w")
 
@@ -289,19 +299,21 @@ class BreedingToolApp(tk.Tk):
         owned_nature_combo = ttk.Combobox(add_form, textvariable=self.owned_nature_var, values=self.natures, state="readonly")
         owned_nature_combo.grid(row=2, column=1, columnspan=2, sticky="ew", pady=2)
 
-        ttk.Button(add_form, text="Aggiungi Pokémon", command=self._add_owned_pokemon).grid(row=3, column=1, sticky="e", pady=10)
+        ttk.Button(add_form, text="Aggiungi Pokémon", command=self._add_owned_pokemon).grid(row=3, column=4, sticky="e", pady=10)
 
         list_frame = ttk.Frame(owned_frame)
         list_frame.grid(row=1, column=0, sticky="nsew", pady=10)
         owned_frame.rowconfigure(1, weight=1)
 
-        self.owned_pokemon_tree = ttk.Treeview(list_frame, columns=("ID", "Specie", "IVs", "Natura"), show="headings", height=10)
+        self.owned_pokemon_tree = ttk.Treeview(list_frame, columns=("ID", "Specie", "Sesso", "IVs", "Natura"), show="headings", height=10)
         self.owned_pokemon_tree.heading("ID", text="ID")
         self.owned_pokemon_tree.heading("Specie", text="Specie")
+        self.owned_pokemon_tree.heading("Sesso", text="Sesso")
         self.owned_pokemon_tree.heading("IVs", text="IVs")
         self.owned_pokemon_tree.heading("Natura", text="Natura")
         self.owned_pokemon_tree.column("ID", width=0, stretch=tk.NO)
         self.owned_pokemon_tree.column("Specie", width=100)
+        self.owned_pokemon_tree.column("Sesso", width=50)
         self.owned_pokemon_tree.column("IVs", width=200)
         self.owned_pokemon_tree.column("Natura", width=100)
 
@@ -354,6 +366,30 @@ class BreedingToolApp(tk.Tk):
         self.results_text.grid(row=0, column=0, sticky="nsew")
         text_scroll.grid(row=0, column=1, sticky="ns")
 
+    def _on_owned_species_selected(self, event=None):
+        specie = self.owned_species_var.get().strip()
+        if not specie:
+            return
+
+        # Query Gender Helper
+        ratio_type = self.gender_helper.get_gender_ratio_type(specie)
+
+        # Adjust Combo
+        if "solo maschio" in ratio_type:
+            self.gender_combo.set("M")
+            self.gender_combo.state(["disabled"])
+        elif "solo femmina" in ratio_type:
+            self.gender_combo.set("F")
+            self.gender_combo.state(["disabled"])
+        elif "genderless" in ratio_type:
+            self.gender_combo.set("Genderless")
+            self.gender_combo.state(["disabled"])
+        else:
+            # maschio e femmina, or N/A
+            self.gender_combo.state(["!disabled"])
+            if self.gender_combo.get() not in ["M", "F"]:
+                self.gender_combo.set("M") # Default
+
     def _add_owned_pokemon(self):
         specie = self.owned_species_var.get()
         if not specie or specie not in self.pokemon_names:
@@ -365,15 +401,19 @@ class BreedingToolApp(tk.Tk):
         if natura == "Nessuna":
             natura = None
 
+        sesso = self.owned_gender_var.get()
+
         pokemon_id = str(uuid.uuid4())
-        new_pokemon = PokemonPosseduto(id_utente=pokemon_id, specie=specie, ivs=ivs, natura=natura)
+        new_pokemon = PokemonPosseduto(id_utente=pokemon_id, specie=specie, ivs=ivs, natura=natura, sesso=sesso)
         self.owned_pokemon_list.append(new_pokemon)
 
         iv_str = ", ".join(ivs) if ivs else "Nessuno"
         natura_str = natura if natura else "Nessuna"
-        self.owned_pokemon_tree.insert("", "end", iid=pokemon_id, values=(pokemon_id, specie, iv_str, natura_str))
+        self.owned_pokemon_tree.insert("", "end", iid=pokemon_id, values=(pokemon_id, specie, sesso, iv_str, natura_str))
 
         self.owned_species_var.set("")
+        self.gender_combo.state(["!disabled"])
+        self.gender_combo.set("M")
         for var in self.owned_ivs_vars.values():
             var.set(False)
         self.owned_nature_var.set("Nessuna")
@@ -498,7 +538,8 @@ class BreedingToolApp(tk.Tk):
                 self.price_manager,
                 target_species,
                 self.pokemon_data,
-                target_nature
+                target_nature,
+                self.gender_helper
             )
             ev._build_tree_maps()
             ev.update_cost(p_val)
