@@ -112,6 +112,9 @@ class TestSuiteCompleta(unittest.TestCase):
             pm.set_price(s, "EggGroup", "F", 50000)
             pm.set_price(s, "Ditto", "X", 50000)
 
+        # Base Price for Male Species (Trash)
+        pm.set_price("Base", "Specie", "M", 2000)
+
         # Offerte
         pm.set_price("PS", "Ditto", "X", 2000)         # PS -> Ditto
         pm.set_price("Attacco", "EggGroup", "M", 3000) # Atk -> Group M
