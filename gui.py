@@ -194,7 +194,9 @@ class BreedingToolApp(tk.Tk):
             "Naughty", "Gentle", "Lax", "Relaxed", "Sassy"
         ]
         self.stats = ["PS", "Attacco", "Difesa", "Attacco Speciale", "Difesa Speciale", "Velocità"]
+        self.gender_data = {}
         self._load_pokemon_data()
+        self._load_gender_data()
 
         self.price_manager = PriceManager()
 
@@ -206,6 +208,7 @@ class BreedingToolApp(tk.Tk):
         self.owned_nature_var = tk.StringVar(value=self.natures[0])
         self.target_species_var = tk.StringVar()
         self.owned_species_var = tk.StringVar()
+        self.owned_gender_var = tk.StringVar(value="Maschio")
 
         # Stored generated plans for phase 2
         self.generated_plans_cache = []
@@ -225,6 +228,18 @@ class BreedingToolApp(tk.Tk):
         except json.JSONDecodeError:
             messagebox.showerror("Errore", "Il file 'pokemon_data.json' non è formattato correttamente.")
             self.destroy()
+
+    def _load_gender_data(self):
+        try:
+            with open('pokemon_gender.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                # Crea una mappa {nome: dati_sesso}
+                for entry in data:
+                    self.gender_data[entry['name']] = entry
+        except FileNotFoundError:
+            messagebox.showwarning("Avviso", "File 'pokemon_gender.json' non trovato. Funzionalità automatica sesso disabilitata.")
+        except json.JSONDecodeError:
+            messagebox.showwarning("Avviso", "File 'pokemon_gender.json' corrotto.")
 
     def _create_widgets(self):
         main_frame = ttk.Frame(self, padding="10")
@@ -280,29 +295,38 @@ class BreedingToolApp(tk.Tk):
         owned_combo.set_completion_list(self.pokemon_names)
         owned_combo.grid(row=0, column=1, columnspan=2, sticky="ew", pady=2)
 
-        ttk.Label(add_form, text="IVs:").grid(row=1, column=0, sticky="w")
+        # Callback per aggiornamento automatico sesso
+        self.owned_species_var.trace('w', self._on_species_change)
+
+        ttk.Label(add_form, text="Sesso:").grid(row=1, column=0, sticky="w")
+        self.owned_gender_combo = ttk.Combobox(add_form, textvariable=self.owned_gender_var, values=["Maschio", "Femmina", "Genderless"], state="readonly")
+        self.owned_gender_combo.grid(row=1, column=1, columnspan=2, sticky="ew", pady=2)
+
+        ttk.Label(add_form, text="IVs:").grid(row=2, column=0, sticky="w")
         owned_iv_frame = ttk.Frame(add_form)
-        owned_iv_frame.grid(row=1, column=1, columnspan=2, sticky="ew")
+        owned_iv_frame.grid(row=2, column=1, columnspan=2, sticky="ew")
         for i, stat in enumerate(self.stats):
             ttk.Checkbutton(owned_iv_frame, text=stat, variable=self.owned_ivs_vars[stat]).grid(row=i//3, column=i%3, sticky="w")
 
-        ttk.Label(add_form, text="Natura:").grid(row=2, column=0, sticky="w")
+        ttk.Label(add_form, text="Natura:").grid(row=3, column=0, sticky="w")
         owned_nature_combo = ttk.Combobox(add_form, textvariable=self.owned_nature_var, values=self.natures, state="readonly")
-        owned_nature_combo.grid(row=2, column=1, columnspan=2, sticky="ew", pady=2)
+        owned_nature_combo.grid(row=3, column=1, columnspan=2, sticky="ew", pady=2)
 
-        ttk.Button(add_form, text="Aggiungi Pokémon", command=self._add_owned_pokemon).grid(row=3, column=1, sticky="e", pady=10)
+        ttk.Button(add_form, text="Aggiungi Pokémon", command=self._add_owned_pokemon).grid(row=4, column=1, sticky="e", pady=10)
 
         list_frame = ttk.Frame(owned_frame)
         list_frame.grid(row=1, column=0, sticky="nsew", pady=10)
         owned_frame.rowconfigure(1, weight=1)
 
-        self.owned_pokemon_tree = ttk.Treeview(list_frame, columns=("ID", "Specie", "IVs", "Natura"), show="headings", height=10)
+        self.owned_pokemon_tree = ttk.Treeview(list_frame, columns=("ID", "Specie", "Sesso", "IVs", "Natura"), show="headings", height=10)
         self.owned_pokemon_tree.heading("ID", text="ID")
         self.owned_pokemon_tree.heading("Specie", text="Specie")
+        self.owned_pokemon_tree.heading("Sesso", text="Sesso")
         self.owned_pokemon_tree.heading("IVs", text="IVs")
         self.owned_pokemon_tree.heading("Natura", text="Natura")
         self.owned_pokemon_tree.column("ID", width=0, stretch=tk.NO)
         self.owned_pokemon_tree.column("Specie", width=100)
+        self.owned_pokemon_tree.column("Sesso", width=80)
         self.owned_pokemon_tree.column("IVs", width=200)
         self.owned_pokemon_tree.column("Natura", width=100)
 
@@ -366,18 +390,46 @@ class BreedingToolApp(tk.Tk):
         if natura == "Nessuna":
             natura = None
 
+        sesso = self.owned_gender_var.get()
+
         pokemon_id = str(uuid.uuid4())
-        new_pokemon = PokemonPosseduto(id_utente=pokemon_id, specie=specie, ivs=ivs, natura=natura)
+        new_pokemon = PokemonPosseduto(id_utente=pokemon_id, specie=specie, ivs=ivs, natura=natura, sesso=sesso)
         self.owned_pokemon_list.append(new_pokemon)
 
         iv_str = ", ".join(ivs) if ivs else "Nessuno"
         natura_str = natura if natura else "Nessuna"
-        self.owned_pokemon_tree.insert("", "end", iid=pokemon_id, values=(pokemon_id, specie, iv_str, natura_str))
+        self.owned_pokemon_tree.insert("", "end", iid=pokemon_id, values=(pokemon_id, specie, sesso, iv_str, natura_str))
 
         self.owned_species_var.set("")
         for var in self.owned_ivs_vars.values():
             var.set(False)
         self.owned_nature_var.set("Nessuna")
+        # Reset sesso
+        self.owned_gender_combo.config(state="readonly")
+        self.owned_gender_var.set("Maschio")
+
+    def _on_species_change(self, *args):
+        specie = self.owned_species_var.get()
+        if specie in self.gender_data:
+            gender_type = self.gender_data[specie].get("gender_type", "").lower()
+
+            if "solo maschio" in gender_type:
+                self.owned_gender_var.set("Maschio")
+                self.owned_gender_combo.config(state="disabled")
+            elif "solo femmina" in gender_type:
+                self.owned_gender_var.set("Femmina")
+                self.owned_gender_combo.config(state="disabled")
+            elif "genderless" in gender_type:
+                self.owned_gender_var.set("Genderless")
+                self.owned_gender_combo.config(state="disabled")
+            else:
+                self.owned_gender_combo.config(state="readonly")
+                # Se era bloccato su un valore, sbloccalo ma non cambiare valore a meno che non sia invalido
+                curr = self.owned_gender_var.get()
+                if curr not in ["Maschio", "Femmina"]:
+                    self.owned_gender_var.set("Maschio")
+        else:
+            self.owned_gender_combo.config(state="readonly")
 
     def _remove_owned_pokemon(self):
         selected_items = self.owned_pokemon_tree.selection()
