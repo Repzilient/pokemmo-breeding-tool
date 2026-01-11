@@ -551,9 +551,11 @@ class BreedingToolApp(tk.Tk):
                 self.price_manager,
                 target_species,
                 self.pokemon_data,
-                target_nature
+                target_nature,
+                self.gender_data # Pass Gender Data
             )
             ev._build_tree_maps()
+            ev._identify_mandatory_nodes() # Important for cost calculation context
             ev.update_cost(p_val)
 
         # Sort: Primary Cost (Asc), Secondary Score (Desc)
