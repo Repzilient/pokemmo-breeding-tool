@@ -112,6 +112,9 @@ class TestSuiteCompleta(unittest.TestCase):
             pm.set_price(s, "EggGroup", "F", 50000)
             pm.set_price(s, "Ditto", "X", 50000)
 
+        # Base Price for Male Species (Trash)
+        pm.set_price("Base", "Specie", "M", 2000)
+
         # Offerte
         pm.set_price("PS", "Ditto", "X", 2000)         # PS -> Ditto
         pm.set_price("Attacco", "EggGroup", "M", 3000) # Atk -> Group M
@@ -146,7 +149,7 @@ class TestSuiteCompleta(unittest.TestCase):
         # Verifica logica di base (scelte economiche ovvie)
         self.assertTrue(found_ditto_ps, "Dovrebbe aver scelto Ditto per PS ($2000)")
         self.assertTrue(found_group_atk, "Dovrebbe aver scelto Drago/EggGroup per Attacco ($3000)")
-        self.assertTrue(found_nature_ditto, "Dovrebbe aver scelto Ditto per Natura ($1000)")
+        self.assertTrue(found_nature_ditto, "Dovrebbe aver scelto Ditto per Natura (poiché $1000 + Base < $50000 Specie F)")
 
         # La scelta della Difesa è condizionata dalla topologia del piano (maschio vs femmina),
         # quindi non asseriamo rigidamente su quella per evitare falsi negativi dovuti al caso.
