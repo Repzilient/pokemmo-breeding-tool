@@ -603,11 +603,17 @@ class BreedingToolApp(tk.Tk):
         owned_map = {p.id_utente: p for p in self.owned_pokemon_list}
 
         for livello in piano.livelli:
+            # Filtra gli accoppiamenti il cui risultato è già posseduto (non serve mostrare come crearlo)
+            active_couplings = [acc for acc in livello.accoppiamenti if id(acc.figlio) not in piano_valutato.mappa_assegnazioni]
+
+            if not active_couplings:
+                continue
+
             output.append(f"\n--- Livello {livello.livello_id} ---\n")
-            for acc in livello.accoppiamenti:
+            for acc in active_couplings:
                 gen1_str = self._get_node_text(acc.genitore1, piano.legenda_ruoli, piano_valutato, owned_map).replace('\n', ' ')
                 gen2_str = self._get_node_text(acc.genitore2, piano.legenda_ruoli, piano_valutato, owned_map).replace('\n', ' ')
-                figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, piano_valutato, {}).replace('\n', ' ')
+                figlio_str = self._get_node_text(acc.figlio, piano.legenda_ruoli, piano_valutato, owned_map).replace('\n', ' ')
 
                 output.append(f"  {gen1_str:<45} + {gen2_str:<45} -> {figlio_str}\n")
 
