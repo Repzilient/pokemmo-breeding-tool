@@ -397,6 +397,7 @@ def valuta_piani(piani_generati: List[PianoCompleto], pokemon_posseduti: List[Po
     for piano in piani_generati:
         evaluator = PlanEvaluator(piano, list(pokemon_posseduti))
         piano_valutato = evaluator.evaluate()
+        piano_valutato.evaluator = evaluator  # Store evaluator
         piani_valutati.append(piano_valutato)
 
     piani_valutati.sort(key=lambda p: p.punteggio, reverse=True)

@@ -545,17 +545,25 @@ class BreedingToolApp(tk.Tk):
 
         # Re-evaluate cost for cached plans
         for p_val in self.generated_plans_cache:
-            ev = plan_evaluator.PlanEvaluator(
-                p_val.piano_originale,
-                self.owned_pokemon_list,
-                self.price_manager,
-                target_species,
-                self.pokemon_data,
-                target_nature,
-                self.gender_data # Pass Gender Data
-            )
-            ev._build_tree_maps()
-            ev._identify_mandatory_nodes() # Important for cost calculation context
+            if p_val.evaluator is None:
+                # Fallback in case the evaluator wasn't stored
+                ev = plan_evaluator.PlanEvaluator(
+                    p_val.piano_originale, self.owned_pokemon_list, self.price_manager,
+                    target_species, self.pokemon_data, target_nature, self.gender_data
+                )
+                ev._build_tree_maps()
+                ev._identify_mandatory_nodes()
+            else:
+                # Reuse the existing evaluator
+                ev = p_val.evaluator
+                ev.price_manager = self.price_manager
+                ev.target_species = target_species
+                ev.pokemon_data = self.pokemon_data
+                ev.target_nature = target_nature
+                ev.gender_data = self.gender_data
+                # Re-identify mandatory nodes in case target species changes
+                ev._identify_mandatory_nodes()
+
             ev.update_cost(p_val)
 
         # Sort: Primary Cost (Asc), Secondary Score (Desc)
