@@ -1,5 +1,9 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Tuple, Set
+from typing import List, Dict, Optional, Tuple, Set, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from plan_evaluator import PlanEvaluator
 
 # --- Strutture Dati Centralizzate ---
 
@@ -71,3 +75,5 @@ class PianoValutato:
     mappa_assegnazioni: Dict[int, str] = field(default_factory=dict)
     # Mappa delle decisioni di acquisto: {id_nodo: "Descrizione acquisto"}
     mappa_acquisti: Dict[int, str] = field(default_factory=dict)
+    # Riferimento all'evaluator per riutilizzo
+    evaluator: Optional['PlanEvaluator'] = None
