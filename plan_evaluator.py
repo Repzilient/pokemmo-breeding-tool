@@ -23,6 +23,7 @@ class PlanEvaluator:
         self._child_to_parents_map: Dict[int, List[int]] = {}
         self._node_map: Dict[int, PokemonRichiesto] = {}
         self._mandatory_species_nodes: Set[int] = set()
+        self.fulfilled_req_ids: Set[int] = set()
 
     def _identify_mandatory_nodes(self):
         """
@@ -79,10 +80,39 @@ class PlanEvaluator:
                     if ref_counts[id(acc.genitore2)] > 1:
                         acc.genitore2 = copy.copy(acc.genitore2)
 
+    def _merge_duplicate_nodes(self):
+        """
+        Identifies identical PokemonRichiesto nodes across the plan and merges them
+        into a single object reference. This allows a single Owned Pokemon assignment
+        to fulfill multiple requirements if they are structurally identical.
+        """
+        canonical_nodes: Dict[PokemonRichiesto, PokemonRichiesto] = {}
+
+        for livello in self.piano.livelli:
+            for acc in livello.accoppiamenti:
+                # Canonicalize Genitore 1
+                if acc.genitore1 in canonical_nodes:
+                    acc.genitore1 = canonical_nodes[acc.genitore1]
+                else:
+                    canonical_nodes[acc.genitore1] = acc.genitore1
+
+                # Canonicalize Genitore 2
+                if acc.genitore2 in canonical_nodes:
+                    acc.genitore2 = canonical_nodes[acc.genitore2]
+                else:
+                    canonical_nodes[acc.genitore2] = acc.genitore2
+
+                # Canonicalize Figlio (less critical, but good for consistency)
+                if acc.figlio in canonical_nodes:
+                    acc.figlio = canonical_nodes[acc.figlio]
+                else:
+                    canonical_nodes[acc.figlio] = acc.figlio
+
     def _build_tree_maps(self):
         """Creates a map to find the parents of any child node in the tree."""
-        # Fix: Ensure nodes are unique before mapping
-        self._ensure_unique_nodes()
+        # Fix: Ensure nodes are unique before mapping (Legacy)
+        # self._ensure_unique_nodes()
+        # UPDATE: We now MERGE nodes instead of uniquifying them, to allow shared pruning.
 
         for livello in self.piano.livelli:
             for acc in livello.accoppiamenti:
@@ -113,17 +143,27 @@ class PlanEvaluator:
             if posseduto.specie != self.target_species:
                 return False
 
-        # 3b. Egg Group Check (For Non-Mandatory / Donor Roles)
-        # If not mandatory, and not Ditto, check if species shares Egg Group with Target
-        elif role == 'gen2' and posseduto.specie != 'Ditto' and posseduto.specie != self.target_species:
-             target_groups = self.pokemon_data.get(self.target_species, [])
-             candidate_groups = self.pokemon_data.get(posseduto.specie, [])
-             # If disjoint and both have data, fail.
-             # If data missing, we allow (fail open) or check strict?
-             # Let's check strict intersection if data exists.
-             if target_groups and candidate_groups:
-                 if set(target_groups).isdisjoint(set(candidate_groups)):
-                     return False
+        # If NOT mandatory (Donor), it can be Target Species OR Ditto OR Shared Egg Group.
+        else:
+             # Allowed:
+             # 1. Exact Species
+             # 2. Ditto
+             # 3. Shared Egg Group
+
+             if posseduto.specie == self.target_species:
+                 pass # OK
+             elif posseduto.specie == 'Ditto':
+                 pass # OK
+             else:
+                 # Check Egg Groups
+                 target_groups = self.pokemon_data.get(self.target_species, [])
+                 candidate_groups = self.pokemon_data.get(posseduto.specie, [])
+
+                 # FAIL OPEN: If data is missing (e.g. possessed pokemon not in DB), assume compatible.
+                 # Only fail if we HAVE data and it is disjoint.
+                 if target_groups and candidate_groups:
+                     if set(target_groups).isdisjoint(set(candidate_groups)):
+                         return False
 
         # 4. Gender Check
         target_gender_type = "maschio e femmina"
@@ -141,18 +181,6 @@ class PlanEvaluator:
         if "genderless" in target_gender_type:
             if role == 'gen1':
                 # Must be Genderless (Species)
-                # Note: Some inputs might treat "Specie M" as generic.
-                # But for strict matching, "Genderless" implies no sex.
-                # However, user input might label it differently.
-                # Let's assume strict "Genderless" or "M" if checking inputs?
-                # For owned pokemon, user selects "Maschio/Femmina/Genderless".
-                # If target is Beldum, user should set owned to "Genderless".
-                # But to be safe against user error (selecting "Maschio" for Beldum), we might relax?
-                # No, strict is better.
-                if p_sesso != 'Genderless':
-                    # Allow relaxation?
-                    pass
-                # Actually, check logic:
                 if p_sesso != 'Genderless':
                      return False
             elif role == 'gen2':
@@ -243,7 +271,7 @@ class PlanEvaluator:
         required_gender: 'F' (Mother) or 'M' (Father) required for breeding compatibility.
         """
         # 1. Pruning Check: If Owned, Cost is 0
-        if node_id in piano_valutato.mappa_assegnazioni:
+        if node_id in self.fulfilled_req_ids:
             return 0, {}
 
         node = self._node_map.get(node_id)
@@ -280,6 +308,8 @@ class PlanEvaluator:
             target_gender_type = "maschio e femmina"
             if self.target_species in self.gender_data:
                 target_gender_type = self.gender_data[self.target_species].get("gender_type", "maschio e femmina").lower()
+            elif "Genderless" in self.pokemon_data.get(self.target_species, []):
+                 target_gender_type = "genderless"
 
             is_genderless_species = "genderless" in target_gender_type
 
@@ -435,6 +465,9 @@ class PlanEvaluator:
         target_gender_type = "maschio e femmina"
         if self.target_species in self.gender_data:
             target_gender_type = self.gender_data[self.target_species].get("gender_type", "maschio e femmina").lower()
+        elif "Genderless" in self.pokemon_data.get(self.target_species, []):
+             target_gender_type = "genderless"
+
         is_genderless_species = "genderless" in target_gender_type
 
         if is_genderless_species:
@@ -460,14 +493,121 @@ class PlanEvaluator:
             cost_2, decisions_2 = self.calculate_cost_recursive(p2_id, piano_valutato, p2_mandatory, required_gender='M')
 
         total_cost = total_breeding_cost + cost_1 + cost_2
-        decisions = {**decisions_1, **decisions_2}
+
+        # Merge decisions smartly to prioritize Species description over EggGroup description
+        # This handles cases where nodes are merged/shared but used in different contexts.
+        decisions = decisions_1.copy()
+        for k, v in decisions_2.items():
+            if k in decisions:
+                current_desc = decisions[k]
+                # If current description mentions target species (e.g. Absol), keep it.
+                # If new description (v) mentions target species and current doesn't, overwrite.
+                # If both or neither, overwrite (default).
+                if self.target_species in current_desc and self.target_species not in v:
+                    continue # Keep current (Species > EggGroup)
+                # Else overwrite
+            decisions[k] = v
+
+        # Add intermediate step description
+        decisions[node_id] = f"Allevamento (Tassa: ${fee}, Items: ${base_item_cost})"
 
         return total_cost, decisions
+
+    def _calculate_score_for_role(self, req: PokemonRichiesto, role: str, is_mandatory: bool) -> float:
+        """Helper to calculate max score for a requirement if we strictly check validity."""
+        max_score = 0.0
+
+        for candidato in self.pokemon_posseduti:
+            # Mimic _is_valid_candidate logic but manually pass mandatory flag
+            valid = True
+
+            # 1. IV Check
+            ivs_reali = {self.legenda.get(r) for r in req.ruoli_iv if r in self.legenda}
+            if not ivs_reali.issubset(set(candidato.ivs)):
+                valid = False
+
+            # 2. Nature Check
+            natura_reale = self.legenda.get(req.ruolo_natura) if req.ruolo_natura in self.legenda else None
+            if valid and natura_reale is not None and candidato.natura != natura_reale:
+                valid = False
+
+            # 3. Species Check
+            if valid:
+                if is_mandatory:
+                    if candidato.specie != self.target_species:
+                        valid = False
+                else:
+                    if candidato.specie == self.target_species:
+                        pass
+                    elif candidato.specie == 'Ditto':
+                        pass
+                    else:
+                        t_groups = self.pokemon_data.get(self.target_species, [])
+                        c_groups = self.pokemon_data.get(candidato.specie, [])
+                        if t_groups and c_groups:
+                             if set(t_groups).isdisjoint(set(c_groups)):
+                                 valid = False
+
+            # 4. Gender Check
+            if valid:
+                target_gender_type = "maschio e femmina"
+                if self.target_species in self.gender_data:
+                    target_gender_type = self.gender_data[self.target_species].get("gender_type", "").lower()
+                elif "Genderless" in self.pokemon_data.get(self.target_species, []):
+                     target_gender_type = "genderless"
+
+                p_sesso = candidato.sesso
+                if p_sesso == 'M': p_sesso = 'Maschio'
+                if p_sesso == 'F': p_sesso = 'Femmina'
+
+                if "genderless" in target_gender_type:
+                    if role == 'gen1':
+                         if p_sesso != 'Genderless': valid = False
+                    elif role == 'gen2':
+                         if candidato.specie != 'Ditto': valid = False
+                else:
+                    if role == 'gen1':
+                         if p_sesso != 'Femmina': valid = False
+                    elif role == 'gen2':
+                         if candidato.specie == 'Ditto': pass
+                         elif p_sesso != 'Maschio': valid = False
+
+            if valid:
+                score = self._calcola_punteggio_match(req, candidato)
+                if score > max_score:
+                    max_score = score
+
+        return max_score
+
+    def _optimize_gender_roles(self):
+        """
+        Swaps Gen1 (Mother) and Gen2 (Father) in the plan if owned Pokemon
+        fit the swapped roles better.
+        """
+        for livello in self.piano.livelli:
+            for acc in livello.accoppiamenti:
+                # Current Configuration: G1=Mother(Mandatory), G2=Father(Donor)
+                score_current = self._calculate_score_for_role(acc.genitore1, 'gen1', True) + \
+                                self._calculate_score_for_role(acc.genitore2, 'gen2', False)
+
+                # Swapped Configuration: G2=Mother(Mandatory), G1=Father(Donor)
+                score_swap = self._calculate_score_for_role(acc.genitore2, 'gen1', True) + \
+                             self._calculate_score_for_role(acc.genitore1, 'gen2', False)
+
+                if score_swap > score_current:
+                    # Perform Swap
+                    acc.genitore1, acc.genitore2 = acc.genitore2, acc.genitore1
 
     def evaluate(self) -> PianoValutato:
         """
         Executes the full evaluation (assignments only).
         """
+        # Step 0: Merge Duplicates to allow shared resource optimization
+        self._merge_duplicate_nodes()
+
+        # Step 1: Optimize Gender Roles
+        self._optimize_gender_roles()
+
         self._build_tree_maps()
         self._identify_mandatory_nodes()
         piano_valutato = PianoValutato(piano_originale=self.piano)
@@ -481,11 +621,11 @@ class PlanEvaluator:
 
         potential_reqs.sort(key=lambda item: (item['level'], len(item['req'].ruoli_iv), item['req'].ruolo_natura is not None), reverse=True)
 
-        fulfilled_req_ids: Set[int] = set()
+        self.fulfilled_req_ids = set()
 
         for item in potential_reqs:
             req_id = item['id']
-            if req_id in fulfilled_req_ids:
+            if req_id in self.fulfilled_req_ids:
                 continue
 
             richiesto = item['req']
@@ -513,8 +653,8 @@ class PlanEvaluator:
             q = [req_id]
             while q:
                 req_id_to_prune = q.pop(0)
-                if req_id_to_prune not in fulfilled_req_ids:
-                    fulfilled_req_ids.add(req_id_to_prune)
+                if req_id_to_prune not in self.fulfilled_req_ids:
+                    self.fulfilled_req_ids.add(req_id_to_prune)
                     if req_id_to_prune in self._child_to_parents_map:
                         q.extend(self._child_to_parents_map[req_id_to_prune])
 
