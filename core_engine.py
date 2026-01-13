@@ -4,6 +4,18 @@ from typing import List, Dict, Optional, Tuple, Set
 
 from structures import PokemonRichiesto, Accoppiamento, Livello, PianoCompleto
 
+def _mirror_structure(livelli_originali: List[Livello]) -> List[Livello]:
+    """
+    Creates a deep copy of the plan structure and swaps genitore1 (Mother/Species)
+    and genitore2 (Father/Donor) for every coupling.
+    This ensures that plans are evaluated for both gender configurations.
+    """
+    livelli_new = copy.deepcopy(livelli_originali)
+    for livello in livelli_new:
+        for acc in livello.accoppiamenti:
+            acc.genitore1, acc.genitore2 = acc.genitore2, acc.genitore1
+    return livelli_new
+
 # NOTE: Le funzioni _crea_piano_* sono state mantenute come fornite,
 # poiché l'errore risiedeva nella logica di generazione delle strategie
 # all'interno di `esegui_generazione`.
@@ -397,7 +409,10 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
         else:
             print(f"[INFO] Trovate {len(strategie_4iv_natura)} strategie 4IV+Natura.")
             for strat in strategie_4iv_natura:
-                try: lista_piani_base_livelli.append(_crea_piano_4iv_natura_strutturato(strat))
+                try:
+                    base_plan = _crea_piano_4iv_natura_strutturato(strat)
+                    lista_piani_base_livelli.append(base_plan)
+                    lista_piani_base_livelli.append(_mirror_structure(base_plan))
                 except Exception as e: print(f"[ERRORE] Gen piano 4IV+N: {strat}, {e}")
 
     elif num_iv == 4 and not ha_natura:
@@ -409,7 +424,10 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
         else:
             print(f"[INFO] Trovate {len(strategie_4iv_senza_natura)} strategie 4IV senza Natura.")
             for strat in strategie_4iv_senza_natura:
-                try: lista_piani_base_livelli.append(_crea_piano_4iv_senza_natura_strutturato(strat))
+                try:
+                    base_plan = _crea_piano_4iv_senza_natura_strutturato(strat)
+                    lista_piani_base_livelli.append(base_plan)
+                    lista_piani_base_livelli.append(_mirror_structure(base_plan))
                 except Exception as e: print(f"[ERRORE] Gen piano 4IV S/N: {strat}, {e}")
 
     elif num_iv == 5 and ha_natura:
@@ -422,7 +440,10 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
         else:
             print(f"[INFO] Trovate {len(strategie_5iv_natura)} strategie 5IV+Natura.")
             for strat in strategie_5iv_natura:
-                try: lista_piani_base_livelli.append(_crea_piano_5iv_natura_strutturato(strat))
+                try:
+                    base_plan = _crea_piano_5iv_natura_strutturato(strat)
+                    lista_piani_base_livelli.append(base_plan)
+                    lista_piani_base_livelli.append(_mirror_structure(base_plan))
                 except Exception as e: print(f"[ERRORE] Gen piano 5IV+N: {strat}, {e}")
 
     elif num_iv == 5 and not ha_natura:
@@ -462,6 +483,7 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
                 try:
                     piani_base = _crea_piano_5iv_senza_natura_strutturato(strategia_tuple)
                     lista_piani_base_livelli.append(piani_base)
+                    lista_piani_base_livelli.append(_mirror_structure(piani_base))
                 except Exception as e: print(f"[ERRORE] Gen piano 5IV S/N: {strategia_tuple}, {e}")
 
     elif num_iv == 3 and ha_natura:
@@ -481,6 +503,7 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
                 try:
                     piani_base = _crea_piano_3iv_natura_strutturato(strategia_tuple)
                     lista_piani_base_livelli.append(piani_base)
+                    lista_piani_base_livelli.append(_mirror_structure(piani_base))
                 except Exception as e: print(f"[ERRORE] Gen piano 3IV+N: {strategia_tuple}, {e}")
 
     elif num_iv == 3 and not ha_natura:
@@ -500,6 +523,7 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
                 try:
                     piani_base = _crea_piano_3iv_senza_natura_strutturato(strategia_tuple)
                     lista_piani_base_livelli.append(piani_base)
+                    lista_piani_base_livelli.append(_mirror_structure(piani_base))
                 except Exception as e: print(f"[ERRORE] Gen piano 3IV S/N: {strategia_tuple}, {e}")
 
     elif num_iv == 2 and ha_natura:
@@ -516,6 +540,7 @@ def esegui_generazione(ivs_desiderate: List[str], natura_desiderata: Optional[st
                 try:
                     piani_base = _crea_piano_2iv_natura_strutturato(strategia_tuple)
                     lista_piani_base_livelli.append(piani_base)
+                    lista_piani_base_livelli.append(_mirror_structure(piani_base))
                 except Exception as e: print(f"[ERRORE] Gen piano 2IV+N: {strategia_tuple}, {e}")
 
     else:
