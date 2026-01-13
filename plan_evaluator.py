@@ -113,18 +113,48 @@ class PlanEvaluator:
             if posseduto.specie != self.target_species:
                 return False
 
+        # 3b. Egg Group Check (For Non-Mandatory / Donor Roles)
+        # If not mandatory, and not Ditto, check if species shares Egg Group with Target
+        elif role == 'gen2' and posseduto.specie != 'Ditto' and posseduto.specie != self.target_species:
+             target_groups = self.pokemon_data.get(self.target_species, [])
+             candidate_groups = self.pokemon_data.get(posseduto.specie, [])
+             # If disjoint and both have data, fail.
+             # If data missing, we allow (fail open) or check strict?
+             # Let's check strict intersection if data exists.
+             if target_groups and candidate_groups:
+                 if set(target_groups).isdisjoint(set(candidate_groups)):
+                     return False
+
         # 4. Gender Check
         target_gender_type = "maschio e femmina"
         if self.target_species in self.gender_data:
             target_gender_type = self.gender_data[self.target_species].get("gender_type", "maschio e femmina").lower()
+        elif "Genderless" in self.pokemon_data.get(self.target_species, []):
+             target_gender_type = "genderless"
+
+        # Normalize Possessed Gender
+        p_sesso = posseduto.sesso
+        if p_sesso == 'M': p_sesso = 'Maschio'
+        if p_sesso == 'F': p_sesso = 'Femmina'
 
         # Genderless Target Logic
         if "genderless" in target_gender_type:
             if role == 'gen1':
-                # Must be Genderless
-                if posseduto.sesso != 'Genderless':
-                    return False
-                # If mandatory, we already checked species above.
+                # Must be Genderless (Species)
+                # Note: Some inputs might treat "Specie M" as generic.
+                # But for strict matching, "Genderless" implies no sex.
+                # However, user input might label it differently.
+                # Let's assume strict "Genderless" or "M" if checking inputs?
+                # For owned pokemon, user selects "Maschio/Femmina/Genderless".
+                # If target is Beldum, user should set owned to "Genderless".
+                # But to be safe against user error (selecting "Maschio" for Beldum), we might relax?
+                # No, strict is better.
+                if p_sesso != 'Genderless':
+                    # Allow relaxation?
+                    pass
+                # Actually, check logic:
+                if p_sesso != 'Genderless':
+                     return False
             elif role == 'gen2':
                 # Must be Ditto
                 if posseduto.specie != 'Ditto':
@@ -134,14 +164,14 @@ class PlanEvaluator:
         else:
             if role == 'gen1':
                 # Must be Female (Mother)
-                if posseduto.sesso != 'Femmina':
+                if p_sesso != 'Femmina':
                     return False
             elif role == 'gen2':
                 # Must be Male (Father) OR Ditto
                 # If possessed is Ditto, it can serve as Male partner.
                 if posseduto.specie == 'Ditto':
                     return True
-                if posseduto.sesso != 'Maschio':
+                if p_sesso != 'Maschio':
                     return False
 
         return True
