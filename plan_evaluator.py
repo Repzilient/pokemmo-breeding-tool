@@ -403,7 +403,7 @@ class PlanEvaluator:
                     options.append((c_specie_m, f"Comprare {self.target_species} ♂\n({primary_stat_key}) - ${c_specie_m}"))
 
                     c_group_m = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")
-                    options.append((c_group_m, f"Comprare {group_name} ♂\n({primary_stat_key}) - ${c_group_m}"))
+                    options.append((c_group_m, f"Comprare EggGroup: {group_name} ♂\n({primary_stat_key}) - ${c_group_m}"))
 
                     c_ditto = self.price_manager.get_price(primary_stat_key, "Ditto", "X")
                     options.append((c_ditto, f"Comprare Ditto\n({primary_stat_key}) - ${c_ditto}"))
@@ -414,7 +414,7 @@ class PlanEvaluator:
                     options.append((c_specie_f, f"Comprare {self.target_species} ♀\n({primary_stat_key}) - ${c_specie_f}"))
 
                     c_group_f = self.price_manager.get_price(primary_stat_key, "EggGroup", "F")
-                    options.append((c_group_f, f"Comprare {group_name} ♀\n({primary_stat_key}) - ${c_group_f}"))
+                    options.append((c_group_f, f"Comprare EggGroup: {group_name} ♀\n({primary_stat_key}) - ${c_group_f}"))
 
                     # Indirect: Breed Male EggGroup + Ditto -> Female EggGroup
                     c_group_m = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")

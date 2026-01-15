@@ -670,9 +670,8 @@ class BreedingToolApp(tk.Tk):
             else:
                 return f"✔ Usa tuo Pokemon (ID Non Trovato)"
 
-        # Check Purchased
-        if node_id in piano_valutato.mappa_acquisti:
-            return f"🛒 {piano_valutato.mappa_acquisti[node_id]}"
+        # Check Purchased (Only show icon, not full text to avoid replacing stats)
+        # Full text is now in Tooltip
 
         # Standard Description
         iv_names = sorted([legenda.get(r, r) for r in node.ruoli_iv])
