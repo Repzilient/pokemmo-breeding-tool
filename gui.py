@@ -534,6 +534,9 @@ class BreedingToolApp(tk.Tk):
             self._display_plan(self.generated_plans_cache[0])
             return
 
+        # Ensure 'Base' is always present for optimization logic (Option B/C requires Base prices)
+        required_stats.add("Base")
+
         # Open Dialog
         PriceInputDialog(self, required_stats, self.price_manager, self._run_evaluation_phase_2)
 
