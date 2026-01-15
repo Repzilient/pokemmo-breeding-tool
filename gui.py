@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 import json
 import uuid
 from typing import Set, List
+import bisect
 
 # Importa le classi e le funzioni necessarie dai file del progetto
 # Aggiornamento: Gestione automatica sesso e ottimizzazione costi
@@ -29,9 +30,20 @@ class AutocompleteCombobox(ttk.Combobox):
             self.position = len(self.get())
 
         _hits = []
-        for element in self._completion_list:
-            if element.lower().startswith(self.get().lower()):
-                _hits.append(element)
+        prefix = self.get().lower()
+
+        if not prefix:
+            _hits = self._completion_list[:]
+        else:
+            # Optimized search using binary search (bisect)
+            start_index = bisect.bisect_left(self._completion_list, prefix, key=str.lower)
+            for i in range(start_index, len(self._completion_list)):
+                element = self._completion_list[i]
+                if element.lower().startswith(prefix):
+                    _hits.append(element)
+                else:
+                    # List is sorted, so we can stop as soon as prefix doesn't match
+                    break
 
         if _hits != self._hits:
             self._hit_index = 0
