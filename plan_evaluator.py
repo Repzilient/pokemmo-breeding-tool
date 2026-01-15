@@ -263,19 +263,28 @@ class PlanEvaluator:
 
         return 5000
 
-    def calculate_cost_recursive(self, node_id: int, piano_valutato: PianoValutato, is_species_mandatory: bool, required_gender: str = 'F') -> Tuple[int, Dict[int, str]]:
+    def calculate_cost_recursive(self, node_id: int, piano_valutato: PianoValutato, is_species_mandatory: bool, required_gender: str = 'F', memo: Optional[Dict] = None) -> Tuple[int, Dict[int, str]]:
         """
         Calculates the cost to obtain the Pokemon at node_id.
         Returns (Cost, Decisions_Map).
         is_species_mandatory: If True, this Pokemon MUST be the target species (Female).
         required_gender: 'F' (Mother) or 'M' (Father) required for breeding compatibility.
         """
+        if memo is None:
+            memo = {}
+
+        cache_key = (node_id, is_species_mandatory, required_gender)
+        if cache_key in memo:
+            return memo[cache_key]
+
         # 1. Pruning Check: If Owned, Cost is 0
         if node_id in self.fulfilled_req_ids:
+            memo[cache_key] = (0, {})
             return 0, {}
 
         node = self._node_map.get(node_id)
         if not node:
+             memo[cache_key] = (999999999, {})
              return 999999999, {}
 
         # 2. Determine Requirements
@@ -288,6 +297,7 @@ class PlanEvaluator:
         # 3. Base Case: Leaf Node or Hole
         if node_id not in self._child_to_parents_map:
             if self.price_manager is None:
+                memo[cache_key] = (999999999, {})
                 return 999999999, {}
 
             primary_stat_key = None
@@ -447,6 +457,7 @@ class PlanEvaluator:
                 else:
                     cost = 999999999 # Should not happen
 
+            memo[cache_key] = (cost, {node_id: decision_desc})
             return cost, {node_id: decision_desc}
 
         # 4. Recursive Step: Breeding
@@ -507,8 +518,8 @@ class PlanEvaluator:
              p1_mandatory = is_species_mandatory
              p2_mandatory = False # Ditto is not the species
 
-             cost_1, decisions_1 = self.calculate_cost_recursive(p1_id, piano_valutato, p1_mandatory, required_gender='Genderless')
-             cost_2, decisions_2 = self.calculate_cost_recursive(p2_id, piano_valutato, p2_mandatory, required_gender='Ditto') # Helper to indicate Ditto role
+             cost_1, decisions_1 = self.calculate_cost_recursive(p1_id, piano_valutato, p1_mandatory, required_gender='Genderless', memo=memo)
+             cost_2, decisions_2 = self.calculate_cost_recursive(p2_id, piano_valutato, p2_mandatory, required_gender='Ditto', memo=memo) # Helper to indicate Ditto role
 
         else:
             # Standard
@@ -516,8 +527,8 @@ class PlanEvaluator:
             p2_mandatory = False
 
             # Pass Gender Roles: Gen1 is always Female (Mother), Gen2 is always Male (Father)
-            cost_1, decisions_1 = self.calculate_cost_recursive(p1_id, piano_valutato, p1_mandatory, required_gender='F')
-            cost_2, decisions_2 = self.calculate_cost_recursive(p2_id, piano_valutato, p2_mandatory, required_gender='M')
+            cost_1, decisions_1 = self.calculate_cost_recursive(p1_id, piano_valutato, p1_mandatory, required_gender='F', memo=memo)
+            cost_2, decisions_2 = self.calculate_cost_recursive(p2_id, piano_valutato, p2_mandatory, required_gender='M', memo=memo)
 
         total_cost = total_breeding_cost + cost_1 + cost_2
 
@@ -536,6 +547,7 @@ class PlanEvaluator:
         # Add intermediate step description
         decisions[node_id] = f"Allevamento (Tassa: ${fee}, Items: ${base_item_cost})"
 
+        memo[cache_key] = (total_cost, decisions)
         return total_cost, decisions
 
     def _calculate_score_for_role(self, req: PokemonRichiesto, role: str, is_mandatory: bool) -> float:
@@ -691,7 +703,7 @@ class PlanEvaluator:
         """
         if self.price_manager and self.piano.livelli:
              final_node = self.piano.livelli[-1].accoppiamenti[0].figlio
-             cost, decisions = self.calculate_cost_recursive(id(final_node), piano_valutato, True)
+             cost, decisions = self.calculate_cost_recursive(id(final_node), piano_valutato, True, memo={})
              piano_valutato.costo_totale = cost
              piano_valutato.mappa_acquisti = decisions
 
