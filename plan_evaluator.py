@@ -320,6 +320,13 @@ class PlanEvaluator:
                     # No "Female" or "Male" logic.
                     # We treat "Specie M" input as generic "Specie" for Genderless in this context.
 
+                    # Fees for breeding the leaf node (Genderless + Ditto -> Genderless)
+                    leaf_item_cost = 15000 if required_nature is not None else 20000
+                    # No gender fee for genderless usually, or handled by _get_gender_cost('X')?
+                    # Using existing logic:
+                    leaf_breeding_fee = self._get_gender_cost('Genderless') # Should return 0
+                    extra_leaf_cost = leaf_breeding_fee + leaf_item_cost
+
                     c_specie_stat = self.price_manager.get_price(primary_stat_key, "Specie", "M") # Using M/F field as generic
                     c_specie_base = self.price_manager.get_price("Base", "Specie", "M")
 
@@ -327,9 +334,9 @@ class PlanEvaluator:
                     c_ditto_base = self.price_manager.get_price("Base", "Ditto", "X")
 
                     # Option 1: Species(Stat) + Ditto(Base)
-                    opt1 = c_specie_stat + c_ditto_base
+                    opt1 = c_specie_stat + c_ditto_base + extra_leaf_cost
                     # Option 2: Species(Base) + Ditto(Stat)
-                    opt2 = c_specie_base + c_ditto_stat
+                    opt2 = c_specie_base + c_ditto_stat + extra_leaf_cost
 
                     if opt1 <= opt2:
                         cost = opt1
@@ -340,7 +347,13 @@ class PlanEvaluator:
 
                 else:
                     # Standard Gendered Logic
-                    # Option A: Buy Female Species (Standard)
+
+                    # Calculate extra breeding costs for Options B and C (Implicit Breeding)
+                    leaf_breeding_fee = self._get_gender_cost('F') # We are creating the Mandatory Species (Female)
+                    leaf_item_cost = 15000 if required_nature is not None else 20000
+                    extra_leaf_cost = leaf_breeding_fee + leaf_item_cost
+
+                    # Option A: Buy Female Species (Standard) - Direct Purchase (No breeding fee)
                     cost_A = self.price_manager.get_price(primary_stat_key, "Specie", "F")
 
                     # Option B: Buy Male Species + Ditto (Ditto Trick)
@@ -352,19 +365,20 @@ class PlanEvaluator:
                     c_ditto_stat = self.price_manager.get_price(primary_stat_key, "Ditto", "X")
                     cost_B2 = c_specie_m_base + c_ditto_stat
 
+                    cost_B = min(cost_B1, cost_B2) + extra_leaf_cost
+
                     if cost_B1 < cost_B2:
-                        cost_B = cost_B1
                         desc_B = f"Comprare {self.target_species} ♂ ({primary_stat_key}) + Ditto (Base) - ${cost_B}"
                     else:
-                        cost_B = cost_B2
                         desc_B = f"Comprare Ditto ({primary_stat_key}) + {self.target_species} ♂ (Base) - ${cost_B}"
 
                     # Option C: Buy Female Species (Base) + Male EggGroup (Stat)
                     # This ensures the Line is preserved (Female Species) but gets stats from cheap EggGroup.
                     c_specie_f_base = self.price_manager.get_price("Base", "Specie", "F")
                     c_group_m_stat = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")
-                    cost_C = c_specie_f_base + c_group_m_stat
-                    desc_C = f"Comprare {self.target_species} ♀ (Base) + {group_name} ♂ ({primary_stat_key}) - ${cost_C}"
+
+                    cost_C = c_specie_f_base + c_group_m_stat + extra_leaf_cost
+                    desc_C = f"Comprare {self.target_species} ♀ (Base) + EggGroup: {group_name} ♂ ({primary_stat_key}) - ${cost_C}"
 
                     # Find Min(A, B, C)
                     options = [
@@ -401,6 +415,19 @@ class PlanEvaluator:
 
                     c_group_f = self.price_manager.get_price(primary_stat_key, "EggGroup", "F")
                     options.append((c_group_f, f"Comprare {group_name} ♀\n({primary_stat_key}) - ${c_group_f}"))
+
+                    # Indirect: Breed Male EggGroup + Ditto -> Female EggGroup
+                    c_group_m = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")
+                    c_ditto_base = self.price_manager.get_price("Base", "Ditto", "X")
+
+                    # Calculate extra cost for indirect breeding
+                    _fee = self._get_gender_cost('F')
+                    _items = 15000 if required_nature is not None else 20000
+                    _extra = _fee + _items
+
+                    cost_indirect = c_group_m + c_ditto_base + _extra
+                    desc_indirect = f"Allevare {group_name} ♀ da {group_name} ♂ + Ditto - ${cost_indirect}"
+                    options.append((cost_indirect, desc_indirect))
 
                 elif required_gender == 'Ditto':
                     # Specific request for a Ditto (e.g. for Genderless breeding)
@@ -500,13 +527,11 @@ class PlanEvaluator:
         for k, v in decisions_2.items():
             if k in decisions:
                 current_desc = decisions[k]
-                # If current description mentions target species (e.g. Absol), keep it.
-                # If new description (v) mentions target species and current doesn't, overwrite.
-                # If both or neither, overwrite (default).
-                if self.target_species in current_desc and self.target_species not in v:
-                    continue # Keep current (Species > EggGroup)
-                # Else overwrite
-            decisions[k] = v
+                # Avoid duplicates
+                if v not in current_desc:
+                     decisions[k] = f"{current_desc} / {v}"
+            else:
+                decisions[k] = v
 
         # Add intermediate step description
         decisions[node_id] = f"Allevamento (Tassa: ${fee}, Items: ${base_item_cost})"
