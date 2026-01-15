@@ -715,16 +715,36 @@ class BreedingToolApp(tk.Tk):
         fill_color = "#ADD8E6"
         outline_color = "#00008B"
 
+        purchase_desc = ""
+        is_complex_strategy = False
+
         if is_owned:
             fill_color = "#90EE90"
             outline_color = "#006400"
         elif is_bought:
-            fill_color = "#FFD700" # Gold for bought
-            outline_color = "#B8860B"
+            purchase_desc = piano_valutato.mappa_acquisti.get(node_id, "")
+            # Heuristic to detect optimization strategies
+            if "+" in purchase_desc or "Allevare" in purchase_desc or "EggGroup" in purchase_desc:
+                is_complex_strategy = True
+                fill_color = "#FF6347" # Tomato Red for Crafting/Optimization
+                outline_color = "#8B0000"
+            else:
+                fill_color = "#FFD700" # Gold for standard purchase
+                outline_color = "#B8860B"
 
-        self.results_canvas.create_rectangle(x - node_width/2, y - node_height/2, x + node_width/2, y + node_height/2, fill=fill_color, outline=outline_color, width=2)
+        rect_tag = f"node_rect_{node_id}"
+        text_tag = f"node_text_{node_id}"
+
+        self.results_canvas.create_rectangle(x - node_width/2, y - node_height/2, x + node_width/2, y + node_height/2, fill=fill_color, outline=outline_color, width=2, tags=rect_tag)
         text = self._get_node_text(node, legenda, piano_valutato, owned_map)
-        self.results_canvas.create_text(x, y, text=text, font=("Arial", 8, "bold" if is_owned else "normal"), justify=tk.CENTER)
+        self.results_canvas.create_text(x, y, text=text, font=("Arial", 8, "bold" if is_owned else "normal"), justify=tk.CENTER, tags=text_tag)
+
+        # Tooltip Binding for Complex Strategies
+        if is_complex_strategy and purchase_desc:
+            self.results_canvas.tag_bind(rect_tag, "<Enter>", lambda e, t=purchase_desc: self._show_tooltip(e, t))
+            self.results_canvas.tag_bind(rect_tag, "<Leave>", self._hide_tooltip)
+            self.results_canvas.tag_bind(text_tag, "<Enter>", lambda e, t=purchase_desc: self._show_tooltip(e, t))
+            self.results_canvas.tag_bind(text_tag, "<Leave>", self._hide_tooltip)
 
         if not is_owned and node_id in child_to_parents_map:
             genitore1, genitore2 = child_to_parents_map[node_id]
@@ -759,6 +779,27 @@ class BreedingToolApp(tk.Tk):
         self.owned_pokemon_list.clear()
         self._clear_results()
         messagebox.showinfo("Reset", "Tutti i campi sono stati resettati.")
+
+    # --- Tooltip Helper ---
+    def _show_tooltip(self, event, text):
+        x, y, _, _ = self.results_canvas.bbox("current")
+        # Adjust position relative to canvas
+        x += self.results_canvas.winfo_rootx() + 20
+        y += self.results_canvas.winfo_rooty() + 20
+
+        self.tooltip = tk.Toplevel(self)
+        self.tooltip.wm_overrideredirect(True)
+        self.tooltip.wm_geometry(f"+{x}+{y}")
+
+        label = ttk.Label(self.tooltip, text=text, justify='left',
+                          background="#ffffe0", relief='solid', borderwidth=1,
+                          font=("tahoma", "8", "normal"))
+        label.pack(ipadx=1)
+
+    def _hide_tooltip(self, event):
+        if hasattr(self, 'tooltip') and self.tooltip:
+            self.tooltip.destroy()
+            self.tooltip = None
 
 if __name__ == '__main__':
     app = BreedingToolApp()
