@@ -77,6 +77,8 @@ class PriceInputDialog(tk.Toplevel):
         self.price_manager = price_manager
         self.on_confirm = on_confirm
         self.required_stats = sorted(list(required_stats))
+        if "Base" not in self.required_stats:
+            self.required_stats.insert(0, "Base")
         self.inputs = {}
 
         self._create_widgets()
@@ -114,30 +116,28 @@ class PriceInputDialog(tk.Toplevel):
 
             self.inputs[stat] = {}
 
+            def create_entry(category, gender, col):
+                entry = ttk.Entry(scrollable_frame, width=10)
+                entry.grid(row=row, column=col, padx=2)
+                val = self.price_manager.get_price(stat, category, gender)
+                if val != 999999999:
+                    entry.insert(0, str(val))
+                return entry
+
             # Specie M
-            sm = ttk.Entry(scrollable_frame, width=10)
-            sm.grid(row=row, column=1, padx=2)
-            self.inputs[stat]["Specie_M"] = sm
+            self.inputs[stat]["Specie_M"] = create_entry("Specie", "M", 1)
 
             # Specie F
-            sf = ttk.Entry(scrollable_frame, width=10)
-            sf.grid(row=row, column=2, padx=2)
-            self.inputs[stat]["Specie_F"] = sf
+            self.inputs[stat]["Specie_F"] = create_entry("Specie", "F", 2)
 
             # EggGroup M
-            em = ttk.Entry(scrollable_frame, width=10)
-            em.grid(row=row, column=3, padx=2)
-            self.inputs[stat]["EggGroup_M"] = em
+            self.inputs[stat]["EggGroup_M"] = create_entry("EggGroup", "M", 3)
 
             # EggGroup F
-            ef = ttk.Entry(scrollable_frame, width=10)
-            ef.grid(row=row, column=4, padx=2)
-            self.inputs[stat]["EggGroup_F"] = ef
+            self.inputs[stat]["EggGroup_F"] = create_entry("EggGroup", "F", 4)
 
             # Ditto
-            d = ttk.Entry(scrollable_frame, width=10)
-            d.grid(row=row, column=5, padx=2)
-            self.inputs[stat]["Ditto"] = d
+            self.inputs[stat]["Ditto"] = create_entry("Ditto", "X", 5)
 
         # Button Frame
         btn_frame = ttk.Frame(container)
@@ -150,7 +150,7 @@ class PriceInputDialog(tk.Toplevel):
         ttk.Button(btn_frame, text="Non aggiungere prezzi", command=self._skip_prices).pack(side="left", padx=10)
 
     def _confirm(self):
-        self.price_manager.clear()
+        # self.price_manager.clear() # REMOVED: Persistence requires keeping old prices
 
         for stat, entries in self.inputs.items():
             try:
@@ -170,6 +170,7 @@ class PriceInputDialog(tk.Toplevel):
                 messagebox.showerror("Errore", f"Inserisci valori numerici validi per {stat}")
                 return
 
+        self.price_manager.save_prices()
         self.on_confirm()
         self.destroy()
 
