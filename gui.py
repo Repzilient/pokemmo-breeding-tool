@@ -73,13 +73,15 @@ class PriceInputDialog(tk.Toplevel):
     def __init__(self, parent, required_stats: Set[str], price_manager: PriceManager, on_confirm):
         super().__init__(parent)
         self.title("Inserimento Prezzi di Mercato")
-        self.geometry("900x600")
+        self.geometry("1100x700")
         self.price_manager = price_manager
         self.on_confirm = on_confirm
         self.required_stats = sorted(list(required_stats))
         if "Base" not in self.required_stats:
             self.required_stats.insert(0, "Base")
-        self.inputs = {}
+
+        self.species_inputs = {}
+        self.gtl_inputs = {}
 
         self._create_widgets()
 
@@ -87,59 +89,19 @@ class PriceInputDialog(tk.Toplevel):
         container = ttk.Frame(self, padding="10")
         container.pack(fill="both", expand=True)
 
-        ttk.Label(container, text="Inserisci i prezzi per gli ingredienti mancanti ($)", font=("Arial", 12, "bold")).pack(pady=10)
+        ttk.Label(container, text="Inserisci i prezzi per gli ingredienti mancanti ($)", font=("Arial", 12, "bold")).pack(pady=(0, 10))
 
-        # Scrollable Frame for inputs
-        canvas = tk.Canvas(container)
-        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
-        scrollable_frame = ttk.Frame(canvas)
+        # Notebook
+        self.notebook = ttk.Notebook(container)
+        self.notebook.pack(fill="both", expand=True)
 
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        # Tab 1: Specie Attuale
+        self._create_tab_species()
 
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        # Tab 2: GTL
+        self._create_tab_gtl()
 
-        # Headers
-        headers = ["Statistica / Natura", "Specie (M)", "Specie (F)", "EggGroup (M)", "EggGroup (F)", "Ditto"]
-        for col, text in enumerate(headers):
-            ttk.Label(scrollable_frame, text=text, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=5, pady=5)
-
-        # Rows
-        for i, stat in enumerate(self.required_stats):
-            row = i + 1
-            ttk.Label(scrollable_frame, text=stat).grid(row=row, column=0, padx=5, pady=5, sticky="w")
-
-            self.inputs[stat] = {}
-
-            def create_entry(category, gender, col):
-                entry = ttk.Entry(scrollable_frame, width=10)
-                entry.grid(row=row, column=col, padx=2)
-                val = self.price_manager.get_price(stat, category, gender)
-                if val != 999999999:
-                    entry.insert(0, str(val))
-                return entry
-
-            # Specie M
-            self.inputs[stat]["Specie_M"] = create_entry("Specie", "M", 1)
-
-            # Specie F
-            self.inputs[stat]["Specie_F"] = create_entry("Specie", "F", 2)
-
-            # EggGroup M
-            self.inputs[stat]["EggGroup_M"] = create_entry("EggGroup", "M", 3)
-
-            # EggGroup F
-            self.inputs[stat]["EggGroup_F"] = create_entry("EggGroup", "F", 4)
-
-            # Ditto
-            self.inputs[stat]["Ditto"] = create_entry("Ditto", "X", 5)
-
-        # Button Frame
+        # Button Frame (Bottom)
         btn_frame = ttk.Frame(container)
         btn_frame.pack(pady=20)
 
@@ -149,12 +111,122 @@ class PriceInputDialog(tk.Toplevel):
         # Skip Prices Button
         ttk.Button(btn_frame, text="Non aggiungere prezzi", command=self._skip_prices).pack(side="left", padx=10)
 
-    def _confirm(self):
-        # self.price_manager.clear() # REMOVED: Persistence requires keeping old prices
+    def _create_tab_species(self):
+        frame = ttk.Frame(self.notebook, padding=10)
+        self.notebook.add(frame, text="Specie Attuale")
 
-        for stat, entries in self.inputs.items():
+        # Scrollable area
+        canvas = tk.Canvas(frame)
+        scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # Headers
+        headers = ["Statistica / Natura", "Specie (M)", "Specie (F)"]
+        for col, text in enumerate(headers):
+            ttk.Label(scrollable_frame, text=text, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=15, pady=5)
+
+        # Rows
+        for i, stat in enumerate(self.required_stats):
+            row = i + 1
+            ttk.Label(scrollable_frame, text=stat).grid(row=row, column=0, padx=5, pady=5, sticky="w")
+
+            self.species_inputs[stat] = {}
+
+            # Specie M
+            entry_m = ttk.Entry(scrollable_frame, width=15)
+            entry_m.grid(row=row, column=1, padx=5, pady=2)
+            val_m = self.price_manager.get_price(stat, "Specie", "M")
+            if val_m != 999999999:
+                entry_m.insert(0, str(val_m))
+            self.species_inputs[stat]["Specie_M"] = entry_m
+
+            # Specie F
+            entry_f = ttk.Entry(scrollable_frame, width=15)
+            entry_f.grid(row=row, column=2, padx=5, pady=2)
+            val_f = self.price_manager.get_price(stat, "Specie", "F")
+            if val_f != 999999999:
+                entry_f.insert(0, str(val_f))
+            self.species_inputs[stat]["Specie_F"] = entry_f
+
+    def _create_tab_gtl(self):
+        frame = ttk.Frame(self.notebook, padding=10)
+        self.notebook.add(frame, text="GTL")
+
+        # Scrollable area (Horizontal & Vertical)
+        canvas = tk.Canvas(frame)
+        v_scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+        h_scrollbar = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+
+        canvas.grid(row=0, column=0, sticky="nsew")
+        v_scrollbar.grid(row=0, column=1, sticky="ns")
+        h_scrollbar.grid(row=1, column=0, sticky="ew")
+
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        # Fixed Stats for GTL
+        gtl_stats = ["Base", "PS", "Attacco", "Difesa", "Attacco Speciale", "Difesa Speciale", "Velocità", "Natura"]
+
+        # Egg Groups (Display -> Internal Key)
+        egg_groups_map = [
+            ("Ditto", "Ditto"),
+            ("Mostro", "Mostro"),
+            ("Umanoide", "Umanoide"),
+            ("Coleottero", "Coleottero"),
+            ("Volante", "Volante"),
+            ("Campo", "Campo"),
+            ("Magico", "Folletto"),
+            ("Erba", "Pianta"),
+            ("Drago", "Drago"),
+            ("Minerale", "Minerale"),
+            ("Amorfo", "Caos"),
+            ("Acqua 1", "Water A"),
+            ("Acqua 2", "Water B"),
+            ("Acqua 3", "Water C")
+        ]
+
+        # Headers
+        ttk.Label(scrollable_frame, text="Stat", font=("Arial", 9, "bold")).grid(row=0, column=0, padx=5, pady=5)
+        for col_idx, (display_name, key) in enumerate(egg_groups_map):
+            ttk.Label(scrollable_frame, text=display_name, font=("Arial", 9, "bold")).grid(row=0, column=col_idx + 1, padx=2, pady=5)
+
+        # Rows
+        for row_idx, stat in enumerate(gtl_stats):
+            row = row_idx + 1
+            ttk.Label(scrollable_frame, text=stat).grid(row=row, column=0, padx=5, pady=2, sticky="w")
+
+            self.gtl_inputs[stat] = {}
+
+            for col_idx, (display_name, key) in enumerate(egg_groups_map):
+                entry = ttk.Entry(scrollable_frame, width=8)
+                entry.grid(row=row, column=col_idx + 1, padx=1, pady=1)
+
+                # Determine gender/category
+                category = key
+                gender = "X" if key == "Ditto" else "M"
+
+                val = self.price_manager.get_price(stat, category, gender)
+                if val != 999999999:
+                    entry.insert(0, str(val))
+
+                self.gtl_inputs[stat][key] = entry
+
+    def _confirm(self):
+        # 1. Save Species Prices
+        for stat, entries in self.species_inputs.items():
             try:
-                # Helper to parse int or default to infinity
                 def get_val(entry):
                     val = entry.get().strip()
                     if not val: return 999999999
@@ -162,27 +234,37 @@ class PriceInputDialog(tk.Toplevel):
 
                 self.price_manager.set_price(stat, "Specie", "M", get_val(entries["Specie_M"]))
                 self.price_manager.set_price(stat, "Specie", "F", get_val(entries["Specie_F"]))
-                self.price_manager.set_price(stat, "EggGroup", "M", get_val(entries["EggGroup_M"]))
-                self.price_manager.set_price(stat, "EggGroup", "F", get_val(entries["EggGroup_F"]))
-                self.price_manager.set_price(stat, "Ditto", "X", get_val(entries["Ditto"]))
-
             except ValueError:
-                messagebox.showerror("Errore", f"Inserisci valori numerici validi per {stat}")
+                messagebox.showerror("Errore", f"Inserisci valori numerici validi in Specie Attuale per {stat}")
                 return
+
+        # 2. Save GTL Prices
+        for stat, entries in self.gtl_inputs.items():
+            for key, entry in entries.items():
+                try:
+                    def get_val(entry):
+                        val = entry.get().strip()
+                        if not val: return 999999999
+                        return int(val)
+
+                    category = key
+                    gender = "X" if key == "Ditto" else "M"
+                    self.price_manager.set_price(stat, category, gender, get_val(entry))
+                except ValueError:
+                    messagebox.showerror("Errore", f"Inserisci valori validi in GTL per {stat}")
+                    return
 
         self.price_manager.save_prices()
         self.on_confirm()
         self.destroy()
 
     def _skip_prices(self):
-        """Sets all prices to 0 and confirms."""
-        self.price_manager.clear()
+        """Sets ONLY Species prices to 0 and confirms, preserving GTL."""
+        # Only reset current species requirements to 0
         for stat in self.required_stats:
             self.price_manager.set_price(stat, "Specie", "M", 0)
             self.price_manager.set_price(stat, "Specie", "F", 0)
-            self.price_manager.set_price(stat, "EggGroup", "M", 0)
-            self.price_manager.set_price(stat, "EggGroup", "F", 0)
-            self.price_manager.set_price(stat, "Ditto", "X", 0)
+            # Do NOT touch EggGroups or Ditto in GTL
 
         self.on_confirm()
         self.destroy()

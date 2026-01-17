@@ -263,6 +263,32 @@ class PlanEvaluator:
 
         return 5000
 
+    def _get_best_egg_group_price(self, stat_name: str, gender: str) -> Tuple[int, str]:
+        """
+        Finds the cheapest price among all compatible Egg Groups for the target species.
+        Returns (price, group_name).
+        """
+        egg_groups = self.pokemon_data.get(self.target_species, [])
+        best_price = 999999999
+        best_group = "EggGroup"
+
+        # Check specific egg groups
+        if egg_groups:
+            for group in egg_groups:
+                p = self.price_manager.get_price(stat_name, group, gender)
+                if p < best_price:
+                    best_price = p
+                    best_group = group
+
+        # Fallback to generic "EggGroup" key (for backward compatibility)
+        # Only if we found nothing valid (infinity), or if generic is cheaper.
+        p_generic = self.price_manager.get_price(stat_name, "EggGroup", gender)
+        if p_generic < best_price:
+            best_price = p_generic
+            best_group = "EggGroup"
+
+        return best_price, best_group
+
     def calculate_cost_recursive(self, node_id: int, piano_valutato: PianoValutato, is_species_mandatory: bool, required_gender: str = 'F', memo: Optional[Dict] = None) -> Tuple[int, Dict[int, str]]:
         """
         Calculates the cost to obtain the Pokemon at node_id.
@@ -310,9 +336,6 @@ class PlanEvaluator:
 
             cost = 999999999
             decision_desc = "Sconosciuto"
-
-            egg_groups = self.pokemon_data.get(self.target_species, [])
-            group_name = egg_groups[0] if egg_groups else "EggGroup"
 
             # Check for Genderless Biological Nature
             target_gender_type = "maschio e femmina"
@@ -385,10 +408,12 @@ class PlanEvaluator:
                     # Option C: Buy Female Species (Base) + Male EggGroup (Stat)
                     # This ensures the Line is preserved (Female Species) but gets stats from cheap EggGroup.
                     c_specie_f_base = self.price_manager.get_price("Base", "Specie", "F")
-                    c_group_m_stat = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")
+
+                    # UPDATE: Use Specific Egg Group Prices
+                    c_group_m_stat, group_name_C = self._get_best_egg_group_price(primary_stat_key, "M")
                     
                     cost_C = c_specie_f_base + c_group_m_stat + extra_leaf_cost
-                    desc_C = f"Comprare {self.target_species} ♀ (Base) + EggGroup: {group_name} ♂ ({primary_stat_key}) - ${cost_C}"
+                    desc_C = f"Comprare {self.target_species} ♀ (Base) + EggGroup: {group_name_C} ♂ ({primary_stat_key}) - ${cost_C}"
 
                     # Find Min(A, B, C)
                     options = [
@@ -412,8 +437,8 @@ class PlanEvaluator:
                     c_specie_m = self.price_manager.get_price(primary_stat_key, "Specie", "M")
                     options.append((c_specie_m, f"Comprare {self.target_species} ♂\n({primary_stat_key}) - ${c_specie_m}"))
 
-                    c_group_m = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")
-                    options.append((c_group_m, f"Comprare {group_name} ♂\n({primary_stat_key}) - ${c_group_m}"))
+                    c_group_m, group_name_M = self._get_best_egg_group_price(primary_stat_key, "M")
+                    options.append((c_group_m, f"Comprare {group_name_M} ♂\n({primary_stat_key}) - ${c_group_m}"))
 
                     c_ditto = self.price_manager.get_price(primary_stat_key, "Ditto", "X")
                     options.append((c_ditto, f"Comprare Ditto\n({primary_stat_key}) - ${c_ditto}"))
@@ -423,11 +448,21 @@ class PlanEvaluator:
                     c_specie_f = self.price_manager.get_price(primary_stat_key, "Specie", "F")
                     options.append((c_specie_f, f"Comprare {self.target_species} ♀\n({primary_stat_key}) - ${c_specie_f}"))
 
-                    c_group_f = self.price_manager.get_price(primary_stat_key, "EggGroup", "F")
-                    options.append((c_group_f, f"Comprare {group_name} ♀\n({primary_stat_key}) - ${c_group_f}"))
+                    # UPDATE: For Female EggGroup, we check if specific prices exist (usually unlikely for F, but possible)
+                    # GTL tab only has Male EggGroups. But logic might require Female.
+                    # The user said "GTL tab... ONLY prices for Male Egg Groups".
+                    # So we probably rely on "EggGroup" generic price OR assume Male price applies?
+                    # Wait, if we only input Male prices, then getting Female EggGroup price will return Infinity unless we have a generic "F" price.
+                    # But wait, Indirect Breeding (Option below) creates a Female from Male + Ditto.
+                    # So direct purchase of Female EggGroup might be expensive/infinity, favoring Indirect.
+                    # I will stick to the same helper but ask for "F". If GTL is M-only, this will return Infinity (correct).
+
+                    c_group_f, group_name_F = self._get_best_egg_group_price(primary_stat_key, "F")
+                    options.append((c_group_f, f"Comprare {group_name_F} ♀\n({primary_stat_key}) - ${c_group_f}"))
 
                     # Indirect: Breed Male EggGroup + Ditto -> Female EggGroup
-                    c_group_m = self.price_manager.get_price(primary_stat_key, "EggGroup", "M")
+                    # We need a Cheap Male Egg Group
+                    c_group_m, group_name_ind = self._get_best_egg_group_price(primary_stat_key, "M")
                     c_ditto_base = self.price_manager.get_price("Base", "Ditto", "X")
                     
                     # Calculate extra cost for indirect breeding
@@ -436,7 +471,7 @@ class PlanEvaluator:
                     _extra = _fee + _items
 
                     cost_indirect = c_group_m + c_ditto_base + _extra
-                    desc_indirect = f"Allevare {group_name} ♀ da {group_name} ♂ + Ditto - ${cost_indirect}"
+                    desc_indirect = f"Allevare {group_name_ind} ♀ da {group_name_ind} ♂ + Ditto - ${cost_indirect}"
                     options.append((cost_indirect, desc_indirect))
 
                 elif required_gender == 'Ditto':
