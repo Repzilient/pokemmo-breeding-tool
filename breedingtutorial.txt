@@ -1,0 +1,139 @@
+Questa è l'enciclopedia definitiva sul breeding di PokeMMO, strutturata per sviscerare ogni meccanica, dai fondamenti alle strategie più oscure utilizzate dai veterani.
+
+---
+
+### 1. Fondamenti e Meccaniche di Base
+A differenza dei giochi originali, il breeding in PokeMMO è un sistema di **sacrificio**:
+*   **Consumo dei Genitori:** Entrambi i genitori vengono consumati definitivamente per generare l'uovo.
+*   **Determinazione della Specie:** La prole sarà sempre della stessa linea evolutiva della **madre**.
+*   **Il Ruolo di Ditto:** Può accoppiarsi con quasi tutto (tranne Baby e altri Ditto). Se usato, la prole sarà della specie del partner.
+*   **Schiusa a Tempo:** Non conta il numero di passi, ma il tempo reale (base circa **5 minuti e 20 secondi**).
+*   **Requisiti Fisici:** È obbligatorio avere una **Poké Ball vuota** nello zaino e i genitori non devono essere "non scambiabili" (come i Pokémon iniziali della storia).
+
+#### Ubicazione delle Pensioni (Daycare)
+Ogni regione ha un NPC dedicato:
+*   **Kanto:** Quattr'Isola (Settipelago), accessibile dopo i Superquattro.
+*   **Hoenn:** Percorso 117, tra Ciclamipoli e Veridipoli.
+*   **Sinnoh:** Flemminia.
+*   **Unima:** Percorso 3, vicino a Levantopoli (la più popolare per la vicinanza al PC).
+*   **Johto:** Percorso 34, a sud di Fiordoropoli.
+
+---
+
+### 2. Dizionario Dinamico del Breeder
+*   **1x31, 2x31... 6x31:** Indica quanti IV al valore massimo (31) possiede il Pokémon.
+*   **Bracer/Vigor (Strumenti Vigor):** Oggetti tenuti per forzare il passaggio di un IV specifico.
+*   **Everstone (Pietrastante):** Oggetto per garantire la natura del genitore al figlio.
+*   **Egg Group (Gruppo Uovo):** Categorie di compatibilità (es. Campo, Mostro, Drago).
+*   **Egg Move (Mossa Uovo):** Mosse trasmissibili solo tramite accoppiamento.
+*   **OT (Original Trainer):** Indica se il Pokémon è stato catturato/generato dal giocatore attuale.
+*   **OT* (OT con asterisco):** Indica un Pokémon nato da genitori comprati/scambiati, non valido per il completamento del Pokédex OT.
+*   **Foddermon/Breeder:** Pokémon "sacrificali" usati solo per passare statistiche a una linea evolutiva principale.
+*   **Chain Breeding:** Processo a più stadi per passare mosse tra Pokémon di gruppi uovo diversi.
+
+---
+
+### 3. Gestione Avanzata di IV e Nature
+
+#### Il Metodo dei Blocchi (IV)
+Per ottenere un Pokémon competitivo (es. 5x31), si segue una progressione geometrica:
+1.  Si accoppiano due Pokémon 1x31 (es. uno con 31 HP e uno con 31 Attacco) usando i rispettivi **Vigor-strumenti** (Peso Vigor e Bracciale Vigor) per ottenere un **2x31**.
+2.  Per passare da un 2x31 a un 3x31, servono due genitori 2x31 che abbiano **una statistica 31 in comune** (che passerà automaticamente) e una diversa ciascuno (che verrà bloccata con i Vigor-strumenti).
+3.  Il costo raddoppia a ogni step: per un 5x31 servono almeno 16 Pokémon 1x31 di base.
+
+#### La Scelta del Genere
+Controllare il sesso della prole ha un costo crescente in base alla rarità della specie:
+*   Rapporto 50/50: **5.000$**.
+*   Rapporto sbilanciato (es. Eevee o Starter): fino a **21.000$** per il genere raro (femmina).
+*   *Consiglio segreto:* Se usi un Ditto, non importa il sesso dell'altro genitore, ma dovrai comunque pagare per scegliere il sesso del figlio se vuoi continuare la catena senza altri Ditto.
+
+#### Ottimizzazione della Natura
+*   **Scuola Risparmio:** Non usare la Pietrastante fino all'ultimo step. Si spera in un "roll" fortunato durante i vari accoppiamenti (randomicità).
+*   **Scuola Sicurezza:** Se si ottiene la natura corretta su un 3x31 o 4x31, la si blocca subito con la Pietrastante. Questo rende i passaggi successivi più costosi perché si può bloccare un solo IV per ogni accoppiamento (l'altro slot è occupato dalla Pietrastante).
+
+---
+
+### 4. Tecniche Speciali: Alphas, Shinies e Particelle
+
+*   **Alpha Breeding:** Per mantenere lo stato **Alpha**, **entrambi** i genitori devono essere Alpha. Se uno solo lo è, il figlio perderà l'aura rossa ma manterrà l'accesso alla Hidden Ability (HA).
+*   **Hidden Ability (Abilità Nascosta):** Passa sempre se la **madre** la possiede. Se si usa Ditto, il genitore non-Ditto deve avere l'HA.
+*   **Shiny Breeding:** Gli Shiny possono accoppiarsi **solo con altri Shiny**. È un processo estremamente costoso che segue le stesse regole degli IV normali.
+*   **Secret Shiny:** È una variante 16 volte più rara. Se accoppi un Secret Shiny con uno Shiny normale, il figlio sarà Secret Shiny.
+*   **Particelle:** Si trasmettono sempre al figlio. Se entrambi i genitori hanno particelle diverse, il figlio le erediterà tutte (se ne può attivare una alla volta).
+
+---
+
+### 5. Trucchi e Segreti per l'Efficienza Pratica
+
+#### Ottimizzazione Tempi (Schiusa Rapida)
+*   **Abilità:** Avere in squadra (o nell'incubatrice nel nuovo sistema) un Pokémon con **Corpoinfuoco (Flame Body)** o **Magmascudo (Magma Armor)** riduce il tempo di schiusa di 1 minuto.
+*   **Donator Status:** Riduce ulteriormente il tempo di schiusa.
+*   **Incubatrici Permanenti:** Puoi sbloccarne fino a 8 parlando con il nonno della pensione o completando obiettivi (Superquattro, Rosso, Ho-Oh).
+
+#### Risparmio di Soldi e Gestione Errori
+*   **Smeargle Cheat Code:** Per il gruppo uovo "Campo", Smeargle può imparare qualsiasi mossa con *Schizzo* e passarla come Egg Move, evitando catene complesse.
+*   **Controllo delle Mosse:** Prima di confermare, controlla la schermata di anteprima. Se una mossa viene sovrascritta, puoi andare dal Ricordamosse o eliminare le mosse inutili dei genitori per forzare il passaggio di quella desiderata.
+*   **Il Trucco della Poké Ball:** Non spendere soldi per ball costose durante i passaggi intermedi. Puoi cambiare la ball del Pokémon finale cliccando sull'icona della ball nella sua scheda informativa (costa il prezzo della ball stessa).
+*   **Everstone Farming:** Puoi ottenere Pietrestanti selvatiche da Pokémon come Geodude o Roggenrola usando la mossa *Furto* e l'abilità *Indagine*.
+
+---
+
+### 6. Analisi Comparativa: Comprare vs. Breeddare
+Dalle fonti emerge una discrepanza tra il valore teorico e il mercato:
+*   **Breeding Manuale:** Solitamente più economico (es. un Larvitar 5x31 può costare ~500k-700k contro i ~900k-1M del GTL).
+*   **Rischio Natura:** Se all'ultimo step di un 5x31 esce una natura inutilizzabile, il valore del Pokémon crolla. In certi casi, conviene vendere il Pokémon "fallito" e ricominciare piuttosto che forzare la natura con un altro genitore 4x31/5x31, che costerebbe quanto comprare il Pokémon già finito.
+*   **Budget Comp:** Molti esperti suggeriscono che un 2x31 con le altre statistiche a 25+ è efficace al 99% rispetto a un 5x31 e costa una frazione del prezzo.
+
+***
+
+**Metafora per la comprensione:**
+Immagina il breeding come la costruzione di un grattacielo con i **LEGO**. Ogni piano è un IV a 31. Per aggiungere un nuovo piano (un nuovo IV), devi avere due edifici identici dell'altezza precedente e "fonderli" insieme. Se sbagli a mettere un mattoncino (la natura o un genere errato) all'ultimo piano, l'intero edificio potrebbe non stare in piedi (perdere valore di mercato), costringendoti a smantellarlo e riutilizzare i pezzi.
+------------------------------------
+La pianificazione di un Pokémon con statistiche perfette (comunemente un **5x31 o 6x31**) in PokeMMO segue una progressione geometrica ed economica rigorosa, basata sul sacrificio dei genitori. Per ottenere un risultato competitivo minimizzando i rischi e massimizzando i profitti, è necessario agire come un architetto, costruendo la struttura IV dopo IV.
+
+Ecco la scomposizione analitica per pianificare costi e generazioni:
+
+### 1. Pianificazione delle Generazioni (La Piramide del Breeding)
+Per ottenere un Pokémon **5x31**, la struttura teorica prevede l'utilizzo di **16 Pokémon base (1x31)**. Il processo si sviluppa in 5 fasi principali:
+*   **Fase 1 (8 accoppiamenti):** Si uniscono 16 Pokémon 1x31 per ottenere otto **2x31**.
+*   **Fase 2 (4 accoppiamenti):** Si uniscono gli otto 2x31 per ottenere quattro **3x31**.
+*   **Fase 3 (2 accoppiamenti):** Si uniscono i quattro 3x31 per ottenere due **4x31**.
+*   **Fase 4 (1 accoppiamento):** Si uniscono i due 4x31 per ottenere il **5x31** finale (senza natura garantita).
+*   **Fase 5 (Il "Nature Lock"):** Si accoppia il 5x31 ottenuto con un altro Pokémon compatibile (spesso un 4x31 o 5x31) che possiede la **Natura** desiderata, usando una **Pietrastante**.
+
+**Regola del "Match":** Per far progredire le generazioni senza perdere IV, i genitori devono avere statistiche identiche in comune tranne quella che si sta aggiungendo. Se entrambi i genitori hanno 31 in una statistica, il figlio la erediterà al 100% senza bisogno di strumenti, permettendo di usare i **Vigor-strumenti** per bloccare le altre statistiche differenti.
+
+### 2. Analisi dei Costi Fissi e Variabili
+Il budget deve essere pianificato considerando tre voci di spesa principali:
+
+#### A. Strumenti di Potere (Vigor-strumenti)
+Ogni bracciale costa **10.000$** (o 750 Punti Lotta). 
+*   Per un **5x31**, il solo costo dei bracciali ammonta a circa **300.000$**.
+*   Ogni accoppiamento consuma due bracciali (uno per genitore) fino a quando le statistiche non iniziano a sovrapporsi.
+
+#### B. Selezione del Genere
+Questa è la variabile più incisiva sul costo finale. Il prezzo per scegliere il sesso del nascituro dipende dal rapporto maschio/femmina della specie.
+*   Rapporto 50/50: **5.000$**.
+*   Rapporto 75/25: **9.000$**.
+*   Rapporto 87.5/12.5 (es. Starter o Eevee): **21.000$** per il sesso raro (femmina).
+*   **Pianificazione:** Per risparmiare, si consiglia di usare i maschi dei "gruppi uovo" più comuni (es. Campo) che costano meno sul GTL rispetto alla specie specifica che si sta creando.
+
+#### C. Natura e Pietrastante
+La **Pietrastante** garantisce la natura ma occupa lo slot di un Vigor-strumento. 
+*   Costo: circa **5.000$** (acquistabile o farmabile da Geodude/Roggenrola).
+*   Se si decide di bloccare la natura dall'inizio, il costo totale del breeding aumenta perché serviranno genitori con IV più alti per compensare lo slot occupato dalla pietra.
+
+### 3. Strategie di Ottimizzazione Economica
+Per non "buttare via milioni", gli esperti suggeriscono tre approcci:
+
+1.  **Sfruttare la randomicità:** Molti breeder non bloccano la natura fino all'ultimo step, sperando che un "roll" fortunato durante i passaggi intermedi generi la natura corretta, risparmiando il costo di un intero ramo di breeding.
+2.  **Vendere i "fallimenti":** Se all'ultimo step il 5x31 nasce con una natura inutilizzabile (es. Modesta su un Garchomp), spesso è più redditizio venderlo sul GTL e ricominciare piuttosto che spendere altri 400k-500k per correggere la natura con un nuovo genitore.
+3.  **Il "Budget Comp":** Un Pokémon **2x31** con le altre statistiche a **25+** costa circa **150k-250k**, contro gli **800k-1M** di un 5x31 perfetto, offrendo prestazioni pressoché identiche in PvP.
+
+### 4. Riepilogo Costi Totali (Esempio 5x31 Naturato)
+*   **Vigor-strumenti:** ~300.000$.
+*   **Selezione Genere:** Minimo 75.000$ (può raddoppiare per gli starter).
+*   **Pietrastante e Breed finale:** ~20.000$.
+*   **Costo complessivo stimato:** Dai **600.000$** agli **1.500.000$** a seconda della specie e della fortuna con le nature.
+
+**Strumento consigliato:** Utilizzare il simulatore di **PokéMMO Hub** o fogli di calcolo personalizzati per visualizzare l'albero genealogico prima di iniziare, evitando di comprare genitori incompatibili o con IV doppie inutili.
